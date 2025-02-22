@@ -24,6 +24,7 @@ model User {
   isHotelOwner           Boolean       @default(false)
   notifications          Notification[]
   hotelOwner             HotelOwner?   // Optional relation to HotelOwner if the user is a hotel owner
+  hotelOwnerId           Int?
 }
 
 model HotelOwner {
