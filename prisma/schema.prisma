@@ -12,3 +12,31 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                      Int           @id @default(autoincrement())
+  firstName              String
+  lastName               String
+  email                  String        @unique
+  profilePicture         String?       // profile picture URL
+  phoneNumber            String
+  unreadNotificationCount Int          @default(0)
+  isHotelOwner           Boolean       @default(false)
+  notifications          Notification[]
+  hotelOwner             HotelOwner?   // Optional relation to HotelOwner if the user is a hotel owner
+}
+
+model HotelOwner {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique          // One-to-one relationship with User
+  hotels    Hotel[]  // One-to-many relationship with hotels
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  message   String
+  read      Boolean  @default(false)
+}
