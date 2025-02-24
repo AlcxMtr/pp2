@@ -9,35 +9,144 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("file:./dev.db")
 }
+
 
 model User {
-  id                      Int           @id @default(autoincrement())
-  firstName              String
-  lastName               String
-  email                  String        @unique
-  profilePicture         String?       // profile picture URL
-  phoneNumber            String
-  unreadNotificationCount Int          @default(0)
-  isHotelOwner           Boolean       @default(false)
-  notifications          Notification[]
-  hotelOwner             HotelOwner?   // Optional relation to HotelOwner if the user is a hotel owner
-  hotelOwnerId           Int?
+  id             Int       @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String    @unique
+  password       String // HASHED
+  profilePicture String?
+  phoneNumber    String
+  role           Role      @default(USER)
+
+  hotels         Hotel[]
+  hotelBookings  HotelBooking[]
+  flightBookings FlightBooking[]
+  notifications  Notification[]
 }
 
-model HotelOwner {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int      @unique          // One-to-one relationship with User
-  hotels    Hotel[]  // One-to-many relationship with hotels
+enum Role {
+  USER
+  HOTEL_OWNER
 }
+
+
+model Hotel {
+  id          Int       @id @default(autoincrement())
+  name        String
+  logo        String?
+  address     String
+  location    String    // City, Country
+  starRating  Int
+
+  owner       User      @relation(fields: [ownerId], references: [id])
+  ownerId     Int
+  roomTypes   RoomType[]
+  bookings    HotelBooking[]
+  images      HotelImage[]
+}
+
+
+model HotelImage {
+  id      Int    @id @default(autoincrement())
+  url     String
+  hotel   Hotel  @relation(fields: [hotelId], references: [id])
+  hotelId Int
+}
+
+
+model RoomType {
+  id            Int       @id @default(autoincrement())
+  name          String    // "Twin", "Double", etc.
+  totalRooms    Int       // No. Available
+  pricePerNight Float
+
+  amenities     RoomTypeAmenity[]
+  hotel         Hotel           @relation(fields: [hotelId], references: [id])
+  hotelId       Int
+  images        RoomTypeImage[]
+}
+
+
+model RoomTypeImage {
+  id         Int       @id @default(autoincrement())
+  url        String
+  roomType   RoomType  @relation(fields: [roomTypeId], references: [id])
+  roomTypeId Int
+}
+
+
+model RoomTypeAmenity {
+  id         Int       @id @default(autoincrement())
+  name       String    // "Wi-Fi", "TV", etc.
+  roomType   RoomType  @relation(fields: [roomTypeId], references: [id])
+  roomTypeId Int
+}
+
+
+model Itinerary {
+  id               Int           @id @default(autoincrement())
+  user             User          @relation(fields: [userId], references: [id])
+  userId           Int
+  creditCardNumber String?       // **** + Last 4 Digits
+  cardExpiry       String?       
+  invoiceUrl       String?       // URL to PDF invoice
+
+  hotelBooking     HotelBooking? @relation(fields: [hotelBookingId], references: [id])
+  hotelBookingId   Int?          @unique
+  flightBooking    FlightBooking? @relation(fields: [flightBookingId], references: [id])
+  flightBookingId  Int?          @unique
+}
+
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model HotelBooking {
+  id            Int           @id @default(autoincrement())
+  hotel         Hotel         @relation(fields: [hotelId], references: [id])
+  hotelId       Int
+  roomType      RoomType      @relation(fields: [roomTypeId], references: [id])
+  roomTypeId    Int
+  checkInDate   DateTime
+  checkOutDate  DateTime
+  hotelPrice    Float
+  status        BookingStatus @default(PENDING)
+
+  itinerary     Itinerary     @relation(fields: [itineraryId], references: [id])
+  itineraryId   Int           @unique
+}
+
+
+model FlightBooking {
+  id                Int           @id @default(autoincrement())
+  flightBookingRef  String        // AFS Reference
+  flightTicketNumber String?      // AFS Ticket No.
+  flightPrice       Float
+  status            BookingStatus @default(PENDING)
+
+  itinerary         Itinerary     @relation(fields: [itineraryId], references: [id])
+  itineraryId       Int           @unique
+}
+
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  message   String
-  read      Boolean  @default(false)
+  id             Int           @id @default(autoincrement())
+  user           User          @relation(fields: [userId], references: [id])
+  userId         Int
+  message        String
+  isRead         Boolean       @default(false)
+
+  hotelBooking   HotelBooking? @relation(fields: [hotelBookingId], references: [id])
+  hotelBookingId Int?
+  flightBooking  FlightBooking? @relation(fields: [flightBookingId], references: [id])
+  flightBookingId Int?
 }
