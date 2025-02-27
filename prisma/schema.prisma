@@ -1,40 +1,33 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("file:./dev.db")
+  url      = "file:./dev.db"
 }
 
-
 model User {
-  id             Int       @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   firstName      String
   lastName       String
-  email          String    @unique
-  password       String // HASHED
+  email          String         @unique
+  password       String         // HASHED
   profilePicture String?
   phoneNumber    String
-  role           Role      @default(USER)
+  role           Role           @default(USER)
 
   hotels         Hotel[]
-  hotelBookings  HotelBooking[]
-  flightBookings FlightBooking[]
+  hotelBookings  HotelBooking[] // One-to-many with HotelBooking
+  flightBookings FlightBooking[] // One-to-many with FlightBooking
   notifications  Notification[]
+  itineraries    Itinerary[]    // Added inverse relation for Itinerary.user
 }
 
 enum Role {
   USER
   HOTEL_OWNER
 }
-
 
 model Hotel {
   id          Int       @id @default(autoincrement())
@@ -51,14 +44,12 @@ model Hotel {
   images      HotelImage[]
 }
 
-
 model HotelImage {
   id      Int    @id @default(autoincrement())
   url     String
   hotel   Hotel  @relation(fields: [hotelId], references: [id])
   hotelId Int
 }
-
 
 model RoomType {
   id            Int       @id @default(autoincrement())
@@ -70,8 +61,8 @@ model RoomType {
   hotel         Hotel           @relation(fields: [hotelId], references: [id])
   hotelId       Int
   images        RoomTypeImage[]
+  hotelBookings HotelBooking[]  // Added inverse relation for HotelBooking.roomType
 }
-
 
 model RoomTypeImage {
   id         Int       @id @default(autoincrement())
@@ -80,14 +71,12 @@ model RoomTypeImage {
   roomTypeId Int
 }
 
-
 model RoomTypeAmenity {
   id         Int       @id @default(autoincrement())
   name       String    // "Wi-Fi", "TV", etc.
   roomType   RoomType  @relation(fields: [roomTypeId], references: [id])
   roomTypeId Int
 }
-
 
 model Itinerary {
   id               Int           @id @default(autoincrement())
@@ -97,12 +86,9 @@ model Itinerary {
   cardExpiry       String?       
   invoiceUrl       String?       // URL to PDF invoice
 
-  hotelBooking     HotelBooking? @relation(fields: [hotelBookingId], references: [id])
-  hotelBookingId   Int?          @unique
-  flightBooking    FlightBooking? @relation(fields: [flightBookingId], references: [id])
-  flightBookingId  Int?          @unique
+  hotelBooking     HotelBooking? @relation("HotelBookingToItinerary")
+  flightBooking    FlightBooking? @relation("FlightBookingToItinerary")
 }
-
 
 enum BookingStatus {
   PENDING
@@ -121,10 +107,12 @@ model HotelBooking {
   hotelPrice    Float
   status        BookingStatus @default(PENDING)
 
-  itinerary     Itinerary     @relation(fields: [itineraryId], references: [id])
+  itinerary     Itinerary     @relation("HotelBookingToItinerary", fields: [itineraryId], references: [id])
   itineraryId   Int           @unique
+  user          User          @relation(fields: [userId], references: [id]) // Added inverse relation for User.hotelBookings
+  userId        Int
+  notifications Notification[] // Added inverse relation for Notification.hotelBooking
 }
-
 
 model FlightBooking {
   id                Int           @id @default(autoincrement())
@@ -133,10 +121,12 @@ model FlightBooking {
   flightPrice       Float
   status            BookingStatus @default(PENDING)
 
-  itinerary         Itinerary     @relation(fields: [itineraryId], references: [id])
+  itinerary         Itinerary     @relation("FlightBookingToItinerary", fields: [itineraryId], references: [id])
   itineraryId       Int           @unique
+  user              User          @relation(fields: [userId], references: [id]) // Added inverse relation for User.flightBookings
+  userId            Int
+  notifications     Notification[] // Added inverse relation for Notification.flightBooking
 }
-
 
 model Notification {
   id             Int           @id @default(autoincrement())
