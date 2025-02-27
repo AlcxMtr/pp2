@@ -54,7 +54,7 @@ model HotelImage {
 model RoomType {
   id            Int       @id @default(autoincrement())
   name          String    // "Twin", "Double", etc.
-  totalRooms    Int       // No. Available
+  totalRooms    Int       // No. Rooms (can't be num available since we would need a date range so is just num rooms of roomtype)
   pricePerNight Float
 
   amenities     RoomTypeAmenity[]
