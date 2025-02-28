@@ -62,6 +62,7 @@ export async function POST(request) {
     // Do hotel and room type exist?
     const hotel = await prisma.hotel.findUnique({
       where: { id: hotelId },
+      include: { owner: true },
     });
     if (!hotel) {
       return NextResponse.json(
@@ -111,15 +112,17 @@ export async function POST(request) {
       );
     }
 
+    // Itinerary should also be validated here
+
     const bookingData = {
-        hotel: { connect: { id: hotelId } }, // Explicitly connect the hotel relation
-        roomType: { connect: { id: roomTypeId } }, // Explicitly connect the roomType relation
-        checkInDate: checkIn,
-        checkOutDate: checkOut,
-        hotelPrice,
-        status,
-        user: { connect: { id: userId } }, // Explicitly connect the user relation
-        ...(itineraryId && { itinerary: { connect: { id: itineraryId } } }), // Only connect if itinerary exists
+      hotel: { connect: { id: hotelId } },
+      roomType: { connect: { id: roomTypeId } },
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      hotelPrice,
+      status,
+      user: { connect: { id: userId } },
+      ...(itineraryId ? { itinerary: { connect: { id: itineraryId } } } : {}),
     };
 
     const newBooking = await prisma.hotelBooking.create({
@@ -128,7 +131,16 @@ export async function POST(request) {
         hotel: true,
         roomType: true,
         user: true,
-        itinerary: itineraryId ? true : false,
+        itinerary: !!itineraryId,
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: hotel.ownerId,
+        message: `New booking for ${roomType.name} from ${checkIn.toISOString().split('T')[0]} to ${checkOut.toISOString().split('T')[0]} by ${user.firstName} ${user.lastName} (Status: ${status})`,
+        isRead: false,
+        hotelBookingId: newBooking.id,
       },
     });
 
