@@ -140,3 +140,22 @@ model Notification {
   flightBooking  FlightBooking? @relation(fields: [flightBookingId], references: [id])
   flightBookingId Int?
 }
+
+
+// Models to store cities and airports locally
+
+model City {
+  id        Int   @id @default(autoincrement())
+  name      String
+  country   String
+  airports  Airport[]
+}
+
+
+model Airport {
+  id        Int   @id @default(autoincrement())
+  code      String
+  name      String
+  cityId    Int
+  city      City     @relation(fields: [cityId], references: [id])
+}
