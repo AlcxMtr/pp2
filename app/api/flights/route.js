@@ -62,7 +62,7 @@ export async function GET(req) {
           params: { origin, destination, date },
           headers: { 'x-api-key': AFS_API_KEY },
         });
-        return response.data.result || [];
+        return response.data.results || [];
       };
   
   

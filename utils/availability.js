@@ -1,3 +1,5 @@
+import { prisma } from "@/utils/db";
+
 export async function getAvailableRooms(roomTypeId, checkInDate, checkOutDate) {
     const totalRooms = await prisma.roomType.findUnique({
         where: { id: roomTypeId },
