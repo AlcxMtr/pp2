@@ -27,7 +27,9 @@
 
 # Prisma
 prisma/.env
-prisma/migrations/
+
+# Database
+dev.db
 
 # production
 /build
