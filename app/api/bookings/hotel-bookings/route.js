@@ -135,15 +135,6 @@ export async function POST(request) {
       },
     });
 
-    await prisma.notification.create({
-      data: {
-        userId: hotel.ownerId,
-        message: `New booking for ${roomType.name} from ${checkIn.toISOString().split('T')[0]} to ${checkOut.toISOString().split('T')[0]} by ${user.firstName} ${user.lastName} (Status: ${status})`,
-        isRead: false,
-        hotelBookingId: newBooking.id,
-      },
-    });
-
     return NextResponse.json(newBooking, { status: 201 });
   } catch (error) {
     console.error('Error creating hotel booking:', error);
