@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 
+// This API route is responsible for finalizing the checkout process for an itinerary
+// It updates the itinerary status to CONFIRMED, as well as the status of any bookings within
+// It also sends a notification to the user to confirm the successful checkout
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -19,6 +23,31 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    if (typeof creditCardNumber !== 'string') {
+      return NextResponse.json(
+        { error: 'creditCardNumber must be a string' },
+        { status: 400 }
+      );
+    }
+  
+    if (typeof cardExpiry !== 'string') {
+      return NextResponse.json(
+        { error: 'cardExpiry must be a string' },
+        { status: 400 }
+      );
+    }
+  
+      /************************* 
+       TODO: NEED TO GENERATE INVOICE HERE 
+      **************************/
+
+      /* if (invoiceUrl && typeof invoiceUrl !== 'string') {
+        return NextResponse.json(
+          { error: 'invoiceUrl must be a string' },
+          { status: 400 }
+        );
+      } */
 
     // Validate creditCardNumber (four 4-digit groups, e.g., "2343 0231 1231 1233")
     if (!/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/.test(creditCardNumber)) {
@@ -63,6 +92,14 @@ export async function POST(request) {
       );
     }
 
+    // Check if itinerary is still PENDING
+    if (itinerary.status !== 'PENDING') {
+        return NextResponse.json(
+          { error: `Itinerary is already ${itinerary.status}. Checkout can only be performed on PENDING itineraries.` },
+          { status: 400 }
+        );
+      }
+
     // Check if there are bookings to finalize
     const hasHotelBooking = itinerary.hotelBooking && itinerary.hotelBooking.status === 'PENDING';
     const hasFlightBooking = itinerary.flightBooking && itinerary.flightBooking.status === 'PENDING';
@@ -74,10 +111,9 @@ export async function POST(request) {
       );
     }
 
-    // Prepare updates in a transaction
     const updates = [];
 
-    // Update itinerary with masked credit card (last 4 digits)
+    // Update itinerary with new completed details
     const lastFourDigits = creditCardNumber.slice(-4);
     updates.push(
       prisma.itinerary.update({
@@ -85,6 +121,7 @@ export async function POST(request) {
         data: {
           creditCardNumber: `**** **** **** ${lastFourDigits}`,
           cardExpiry,
+          status: 'CONFIRMED',
         },
       })
     );
@@ -125,7 +162,8 @@ export async function POST(request) {
       data: {
         userId: itinerary.userId,
         message: `Itinerary ${itineraryId} checkout completed. Bookings confirmed.`,
-        isRead: false,
+        hotelBookingId: hasHotelBooking ? itinerary.hotelBooking.id : null,
+        flightBookingId: hasFlightBooking ? itinerary.flightBooking.id : null,
       },
     });
 

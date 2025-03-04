@@ -24,14 +24,9 @@ export async function GET(request, { params }) {
           include: {
             hotel: true,    // Include Hotel details
             roomType: true, // Include RoomType details
-            user: true,     // Include User who made the booking
           },
         },
-        flightBooking: {
-          include: {
-            user: true,     // Include User who made the booking
-          },
-        },
+        flightBooking: true,
       },
     });
 

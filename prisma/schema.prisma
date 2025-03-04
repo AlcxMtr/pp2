@@ -78,6 +78,12 @@ model RoomTypeAmenity {
   roomTypeId Int
 }
 
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
 model Itinerary {
   id               Int           @id @default(autoincrement())
   user             User          @relation(fields: [userId], references: [id])
@@ -85,15 +91,10 @@ model Itinerary {
   creditCardNumber String?       // **** + Last 4 Digits
   cardExpiry       String?       
   invoiceUrl       String?       // URL to PDF invoice
+  status           BookingStatus @default(PENDING)
 
   hotelBooking     HotelBooking? @relation("HotelBookingToItinerary")
   flightBooking    FlightBooking? @relation("FlightBookingToItinerary")
-}
-
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
 }
 
 model HotelBooking {

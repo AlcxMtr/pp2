@@ -54,6 +54,13 @@ export async function POST(request) {
       );
     }
 
+    if (booking.status === 'PENDING') {
+        return NextResponse.json(
+          { error: "Booking hasn't been made yet" },
+          { status: 400 }
+        );
+      }
+
     const updatedBooking = await prisma.hotelBooking.update({
       where: { id: bookingId },
       data: { status: 'CANCELLED' },
