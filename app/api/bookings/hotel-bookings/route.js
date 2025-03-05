@@ -143,3 +143,99 @@ export async function POST(request) {
     );
   }
 }
+
+// Used grok AI for help with this
+// GET: hotel bookings for hotels owned by a specific owner
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const ownerId = searchParams.get('ownerId');
+
+    // Validate required fields
+    if (!ownerId) {
+      return NextResponse.json(
+        { error: 'Missing required query parameter: ownerId' },
+        { status: 400 }
+      );
+    }
+
+    const ownerIdNum = parseInt(ownerId);
+    if (isNaN(ownerIdNum)) {
+      return NextResponse.json(
+        { error: 'Invalid ownerId: must be a valid integer' },
+        { status: 400 }
+      );
+    }
+
+    // Does the owner even exist? 
+    const ownerExists = await prisma.user.findUnique({
+      where: { id: ownerIdNum },
+    });
+
+    if (!ownerExists) {
+      return NextResponse.json(
+        { error: `Owner with ID ${ownerId} does not exist` },
+        { status: 404 }
+      );
+    }
+    const hotels = await prisma.hotel.findMany({
+      where: { ownerId: ownerIdNum },
+      select: { id: true },
+    });
+
+    if (hotels.length === 0) {
+      return NextResponse.json(
+        { message: 'No hotels found for this owner', bookings: [] },
+        { status: 201 }
+      );
+    }
+
+    const hotelIds = hotels.map(hotel => hotel.id);
+
+    const bookings = await prisma.hotelBooking.findMany({
+      where: {
+        hotelId: { in: hotelIds },
+      },
+      include: {
+        hotel: {
+          select: {
+            id: true,
+            name: true,
+            location: true,
+          },
+        },
+        roomType: {
+          select: {
+            id: true,
+            name: true,
+            pricePerNight: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        itinerary: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: {
+        checkInDate: 'asc',
+      },
+    });
+
+    return NextResponse.json(bookings, { status: 201 });
+  } catch (error) {
+    console.error('Error fetching hotel bookings:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500 }
+    );
+  }
+}

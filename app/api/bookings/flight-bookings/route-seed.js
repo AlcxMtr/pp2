@@ -1,8 +1,12 @@
 const { NextResponse } = require('next/server');
-import { prisma } from "@/utils/db";
+const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
+
+const prisma = new PrismaClient();
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
+
 
 // Reusable function to create a flight booking
 async function createFlightBooking({ passportNumber, flightIds, userId, itineraryId, status}) {
