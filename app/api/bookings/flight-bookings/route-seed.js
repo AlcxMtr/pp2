@@ -1,7 +1,5 @@
 const { NextResponse } = require('next/server');
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+import { prisma } from "@/utils/db";
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/utils/db";
 import bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
 
 // Create a new user
 export async function POST(request) {

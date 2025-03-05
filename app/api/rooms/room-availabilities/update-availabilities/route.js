@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "@/utils/db";
 
 // PUT Update the number of available rooms for a room type
 export async function PUT(request) {

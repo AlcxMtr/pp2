@@ -1,9 +1,8 @@
 // This file was created with the help of GROK AI
 
-const { PrismaClient } = require('@prisma/client');
+import { prisma } from "@/utils/db";
 const { createFlightBooking } = require('../app/api/bookings/flight-bookings/route-seed');
 
-const prisma = new PrismaClient();
 
 async function seed() {
   try {

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/utils/db";
 
-const prisma = new PrismaClient();
 
 // POST  Create a new notification
 export async function POST(request) {

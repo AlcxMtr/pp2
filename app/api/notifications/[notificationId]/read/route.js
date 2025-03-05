@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/utils/db";
 
-const prisma = new PrismaClient();
 
 // PUT Mark a notification as read
 export async function PUT(request, { params }) {

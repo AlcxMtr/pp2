@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "@/utils/db";
 
 // GET Get the number of unread notifications for a user
 export async function GET(request) {
