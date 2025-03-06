@@ -105,11 +105,10 @@ model HotelBooking {
   roomTypeId    Int
   checkInDate   DateTime
   checkOutDate  DateTime
-  hotelPrice    Float
   status        BookingStatus @default(PENDING)
 
-  itinerary     Itinerary?    @relation("HotelBookingToItinerary", fields: [itineraryId], references: [id])
-  itineraryId   Int?          @unique
+  itinerary     Itinerary     @relation("HotelBookingToItinerary", fields: [itineraryId], references: [id])
+  itineraryId   Int           @unique
   user          User          @relation(fields: [userId], references: [id]) // Added inverse relation for User.hotelBookings
   userId        Int
   notifications Notification[] // Added inverse relation for Notification.hotelBooking
