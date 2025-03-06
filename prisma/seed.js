@@ -210,7 +210,6 @@ async function seed() {
         roomTypeId: deluxeSuiteId,
         checkInDate: new Date('2025-03-10T14:00:00Z'),
         checkOutDate: new Date('2025-03-12T11:00:00Z'),
-        hotelPrice: 300.0,
         status: 'CONFIRMED',
         itineraryId: itinerary1.id,
       },
@@ -223,7 +222,6 @@ async function seed() {
         roomTypeId: oceanSuiteId,
         checkInDate: new Date('2025-04-01T15:00:00Z'),
         checkOutDate: new Date('2025-04-03T12:00:00Z'),
-        hotelPrice: 600.0,
         status: 'CONFIRMED',
         itineraryId: itinerary2.id,
       },
@@ -236,7 +234,6 @@ async function seed() {
           roomTypeId: deluxeSuiteId,
           checkInDate: new Date('2025-03-10T14:00:00Z'),
           checkOutDate: new Date('2025-03-12T11:00:00Z'),
-          hotelPrice: 300.0,
           status: 'PENDING',
           itineraryId: itinerary3.id,
         },
@@ -249,7 +246,6 @@ async function seed() {
           roomTypeId: standardRoomId,
           checkInDate: new Date('2025-03-12T14:00:00Z'),
           checkOutDate: new Date('2025-03-14T11:00:00Z'),
-          hotelPrice: 150.0,
           status: 'PENDING',
           itineraryId: itinerary4.id,
         },
@@ -262,7 +258,6 @@ async function seed() {
           roomTypeId: standardRoomId,
           checkInDate: new Date('2025-03-12T14:00:00Z'),
           checkOutDate: new Date('2025-03-14T11:00:00Z'),
-          hotelPrice: 150.0,
           status: 'PENDING',
           itineraryId: itinerary5.id,
         },
@@ -272,7 +267,6 @@ async function seed() {
     await createFlightBooking({
       passportNumber: '123233333',
       flightIds: [
-        'bd7ee4df-004d-4c95-abda-633d276a5842',
         'f572ee8c-7db6-47ef-ac7d-fe1405c31323',
         '4dce2a75-2d6f-4906-a5b0-2d5a5e0c468d',
       ],
@@ -300,7 +294,7 @@ async function seed() {
 
     await createFlightBooking({
         passportNumber: '123515154',
-        flightIds: ['bd7ee4df-004d-4c95-abda-633d276a5842'],
+        flightIds: ['f572ee8c-7db6-47ef-ac7d-fe1405c31323'],
         userId: user3.id,
         itineraryId: itinerary4.id,
         status: 'PENDING',

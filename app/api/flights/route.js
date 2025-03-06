@@ -47,6 +47,20 @@ export async function GET(req) {
     if (!origin || !destination || !departureDate) {
       return NextResponse.json({ message: 'Origin, destination, and departure date required!' }, { status: 400 });
     }
+
+    if (isNaN(Date.parse(departureDate))) {
+      return NextResponse.json(
+        { message: 'Invalid departure date!' },
+        { status: 400 }
+      );
+    }
+    
+    if (returnDate && isNaN(Date.parse(returnDate))) {
+      return NextResponse.json(
+        { message: 'Invalid return date!' },
+        { status: 400 }
+      );
+    }
   
     try {
 
@@ -83,14 +97,24 @@ export async function GET(req) {
           return matchesOrigin && matchesDestination;
         });
       };
+      
+      // Ensure returned flights have available seats
+      const filterFlightsWithAvailableSeats = (flights) => {
+        return flights.filter((flight) => {
+          if (!flight.flights || flight.flights.length === 0) return false;
+          return flight.flights.every((leg) => leg.availableSeats > 0);
+        });
+      };
   
       let outboundFlights = await fetchFlights(originLocation.city, destinationLocation.city, departureDate);
       outboundFlights = validateAirports(outboundFlights, originLocation, destinationLocation);
+      outboundFlights = filterFlightsWithAvailableSeats(outboundFlights);
   
       let inboundFlights = null;
       if (returnDate) {
         inboundFlights = await fetchFlights(destinationLocation.city, originLocation.city, returnDate);
         inboundFlights = validateAirports(inboundFlights, destinationLocation, originLocation);
+        inboundFlights = filterFlightsWithAvailableSeats(inboundFlights);
       }
   
       return NextResponse.json({
