@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
     // Check id
     if (!hotel.ownerId || hotel.ownerId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }

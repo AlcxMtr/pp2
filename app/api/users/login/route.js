@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/utils/db";
-import { comparePassword, generateToken, generateRefreshToken } from "@/middleware/auth"
+import { isString, comparePassword, generateToken, generateRefreshToken } from "@/middleware/auth"
 
 export async function POST(request) {
   try {
@@ -8,7 +8,7 @@ export async function POST(request) {
     const { email, password } = await request.json();
 
     // Validate input
-    if (!email || !password /* || typeof username !== "string" || typeof password !== "string" */) {
+    if (!email || !password || !isString(email) || !isString(password)) {
       return NextResponse.json(
         { error: "Email and password are required and must be strings" },
         { status: 400 }

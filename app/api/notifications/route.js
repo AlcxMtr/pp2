@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
-
+import { verifyToken } from "@/middleware/auth"
 
 // POST  Create a new notification
 export async function POST(request) {
@@ -31,6 +31,21 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID or credentials" },
+        { status: 400 }
       );
     }
 

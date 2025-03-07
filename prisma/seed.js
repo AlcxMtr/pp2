@@ -268,8 +268,9 @@ async function seed() {
     await createFlightBooking({
       passportNumber: '123233333',
       flightIds: [
-        'f572ee8c-7db6-47ef-ac7d-fe1405c31323',
-        '4dce2a75-2d6f-4906-a5b0-2d5a5e0c468d',
+        '6bbb4978-6d03-4a11-b752-a3be17f202cb',
+        'abebdfe5-77e8-4d43-b277-437e81e311cf',
+        'c9355bd2-a5c0-48f9-a5ff-8d8d112c2426'
       ],
       userId: user1.id,
       itineraryId: itinerary1.id,
@@ -278,7 +279,7 @@ async function seed() {
 
     await createFlightBooking({
         passportNumber: '987654321',
-        flightIds: ['4dce2a75-2d6f-4906-a5b0-2d5a5e0c468d'],
+        flightIds: ['abebdfe5-77e8-4d43-b277-437e81e311cf'],
         userId: user2.id,
         itineraryId: itinerary2.id,
         status: 'CONFIRMED',
@@ -286,7 +287,7 @@ async function seed() {
 
     await createFlightBooking({
         passportNumber: '987654321',
-        flightIds: ['f572ee8c-7db6-47ef-ac7d-fe1405c31323'],
+        flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
         userId: user2.id,
         itineraryId: itinerary3.id,
         status: 'PENDING',
@@ -295,7 +296,7 @@ async function seed() {
 
     await createFlightBooking({
         passportNumber: '123515154',
-        flightIds: ['f572ee8c-7db6-47ef-ac7d-fe1405c31323'],
+        flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
         userId: user3.id,
         itineraryId: itinerary4.id,
         status: 'PENDING',

@@ -31,6 +31,14 @@ export async function GET(request, { params }) {
       },
     });
 
+    // Check if itinerary exists
+    if (!itinerary) {
+      return NextResponse.json(
+        { error: 'Itinerary not found' },
+        { status: 404 }
+      );
+    }
+
     // Authenticate user
     const authResult = verifyToken(request);
     if (authResult instanceof NextResponse) {
@@ -41,16 +49,8 @@ export async function GET(request, { params }) {
     // Check id
     if (!itinerary.userId || itinerary.userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
-      );
-    }
-
-    // Check if itinerary exists
-    if (!itinerary) {
-      return NextResponse.json(
-        { error: 'Itinerary not found' },
-        { status: 404 }
       );
     }
 

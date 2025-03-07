@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import { getAvailableRooms } from '@/utils/availability';
-import { verifyToken } from '@/middleware/auth';
+import { isString, verifyToken } from '@/middleware/auth';
 
 // Create a new hotel
 export async function POST(request) {
@@ -26,6 +26,16 @@ export async function POST(request) {
       );
     }
 
+    if ((name && !isString(name)) ||
+      (address && !isString(address)) ||
+      (location && !isString(location)) ||
+      (logo && !isString(logo))) {
+      return NextResponse.json(
+        { error: 'Sent non-string for name, address, location, or logo' },
+        { status: 400 }
+      );
+    }
+
     // Authenticate user
     const authResult = verifyToken(request);
     if (authResult instanceof NextResponse) {
@@ -40,6 +50,8 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    //TODO: If a user made a hotel, make their role "HOTEL_OWNER"
 
     // Star rating must be between 1 and 5
     if (!Number.isInteger(starRating) || starRating < 1 || starRating > 5) {

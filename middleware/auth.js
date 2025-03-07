@@ -1,4 +1,4 @@
-// File created with help from lecture code and Grok AI
+// File created with help from lecture slides and Grok AI
 const { NextResponse } = require('next/server');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -7,6 +7,10 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 const TOKEN_EXPIRY_TIME = process.env.TOKEN_EXPIRY_TIME;
 const REFRESH_EXPIRY_TIME = process.env.REFRESH_EXPIRY_TIME;
 const BCRYPT_ROUNDS = process.env.BCRYPT_ROUNDS;
+
+function isString(value) {
+  return typeof value === 'string';
+}
 
 function hashPassword(password) {
   return bcrypt.hashSync(password, parseInt(BCRYPT_ROUNDS));
@@ -75,6 +79,7 @@ function verifyRefreshToken(request) {
 }
 
 module.exports = {
+  isString,
   hashPassword,
   comparePassword,
   generateToken,

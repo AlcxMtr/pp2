@@ -35,7 +35,7 @@ export async function POST(request) {
     // Check id
     if (!userId || userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }
@@ -65,27 +65,27 @@ export async function POST(request) {
 
     // Validate itinerary's existence
     const itinerary = await prisma.itinerary.findUnique({
-        where: { id: itineraryId },
-      });
-      if (!itinerary) {
-        return NextResponse.json(
-          { error: 'Itinerary not found' },
-          { status: 404 }
-        );
-      }
-    
-      // Check for existing booking under this itinerary
-      const existingFlightBooking = await prisma.flightBooking.findFirst({
-        where: { itineraryId },
-      });
-      if (existingFlightBooking) {
-        // Delete the existing booking since we are replacing it with a new one
-        await prisma.$transaction([
-          prisma.flightBooking.delete({
-            where: { id: existingFlightBooking.id },
-          }),
-        ]);
-      }
+      where: { id: itineraryId },
+    });
+    if (!itinerary) {
+      return NextResponse.json(
+        { error: 'Itinerary not found' },
+        { status: 404 }
+      );
+    }
+  
+    // Check for existing booking under this itinerary
+    const existingFlightBooking = await prisma.flightBooking.findFirst({
+      where: { itineraryId },
+    });
+    if (existingFlightBooking) {
+      // Delete the existing booking since we are replacing it with a new one
+      await prisma.$transaction([
+        prisma.flightBooking.delete({
+          where: { id: existingFlightBooking.id },
+        }),
+      ]);
+    }
 
     // Call external AFS API to get booking reference
     const afsResponse = await fetch(`${AFS_BASE_URL}/api/bookings`, {

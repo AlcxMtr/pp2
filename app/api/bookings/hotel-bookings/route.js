@@ -14,14 +14,15 @@ export async function POST(request) {
       checkOutDate,
       hotelPrice,
       userId,
-      status = 'PENDING',
       itineraryId,
     } = body;
 
+    const status = 'PENDING';
+
     // Validation for required fields
-    if (!hotelId || !roomTypeId || !checkInDate || !checkOutDate || !hotelPrice || !userId) {
+    if (!hotelId || !roomTypeId || !checkInDate || !checkOutDate || !hotelPrice || !userId || !itineraryId) {
       return NextResponse.json(
-        { error: 'Missing required fields: hotelId, roomTypeId, checkInDate, checkOutDate, hotelPrice, or userId' },
+        { error: 'Missing required fields: hotelId, roomTypeId, checkInDate, checkOutDate, hotelPrice, userId, or itineraryId' },
         { status: 400 }
       );
     }
@@ -36,7 +37,7 @@ export async function POST(request) {
     // Check id
     if (!userId || userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }
@@ -61,14 +62,6 @@ export async function POST(request) {
     if (typeof hotelPrice !== 'number' || hotelPrice <= 0) {
       return NextResponse.json(
         { error: 'hotelPrice must be a positive number' },
-        { status: 400 }
-      );
-    }
-
-    // status must be either PENDING, CONFIRMED, or CANCELLED
-    if (!['PENDING', 'CONFIRMED', 'CANCELLED'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status: must be PENDING, CONFIRMED, or CANCELLED' },
         { status: 400 }
       );
     }
@@ -128,15 +121,37 @@ export async function POST(request) {
 
     // Itinerary should also be validated here
 
+    const itinerary = await prisma.itinerary.findUnique({
+      where: { id: itineraryId },
+    });
+    if (!itinerary || itinerary.userId !== userId) {
+      return NextResponse.json(
+        { error: 'Itinerary not found or belong to another user' },
+        { status: 404 }
+      );
+    }
+
+    // Check for existing booking under this itinerary
+    const existingHotelBooking = await prisma.hotelBooking.findFirst({
+      where: { itineraryId },
+    });
+    if (existingHotelBooking) {
+      // Delete the existing booking since we are replacing it with a new one
+      await prisma.$transaction([
+        prisma.hotelBooking.delete({
+          where: { id: existingHotelBooking.id },
+        }),
+      ]);
+    }
+
     const bookingData = {
       hotel: { connect: { id: hotelId } },
       roomType: { connect: { id: roomTypeId } },
       checkInDate: checkIn,
       checkOutDate: checkOut,
-      hotelPrice,
       status,
       user: { connect: { id: userId } },
-      ...(itineraryId ? { itinerary: { connect: { id: itineraryId } } } : {}),
+      itinerary: { connect: { id: itineraryId } },
     };
 
     const newBooking = await prisma.hotelBooking.create({
@@ -149,6 +164,13 @@ export async function POST(request) {
       },
     });
 
+    if (!newBooking) {
+      return NextResponse.json(
+        { error: 'Error creating hotel booking' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(newBooking, { status: 201 });
   } catch (error) {
     console.error('Error creating hotel booking:', error);
@@ -158,6 +180,9 @@ export async function POST(request) {
     );
   }
 }
+
+
+
 
 // Used grok AI for help with this
 // GET: hotel bookings for hotels owned by a specific owner
@@ -193,6 +218,22 @@ export async function GET(request) {
         { status: 404 }
       );
     }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (ownerId != authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID or credentials" },
+        { status: 400 }
+      );
+    }
+
     const hotels = await prisma.hotel.findMany({
       where: { ownerId: ownerIdNum },
       select: { id: true },

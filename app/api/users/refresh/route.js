@@ -3,14 +3,6 @@ import { verifyRefreshToken, generateToken } from "@/middleware/auth"
 
 export async function POST(request) {
   try {
-    // Validate secrets
-    if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
-      return NextResponse.json(
-        { error: 'Server configuration error: Missing token secrets' },
-        { status: 500 }
-      );
-    }
-
     const authResult = verifyRefreshToken(request);
     if (authResult instanceof NextResponse) {
       return authResult;

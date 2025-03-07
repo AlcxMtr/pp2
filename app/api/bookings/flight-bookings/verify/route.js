@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
-import { verifyToken } from "@/middleware/auth";
+import { isString, verifyToken } from "@/middleware/auth";
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
@@ -43,7 +43,7 @@ export async function GET(request) {
     // Check id
     if (!flightBooking.userId || flightBooking.userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }

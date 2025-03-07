@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/utils/db";
-import { verifyToken } from "@/middleware/auth"
+import { isString, verifyToken } from "@/middleware/auth"
 
 export async function POST(request) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request) {
     // Check id
     if (!id || id !== userId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }
@@ -27,6 +27,18 @@ export async function POST(request) {
     if (!firstName && !lastName && !email && !profilePicture && !phoneNumber) {
       return NextResponse.json(
         { error: 'At least one field (firstName, lastName, email, profilePicture, phoneNumber) must be provided' },
+        { status: 400 }
+      );
+    }
+
+    if ((firstName && (!isString(firstName) || (firstName.trim() === ''))) ||
+        (lastName && (!isString(lastName) || (lastName.trim() === ''))) ||
+        (email && (!isString(email) || (email.trim() === ''))) ||
+        (profilePicture && (!isString(profilePicture) || (profilePicture.trim() === ''))) ||
+        (phoneNumber && (!isString(phoneNumber) || (phoneNumber.trim() === '')))) 
+    {
+      return NextResponse.json(
+        { error: 'All user data must be sent as non-empty strings' },
         { status: 400 }
       );
     }
@@ -46,22 +58,10 @@ export async function POST(request) {
     const updateData = {};
 
     if (firstName) {
-      if (typeof firstName !== 'string' || firstName.trim() === '') {
-        return NextResponse.json(
-          { error: 'Invalid firstName: must be a non-empty string' },
-          { status: 400 }
-        );
-      }
       updateData.firstName = firstName.trim();
     }
 
     if (lastName) {
-      if (typeof lastName !== 'string' || lastName.trim() === '') {
-        return NextResponse.json(
-          { error: 'Invalid lastName: must be a non-empty string' },
-          { status: 400 }
-        );
-      }
       updateData.lastName = lastName.trim();
     }
 
@@ -88,23 +88,11 @@ export async function POST(request) {
       updateData.email = email;
     }
 
-    if (profilePicture !== undefined) {
-      if (profilePicture !== null && (typeof profilePicture !== 'string' || profilePicture.trim() === '')) {
-        return NextResponse.json(
-          { error: 'Invalid profilePicture: must be a non-empty string or null' },
-          { status: 400 }
-        );
-      }
+    if (profilePicture) {
       updateData.profilePicture = profilePicture === null ? null : profilePicture.trim();
     }
 
     if (phoneNumber) {
-      if (typeof phoneNumber !== 'string' || phoneNumber.trim() === '') {
-        return NextResponse.json(
-          { error: 'Invalid phoneNumber: must be a non-empty string' },
-          { status: 400 }
-        );
-      }
       updateData.phoneNumber = phoneNumber.trim();
     }
 

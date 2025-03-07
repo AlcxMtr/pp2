@@ -103,7 +103,7 @@ export async function POST(request) {
     // Check id
     if (!itinerary.userId || itinerary.userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }

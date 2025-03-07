@@ -31,7 +31,7 @@ export async function PUT(request) {
     // Check id
     if (!ownerId || ownerId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }

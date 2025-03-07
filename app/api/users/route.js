@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import bcrypt from 'bcrypt';
+import { isString } from "@/middleware/auth"
 
 
 // Create a new user
@@ -21,6 +22,20 @@ export async function POST(request) {
     if (!firstName || !lastName || !email || !password || !phoneNumber) {
       return NextResponse.json(
         { error: 'Missing required fields: firstName, lastName, email, password, or phoneNumber' },
+        { status: 400 }
+      );
+    }
+
+    // Validate strings
+    if (
+      !isString(firstName) || (firstName.trim() === '') ||
+      !isString(lastName) || (lastName.trim() === '') ||
+      !isString(email) || (email.trim() === '') ||
+      !isString(password) || (password.trim() === '') ||
+      !isString(phoneNumber) || (phoneNumber.trim() === '')
+    ) {
+      return NextResponse.json(
+        { error: "All user data must be sent as non-empty strings" },
         { status: 400 }
       );
     }
