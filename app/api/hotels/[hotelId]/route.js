@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import { getAvailableRooms } from '@/utils/availability';
-import { verifyToken } from '@/middleware/auth';
 
 
 export async function GET(req, { params }) {
@@ -35,21 +34,6 @@ export async function GET(req, { params }) {
       return NextResponse.json(
         { message: 'Hotel not found' },
         { status: 404 }
-      );
-    }
-
-    // Authenticate user
-    const authResult = verifyToken(request);
-    if (authResult instanceof NextResponse) {
-      return authResult; // Return error response directly
-    }
-    const authUserId = authResult.userId;
-
-    // Check id
-    if (!hotel.ownerId || hotel.ownerId !== authUserId) {
-      return NextResponse.json(
-        { error: "Invalid user ID or credentials" },
-        { status: 400 }
       );
     }
 
