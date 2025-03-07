@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
@@ -20,6 +21,21 @@ export async function POST(request) {
     if (!passportNumber || !flightIds || !userId || !itineraryId) {
       return NextResponse.json(
         { error: 'Missing required fields: email, firstName, lastName, passportNumber, flightIds, flightPrice, or userId' },
+        { status: 400 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
         { status: 400 }
       );
     }

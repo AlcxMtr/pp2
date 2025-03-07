@@ -10,12 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 
-# Environment variables (can opt-in for committing if needed)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Environment variables (commiting to make testing easier for TAs)
+# .env
 
 # testing
 /coverage

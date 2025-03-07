@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 
 // PUT Mark a notification as read
@@ -18,6 +19,21 @@ export async function PUT(request, { params }) {
     if (!userId) {
       return NextResponse.json(
         { error: 'Missing required parameter: userId' },
+        { status: 400 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
         { status: 400 }
       );
     }

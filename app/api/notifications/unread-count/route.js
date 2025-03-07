@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 // GET Get the number of unread notifications for a user
 export async function GET(request) {
@@ -23,6 +24,21 @@ export async function GET(request) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
       );
     }
 

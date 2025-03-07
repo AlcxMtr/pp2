@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 export async function POST(request) {
   try {
@@ -27,6 +28,21 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Flight booking not found' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!flightBooking.userId || flightBooking.userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
       );
     }
 

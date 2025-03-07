@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 export async function GET(request, { params }) {
   try {
@@ -29,6 +30,21 @@ export async function GET(request, { params }) {
         flightBooking: true,
       },
     });
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!itinerary.userId || itinerary.userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
 
     // Check if itinerary exists
     if (!itinerary) {

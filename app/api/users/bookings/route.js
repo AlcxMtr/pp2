@@ -1,11 +1,27 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 export async function GET(request) {
   try {
     // Extract userId from query parameters (e.g., ?userId=1)
     const { searchParams } = new URL(request.url);
     const userId = parseInt(searchParams.get('userId'), 10);
+    
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
 
     // Validate userId
     if (!userId || isNaN(userId)) {

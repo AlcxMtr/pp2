@@ -2,6 +2,7 @@
 
 const { PrismaClient } = require('@prisma/client');
 const { createFlightBooking } = require('../app/api/bookings/flight-bookings/route-seed');
+const { hashPassword } = require('../middleware/auth');
 
 const prisma = new PrismaClient();
 
@@ -27,7 +28,7 @@ async function seed() {
         firstName: 'Jane',
         lastName: 'Doe',
         email: 'jane.doe@example.com',
-        password: '$2b$10$KIXe./zGZuMJDvXgW6JqMe8uO6z6sX4Qz5fG9W8gQz5fG9W8gQz5f',
+        password: hashPassword('111'),
         profilePicture: 'https://example.com/jane.jpg',
         phoneNumber: '123-456-7890',
         role: 'USER',
@@ -39,7 +40,7 @@ async function seed() {
         firstName: 'John',
         lastName: 'Smith',
         email: 'john.smith@example.com',
-        password: '$2b$10$KIXe./zGZuMJDvXgW6JqMe8uO6z6sX4Qz5fG9W8gQz5fG9W8gQz5f',
+        password: hashPassword('222'),
         profilePicture: 'https://example.com/john.jpg',
         phoneNumber: '987-654-3210',
         role: 'HOTEL_OWNER',
@@ -51,7 +52,7 @@ async function seed() {
           firstName: 'Kevin',
           lastName: 'Nguyen',
           email: 'kevngu21@example.com',
-          password: '$3asdff$KIXe./zGsdfsdfsO6z6sXsffsdf9W8gQzsdf5fasd423',
+          password: hashPassword('333'),
           profilePicture: 'https://example.com/kev.jpg',
           phoneNumber: '647-123-3265',
           role: 'USER',

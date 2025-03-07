@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth";
 
 // This route create a new itinerary ONLY if no existing PENDING itinerary exists
 // If a PENDING itinerary exists, it returns the PENDING itinerary
@@ -14,6 +15,21 @@ export async function POST(request) {
     if (!userId) {
       return NextResponse.json(
         { error: 'Missing required field: userId' },
+        { status: 400 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!userId || userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
         { status: 400 }
       );
     }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth";
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
@@ -29,6 +30,21 @@ export async function GET(request) {
       return NextResponse.json(
         { error: 'Flight booking not found in local database' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!flightBooking.userId || flightBooking.userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
       );
     }
 

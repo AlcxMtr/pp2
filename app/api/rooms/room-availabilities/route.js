@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 // GET Fetch room availability for a room type within a date range
 export async function GET(request) {
@@ -17,6 +18,22 @@ export async function GET(request) {
         { status: 400 }
       );
     }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!ownerId || ownerId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
+
     if (!startDate || !endDate) {
       return NextResponse.json(
         { error: 'Missing required parameters: startDate or endDate' },

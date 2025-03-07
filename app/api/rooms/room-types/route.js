@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 // Create a new room type
 export async function POST(request) {
@@ -47,6 +48,21 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Hotel not found' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!hotel.ownerId || hotel.ownerId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid Hotel Owner" },
+        { status: 400 }
       );
     }
 

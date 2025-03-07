@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
+import { verifyToken } from "@/middleware/auth"
 
 // This API route is responsible for finalizing the checkout process for an itinerary
 // It updates the itinerary status to CONFIRMED, as well as the status of any bookings within
@@ -89,6 +90,21 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
         { status: 404 }
+      );
+    }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!itinerary.userId || itinerary.userId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
       );
     }
 

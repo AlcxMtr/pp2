@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
-
+import { verifyToken } from '@/middleware/auth';
 
 // POST Cancel a hotel booking
 export async function POST(request) {
@@ -18,6 +18,22 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+
+    // Authenticate user
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response directly
+    }
+    const authUserId = authResult.userId;
+
+    // Check id
+    if (!ownerId || ownerId !== authUserId) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
+
     if (!bookingId) {
       return NextResponse.json(
         { error: 'Missing required field: bookingId' },
