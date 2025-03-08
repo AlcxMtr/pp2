@@ -1,0 +1,1831 @@
+{
+	"info": {
+		"_postman_id": "477d37f9-88ec-45b9-be9a-ff8aa67648fa",
+		"name": "PP1 Postman Collection",
+		"description": "In this collection, we tested our API endpoints for the PP1 deliverable. All endpoints were tested with a sample request that matched their use cases. Feel free to play with the requests to see the behaviour of the endpoints :)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33452893",
+		"_collection_link": "https://csc309-team.postman.co/workspace/CSC309-Project~bd46acef-ce83-4a53-9c4c-5354154d341b/collection/33452893-477d37f9-88ec-45b9-be9a-ff8aa67648fa?action=share&source=collection_link&creator=33452893"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Test for response body properties",
+									"pm.test(\"Response body has required properties\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('id');",
+									"    pm.expect(pm.response.json()).to.have.property('firstName');",
+									"    pm.expect(pm.response.json()).to.have.property('lastName');",
+									"    pm.expect(pm.response.json()).to.have.property('email');",
+									"    pm.expect(pm.response.json()).to.have.property('profilePicture');",
+									"    pm.expect(pm.response.json()).to.have.property('phoneNumber');",
+									"    pm.expect(pm.response.json()).to.have.property('role');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Joseph\",\n  \"lastName\": \"Doe\",\n  \"email\": \"jopseph.doe@example.com\",\n  \"password\": \"444\",\n  \"phoneNumber\": \"123-456-7890\",\n  \"role\": \"HOTEL_OWNER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+					},
+					"response": []
+				},
+				{
+					"name": "View Bookings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/users/bookings?userId=23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "23"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 23,\r\n    \"firstName\": \"Anna\",\r\n    \"lastName\": \"Bretscher\",\r\n    \"email\": \"anna@email.com\",\r\n    \"profilePicture\": \"profile.picture.com\",\r\n    \"phoneNumber\": \"123 431 1231\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/edit-profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"edit-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"accessToken\", jsonData.accessToken);\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"refreshToken\", jsonData.refreshToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"jane.doe@example.com\",\r\n    \"password\": \"111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"accessToken\", jsonData.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refreshToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Autocomplete",
+			"item": [
+				{
+					"name": "Get Suggestions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/autocomplete?query=or",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"autocomplete"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "or"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Flight Info",
+			"item": [
+				{
+					"name": "Retrieve Available Flights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/flights?origin=YYZ&destination=Paris&departureDate=2024-11-16&returnDate=2024-12-24",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"flights"
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "YYZ"
+								},
+								{
+									"key": "destination",
+									"value": "Paris"
+								},
+								{
+									"key": "departureDate",
+									"value": "2024-11-16"
+								},
+								{
+									"key": "returnDate",
+									"value": "2024-12-24"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Hotels",
+			"item": [
+				{
+					"name": "Retrieve Available Hotels",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/hotels?checkInDate=2025-03-10&checkOutDate=2025-03-12&city=Vancouver&minPrice=150&starRating=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"hotels"
+							],
+							"query": [
+								{
+									"key": "checkInDate",
+									"value": "2025-03-10"
+								},
+								{
+									"key": "checkOutDate",
+									"value": "2025-03-12"
+								},
+								{
+									"key": "city",
+									"value": "Vancouver"
+								},
+								{
+									"key": "minPrice",
+									"value": "150"
+								},
+								{
+									"key": "starRating",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Hotel Details",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/hotels/8?checkInDate=2025-03-10&checkOutDate=2025-03-12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"hotels",
+								"8"
+							],
+							"query": [
+								{
+									"key": "checkInDate",
+									"value": "2025-03-10"
+								},
+								{
+									"key": "checkOutDate",
+									"value": "2025-03-12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Hotel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Seaside Resort2\",\n  \"address\": \"123 Ocean Drive\",\n  \"logo\": \"https://example.com/logo.png\",\n  \"location\": \"Miami, USA\",\n  \"starRating\": 4,\n  \"ownerId\": 24,\n  \"images\": [\n    {\"url\": \"https://example.com/hotel-front.jpg\"},\n    {\"url\": \"https://example.com/hotel-pool.jpg\"}\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/hotels",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"hotels"
+							]
+						},
+						"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Room Types",
+			"item": [
+				{
+					"name": "Create New Room Type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"// Test for the presence of required fields",
+									"pm.test(\"Verify the response contains the 'id' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('id');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'name' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('name');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'totalRooms' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('totalRooms');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'pricePerNight' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('pricePerNight');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'hotelId' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('hotelId');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'amenities' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('amenities');",
+									"});",
+									"",
+									"pm.test(\"Verify the response contains the 'images' field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('images');",
+									"});",
+									"",
+									"// Test for the array length of 'amenities' and 'images'",
+									"pm.test(\"Verify the length of the 'amenities' array\", function () {",
+									"    pm.expect(pm.response.json().amenities).to.have.length(3);",
+									"});",
+									"",
+									"pm.test(\"Verify the length of the 'images' array\", function () {",
+									"    pm.expect(pm.response.json().images).to.have.length(2);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Double\",\n  \"totalRooms\": 10,\n  \"pricePerNight\": 160.0,\n  \"hotelId\": 17,\n  \"amenities\": [\n    { \"name\": \"Wi-Fi\" },\n    { \"name\": \"TV\" },\n    { \"name\": \"Mini Bar\" }\n  ],\n  \"images\": [\n    { \"url\": \"https://example.com/double-room-1.jpg\" },\n    { \"url\": \"https://example.com/double-room-2.jpg\" }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/rooms/room-types",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"rooms",
+								"room-types"
+							]
+						},
+						"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Room Availability",
+			"item": [
+				{
+					"name": "Retrieve Room Availability Per Room Type, with Date Filtering",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/rooms/room-availabilities?ownerId=24&startDate=2025-03-01&endDate=2025-03-05",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"rooms",
+								"room-availabilities"
+							],
+							"query": [
+								{
+									"key": "ownerId",
+									"value": "24"
+								},
+								{
+									"key": "startDate",
+									"value": "2025-03-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-03-05"
+								}
+							]
+						},
+						"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Num Available Rooms",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomTypeId\": 24,\n  \"newTotalRooms\": 7\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/rooms/room-availabilities/update-availabilities?ownerId=24",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"rooms",
+								"room-availabilities",
+								"update-availabilities"
+							],
+							"query": [
+								{
+									"key": "ownerId",
+									"value": "24"
+								}
+							]
+						},
+						"description": "This endpoint will delete an account by passing in the account `id` as a path parameter.\n\n### Important!\n\nOnce an account is deleted, it cannot be restored, so please use this endpoint with caution.\n\nAdditionally, only bank admins have permission to update an account. You may encounter a `403 Forbidden` error if you try to update an account without the correct permissions."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Hotels",
+					"item": [
+						{
+							"name": "Create New Hotel Booking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"hotelId\": 16,\n  \"roomTypeId\": 24,\n  \"checkInDate\": \"2025-03-01\",\n  \"checkOutDate\": \"2025-03-05\",\n  \"userId\": 24,\n  \"itineraryId\": 29\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/hotel-bookings",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"hotel-bookings"
+									]
+								},
+								"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve All Bookings for a Hotel",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/hotel-bookings?ownerId=24",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"hotel-bookings"
+									],
+									"query": [
+										{
+											"key": "owner",
+											"value": "Nova Newman",
+											"description": "(Optional) filter by full name of the account owner",
+											"disabled": true
+										},
+										{
+											"key": "ownerId",
+											"value": "24"
+										}
+									]
+								},
+								"description": "This endpoint will list all accounts that exist at the Intergalactic Bank. Optionally, filter by `owner` (using a full name), or the `createdAt` date (using `YYYY-MM-DD` format)."
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve Hotel Bookings Filtered By Date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/hotel-bookings?startDate=2025-03-01&endDate=2025-03-10\"&ownerId=18",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"hotel-bookings"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-03-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-03-10\""
+										},
+										{
+											"key": "owner",
+											"value": "Nova Newman",
+											"description": "(Optional) filter by full name of the account owner",
+											"disabled": true
+										},
+										{
+											"key": "ownerId",
+											"value": "18"
+										}
+									]
+								},
+								"description": "This endpoint will list all accounts that exist at the Intergalactic Bank. Optionally, filter by `owner` (using a full name), or the `createdAt` date (using `YYYY-MM-DD` format)."
+							},
+							"response": []
+						},
+						{
+							"name": "Retrieve Hotel Bookings Filtered By Room Type",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/hotel-bookings?ownerId=18&roomTypeId=14",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"hotel-bookings"
+									],
+									"query": [
+										{
+											"key": "owner",
+											"value": "Nova Newman",
+											"description": "(Optional) filter by full name of the account owner",
+											"disabled": true
+										},
+										{
+											"key": "ownerId",
+											"value": "18"
+										},
+										{
+											"key": "roomTypeId",
+											"value": "14"
+										}
+									]
+								},
+								"description": "This endpoint will list all accounts that exist at the Intergalactic Bank. Optionally, filter by `owner` (using a full name), or the `createdAt` date (using `YYYY-MM-DD` format)."
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Hotel Reservation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var response = pm.response.text()",
+											"",
+											"// Test the response body structure",
+											"pm.test(\"Response body to be empty\", function () {",
+											"    pm.expect(response).to.be.empty;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"bookingId\": 23\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/hotel-bookings/cancel?ownerId=24",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"hotel-bookings",
+										"cancel"
+									],
+									"query": [
+										{
+											"key": "ownerId",
+											"value": "24"
+										}
+									]
+								},
+								"description": "This endpoint will delete an account by passing in the account `id` as a path parameter.\n\n### Important!\n\nOnce an account is deleted, it cannot be restored, so please use this endpoint with caution.\n\nAdditionally, only bank admins have permission to update an account. You may encounter a `403 Forbidden` error if you try to update an account without the correct permissions."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Flights",
+					"item": [
+						{
+							"name": "Create New Flight Booking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is less than 200ms\", function () {\r",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate the response properties\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.id).to.exist;\r",
+											"    pm.expect(responseData.flightBookingRef).to.exist;\r",
+											"    pm.expect(responseData.flightTicketNumber).to.exist;\r",
+											"    pm.expect(responseData.flightPrice).to.exist;\r",
+											"    pm.expect(responseData.status).to.exist;\r",
+											"    pm.expect(responseData.itineraryId).to.exist;\r",
+											"    pm.expect(responseData.userId).to.exist;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"User object should have specific properties\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(responseData.user).to.be.an('object');\r",
+											"    pm.expect(responseData.user).to.have.property('id').that.is.a('number');\r",
+											"    pm.expect(responseData.user).to.have.property('firstName').that.is.a('string');\r",
+											"    pm.expect(responseData.user).to.have.property('lastName').that.is.a('string');\r",
+											"    pm.expect(responseData.user).to.have.property('email').that.is.a('string');\r",
+											"    pm.expect(responseData.user).to.have.property('password').that.is.a('string');\r",
+											"    pm.expect(responseData.user).to.have.property('profilePicture').that.is.null;\r",
+											"    pm.expect(responseData.user).to.have.property('phoneNumber').that.is.a('string');\r",
+											"    pm.expect(responseData.user).to.have.property('role').that.is.a('string');\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validate the 'itinerary' object properties\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"\r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.itinerary).to.exist.and.to.be.an('object');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('id');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('userId');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('creditCardNumber');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('cardExpiry');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('invoiceUrl');\r",
+											"    pm.expect(responseData.itinerary).to.have.property('status');\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"passportNumber\": \"123233333\",\r\n  \"flightIds\": [\"c9355bd2-a5c0-48f9-a5ff-8d8d112c2426\"],\r\n  \"userId\": 23,\r\n  \"itineraryId\": 31\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/flight-bookings",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"flight-bookings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response has the required fields\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.id).to.exist;\r",
+											"    pm.expect(responseData.flightBookingRef).to.exist;\r",
+											"    pm.expect(responseData.flightTicketNumber).to.exist;\r",
+											"    pm.expect(responseData.flightPrice).to.exist;\r",
+											"    pm.expect(responseData.status).to.exist;\r",
+											"    pm.expect(responseData.itineraryId).to.exist;\r",
+											"    pm.expect(responseData.userId).to.exist;\r",
+											"    pm.expect(responseData.user).to.exist;\r",
+											"    pm.expect(responseData.itinerary).to.exist;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"User object should exist and have required properties\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.user).to.exist;\r",
+											"    pm.expect(responseData.user.id).to.exist.and.to.be.a('number');\r",
+											"    pm.expect(responseData.user.firstName).to.exist.and.to.be.a('string');\r",
+											"    pm.expect(responseData.user.lastName).to.exist.and.to.be.a('string');\r",
+											"    pm.expect(responseData.user.email).to.exist.and.to.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$/);\r",
+											"    pm.expect(responseData.user.password).to.exist.and.to.be.a('string');\r",
+											"    pm.expect(responseData.user.phoneNumber).to.exist.and.to.be.a('string');\r",
+											"    pm.expect(responseData.user.role).to.exist.and.to.be.a('string');\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Itinerary object is present in the response\", function () {\r",
+											"    const responseData = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(responseData).to.be.an('object');\r",
+											"    pm.expect(responseData.itinerary).to.exist;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is less than 200ms\", function () {\r",
+											"  pm.expect(pm.response.responseTime).to.be.below(200);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"flightBookingId\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/flight-bookings/cancel",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"flight-bookings",
+										"cancel"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:3000/api/bookings/flight-bookings/verify?lastName=Doe&bookingReference=9BAAAF",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"bookings",
+										"flight-bookings",
+										"verify"
+									],
+									"query": [
+										{
+											"key": "lastName",
+											"value": "Doe"
+										},
+										{
+											"key": "bookingReference",
+											"value": "9BAAAF"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Itineraries",
+			"item": [
+				{
+					"name": "Retrieve Itinerary Data",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/itinerary/retrieve?id=29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"itinerary",
+								"retrieve"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "29"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Itinerary",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 24\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/itinerary/active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"itinerary",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"itineraryId\": 30, \r\n    \"creditCardNumber\": \"1111 1111 1111 1111\", \r\n    \"cardExpiry\": \"11/25\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/itinerary/checkout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"itinerary",
+								"checkout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Retrieve Unread Notification Count",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"// Test for the presence of the unreadCount field in the response",
+									"pm.test(\"Verify the presence of unreadCount field\", function () {",
+									"    pm.expect(pm.response.json()).to.have.property('unreadCount');",
+									"    pm.expect(pm.response.json().unreadCount).to.be.a('number');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/notifications/unread-count?userId=24",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"notifications",
+								"unread-count"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "Nova Newman",
+									"description": "(Optional) filter by full name of the account owner",
+									"disabled": true
+								},
+								{
+									"key": "userId",
+									"value": "24"
+								}
+							]
+						},
+						"description": "This endpoint will list all accounts that exist at the Intergalactic Bank. Optionally, filter by `owner` (using a full name), or the `createdAt` date (using `YYYY-MM-DD` format)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification To Be Read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"// Test for the existence of the fields in the response",
+									"pm.test(\"Verify the existence of the 'id' field\", function () {",
+									"    pm.expect(pm.response.json().id).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'userId' field\", function () {",
+									"    pm.expect(pm.response.json().userId).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'message' field\", function () {",
+									"    pm.expect(pm.response.json().message).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'isRead' field\", function () {",
+									"    pm.expect(pm.response.json().isRead).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'hotelBookingId' field\", function () {",
+									"    pm.expect(pm.response.json().hotelBookingId).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'flightBookingId' field\", function () {",
+									"    pm.expect(pm.response.json().flightBookingId).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'user' field\", function () {",
+									"    pm.expect(pm.response.json().user).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'hotelBooking' field\", function () {",
+									"    pm.expect(pm.response.json().hotelBooking).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Verify the existence of the 'flightBooking' field\", function () {",
+									"    pm.expect(pm.response.json().flightBooking).to.exist;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/notifications/31/read?userId=24",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"notifications",
+								"31",
+								"read"
+							],
+							"query": [
+								{
+									"key": "owner",
+									"value": "Nova Newman",
+									"description": "(Optional) filter by full name of the account owner",
+									"disabled": true
+								},
+								{
+									"key": "userId",
+									"value": "24"
+								}
+							]
+						},
+						"description": "This endpoint will list all accounts that exist at the Intergalactic Bank. Optionally, filter by `owner` (using a full name), or the `createdAt` date (using `YYYY-MM-DD` format)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 24,\n  \"message\": \"New booking for Double room from 2025-03-01 to 2025-03-05\",\n  \"hotelBookingId\": 27\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/notifications",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"notifications"
+							]
+						},
+						"description": "This endpoint will create a new account at the Intergalactic Bank.\n\n### Request Body Properties\n\n| Property Name | Property Type | **Description** | **Required?** |\n| --- | --- | --- | --- |\n| owner | String | Full name of the person opening this account | Yes |\n| balance | Number | The starting balance of the account | Yes |\n| currency | String - Possible values: `COSMIC_COINS`, `GALAXY_GOLD`, `MOON_BUCKS` | The currency this account will be using for transactions. This cannot be changed once established. | Yes |"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AFS",
+			"item": [
+				{
+					"name": "Make Booking",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"test@test.com\",\r\n  \"firstName\": \"Ali\",\r\n  \"flightIds\": [\r\n    \"4dce2a75-2d6f-4906-a5b0-2d5a5e0c468d\", \"f572ee8c-7db6-47ef-ac7d-fe1405c31323\"\r\n  ],\r\n  \"lastName\": \"Marez\",\r\n  \"passportNumber\": \"123239934\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://advanced-flights-system.replit.app/api/bookings",
+							"protocol": "https",
+							"host": [
+								"advanced-flights-system",
+								"replit",
+								"app"
+							],
+							"path": [
+								"api",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Date For Flights",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://advanced-flights-system.replit.app/api/flights?origin=Zurich&destination=Toronto&date=2024-11-26",
+							"protocol": "https",
+							"host": [
+								"advanced-flights-system",
+								"replit",
+								"app"
+							],
+							"path": [
+								"api",
+								"flights"
+							],
+							"query": [
+								{
+									"key": "origin",
+									"value": "Zurich"
+								},
+								{
+									"key": "destination",
+									"value": "Toronto"
+								},
+								{
+									"key": "date",
+									"value": "2024-11-26"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Booking",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://advanced-flights-system.replit.app/api/bookings/retrieve?lastName=Doe&bookingReference=1A381D",
+							"protocol": "https",
+							"host": [
+								"advanced-flights-system",
+								"replit",
+								"app"
+							],
+							"path": [
+								"api",
+								"bookings",
+								"retrieve"
+							],
+							"query": [
+								{
+									"key": "lastName",
+									"value": "Doe"
+								},
+								{
+									"key": "bookingReference",
+									"value": "1A381D"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
