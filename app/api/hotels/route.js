@@ -26,10 +26,12 @@ export async function POST(request) {
       );
     }
 
-    if ((name && !isString(name)) ||
-      (address && !isString(address)) ||
-      (location && !isString(location)) ||
-      (logo && !isString(logo))) {
+    if (
+      !isString(name) ||
+      !isString(address) ||
+      !isString(location) ||
+      !isString(logo)
+    ) {
       return NextResponse.json(
         { error: 'Sent non-string for name, address, location, or logo' },
         { status: 400 }
@@ -46,12 +48,16 @@ export async function POST(request) {
     // Check id
     if (!ownerId || ownerId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID" },
+        { error: "Invalid user ID or credentials" },
         { status: 400 }
       );
     }
 
-    //TODO: If a user made a hotel, make their role "HOTEL_OWNER"
+    // Update user profile
+    const updatedUser = await prisma.user.update({
+      where: { id: ownerId },
+      data: { role: 'HOTEL_OWNER' },
+    });
 
     // Star rating must be between 1 and 5
     if (!Number.isInteger(starRating) || starRating < 1 || starRating > 5) {
