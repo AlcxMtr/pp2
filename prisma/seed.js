@@ -3,8 +3,36 @@
 const { PrismaClient } = require('@prisma/client');
 const { createFlightBooking } = require('../app/api/bookings/flight-bookings/route-seed');
 const { hashPassword } = require('../middleware/auth');
+const axios = require('axios');
 
 const prisma = new PrismaClient();
+
+const AFS_BASE_URL = process.env.AFS_BASE_URL;
+const AFS_API_KEY = process.env.AFS_API_KEY;
+
+async function fetchCities() {
+  try {
+    const response = await axios.get(`${AFS_BASE_URL}/api/cities`, {
+      headers: { 'x-api-key': AFS_API_KEY },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching cities:', error);
+    throw error;
+  }
+}
+
+async function fetchAirports() {
+  try {
+    const response = await axios.get(`${AFS_BASE_URL}/api/airports`, {
+      headers: { 'x-api-key': AFS_API_KEY },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching airports:', error);
+    throw error;
+  }
+}
 
 async function seed() {
   try {
@@ -59,36 +87,33 @@ async function seed() {
         },
       });
 
-    // Create Cities and Airports
-    await prisma.city.create({
-      data: {
-        name: 'Toronto',
-        country: 'Canada',
-        airports: {
-          create: [{ code: 'YYZ', name: 'Toronto Pearson International Airport' }],
-        },
-      },
-    });
 
-    await prisma.city.create({
-      data: {
-        name: 'Vancouver',
-        country: 'Canada',
-        airports: {
-          create: [{ code: 'YVR', name: 'Vancouver International Airport' }],
-        },
-      },
-    });
+    // Fetch cities and airports from AFS API
+    const cities = await fetchCities();
+    const airports = await fetchAirports();
 
-    await prisma.city.create({
-      data: {
-        name: 'Zurich',
-        country: 'Switzerland',
-        airports: {
-          create: [{ code: 'ZRH', name: 'Zurich Airport' }],
+    // Populate Cities and Airports
+    for (const cityData of cities) {
+      const city = await prisma.city.create({
+        data: {
+          name: cityData.city,
+          country: cityData.country,
         },
-      },
-    });
+      });
+
+      // Find airports for this city
+      const cityAirports = airports.filter((airport) => airport.city === cityData.city);
+
+      for (const airportData of cityAirports) {
+        await prisma.airport.create({
+          data: {
+            code: airportData.code,
+            name: airportData.name,
+            cityId: city.id,
+          },
+        });
+      }
+    }
 
     // Create Hotels and Room Types (owned by John)
     const hotel1 = await prisma.hotel.create({

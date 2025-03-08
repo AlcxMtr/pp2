@@ -4,7 +4,7 @@ import { getAvailableRooms } from '@/utils/availability';
 
 
 export async function GET(req, { params }) {
-  const { hotelId } = params;
+  const { hotelId } = await params;
 
   const checkInDate = req.nextUrl.searchParams.get('checkInDate');
   const checkOutDate = req.nextUrl.searchParams.get('checkOutDate');
