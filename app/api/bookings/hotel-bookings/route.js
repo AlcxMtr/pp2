@@ -12,7 +12,6 @@ export async function POST(request) {
       roomTypeId,
       checkInDate,
       checkOutDate,
-      hotelPrice,
       userId,
       itineraryId,
     } = body;
@@ -20,9 +19,9 @@ export async function POST(request) {
     const status = 'PENDING';
 
     // Validation for required fields
-    if (!hotelId || !roomTypeId || !checkInDate || !checkOutDate || !hotelPrice || !userId || !itineraryId) {
+    if (!hotelId || !roomTypeId || !checkInDate || !checkOutDate || !userId || !itineraryId) {
       return NextResponse.json(
-        { error: 'Missing required fields: hotelId, roomTypeId, checkInDate, checkOutDate, hotelPrice, userId, or itineraryId' },
+        { error: 'Missing required fields: hotelId, roomTypeId, checkInDate, checkOutDate, userId, or itineraryId' },
         { status: 400 }
       );
     }
@@ -54,14 +53,6 @@ export async function POST(request) {
     if (checkIn >= checkOut) {
       return NextResponse.json(
         { error: 'checkInDate must be before checkOutDate' },
-        { status: 400 }
-      );
-    }
-
-    // hotelPrice must be greater than 0
-    if (typeof hotelPrice !== 'number' || hotelPrice <= 0) {
-      return NextResponse.json(
-        { error: 'hotelPrice must be a positive number' },
         { status: 400 }
       );
     }
