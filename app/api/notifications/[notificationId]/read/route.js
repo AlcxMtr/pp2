@@ -6,7 +6,7 @@ import { verifyToken } from "@/middleware/auth"
 // PUT Mark a notification as read
 export async function PUT(request, { params }) {
   try {
-    const { notificationId } = params;
+    const { notificationId } = await params;
     const userId = parseInt(request.nextUrl.searchParams.get('userId'), 10);
 
     // Validation for required fields
