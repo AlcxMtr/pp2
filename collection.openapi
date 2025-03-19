@@ -1,0 +1,2797 @@
+openapi: 3.0.0
+info:
+  title: PP1 Postman Collection
+  description: >-
+    In this collection, we tested our API endpoints for the PP1 deliverable. All
+    endpoints were tested with a sample request that matched their use cases.
+    Feel free to play with the requests to see the behaviour of the endpoints :)
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+  - url: https://advanced-flights-system.replit.app
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    noauthAuth:
+      type: http
+      scheme: noauth
+tags:
+  - name: Users
+  - name: Autocomplete
+  - name: Flight Info
+  - name: Hotels
+  - name: Room Types
+  - name: Room Availability
+  - name: Bookings
+  - name: Bookings > Hotels
+  - name: Bookings > Flights
+  - name: Itineraries
+  - name: Notifications
+  - name: AFS
+paths:
+  /api/users:
+    post:
+      tags:
+        - Users
+      summary: Create New User
+      description: Registers a new user in the system with provided details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: User's first name
+                lastName:
+                  type: string
+                  description: User's last name
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+                phoneNumber:
+                  type: string
+                  description: User's phone number
+                role:
+                  type: string
+                  description: User's role (e.g., HOTEL_OWNER, USER)
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+              example:
+                firstName: Joseph
+                lastName: Doe
+                email: joseph.doe@example.com
+                password: '444'
+                phoneNumber: 123-456-7890
+                role: HOTEL_OWNER
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  email:
+                    type: string
+                  profilePicture:
+                    type: string
+                    nullable: true
+                  phoneNumber:
+                    type: string
+                  role:
+                    type: string
+              example:
+                id: 4
+                firstName: John
+                lastName: Doe
+                email: john.doe@example.com
+                profilePicture: null
+                phoneNumber: 123-456-7890
+                role: HOTEL_OWNER
+
+  /api/users/bookings:
+    get:
+      tags:
+        - Users
+      summary: View Bookings
+      description: Retrieves a list of bookings associated with a specific user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          description: Bearer token for authentication
+        - name: userId
+          in: query
+          schema:
+            type: integer
+          example: 23
+          description: ID of the user whose bookings are being retrieved
+      responses:
+        '200':
+          description: List of user bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    userId:
+                      type: integer
+                    creditCardNumber:
+                      type: string
+                    cardExpiry:
+                      type: string
+                    invoiceUrl:
+                      type: string
+                    status:
+                      type: string
+                    hotelBooking:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        hotelId:
+                          type: integer
+                        roomTypeId:
+                          type: integer
+                        checkInDate:
+                          type: string
+                        checkOutDate:
+                          type: string
+                        status:
+                          type: string
+                        itineraryId:
+                          type: integer
+                        userId:
+                          type: integer
+                        hotel:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            logo:
+                              type: string
+                            address:
+                              type: string
+                            location:
+                              type: string
+                            starRating:
+                              type: integer
+                            ownerId:
+                              type: integer
+                        roomType:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            totalRooms:
+                              type: integer
+                            pricePerNight:
+                              type: integer
+                            hotelId:
+                              type: integer
+                    flightBooking:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        flightBookingRef:
+                          type: string
+                        flightTicketNumber:
+                          type: string
+                        flightPrice:
+                          type: integer
+                        status:
+                          type: string
+                        itineraryId:
+                          type: integer
+                        userId:
+                          type: integer
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        email:
+                          type: string
+                        password:
+                          type: string
+                        profilePicture:
+                          type: string
+                        phoneNumber:
+                          type: string
+                        role:
+                          type: string
+              example:
+                - id: 2
+                  userId: 2
+                  creditCardNumber: "**** **** **** 4567"
+                  cardExpiry: "06/26"
+                  invoiceUrl: "/invoices/itinerary_2.pdf"
+                  status: "CONFIRMED"
+                  hotelBooking:
+                    id: 2
+                    hotelId: 2
+                    roomTypeId: 3
+                    checkInDate: "2025-04-01T15:00:00.000Z"
+                    checkOutDate: "2025-04-03T12:00:00.000Z"
+                    status: "CONFIRMED"
+                    itineraryId: 2
+                    userId: 2
+                    hotel:
+                      id: 2
+                      name: "Ocean View Resort"
+                      logo: "https://example.com/ocean-view-logo.png"
+                      address: "456 Beach Rd, Vancouver, BC"
+                      location: "Vancouver"
+                      starRating: 5
+                      ownerId: 2
+                    roomType:
+                      id: 3
+                      name: "Ocean Suite"
+                      totalRooms: 5
+                      pricePerNight: 300
+                      hotelId: 2
+                  flightBooking:
+                    id: 2
+                    flightBookingRef: "04B014"
+                    flightTicketNumber: "5717e2810a"
+                    flightPrice: 1392
+                    status: "CONFIRMED"
+                    itineraryId: 2
+                    userId: 2
+                  user:
+                    id: 2
+                    firstName: "John"
+                    lastName: "Smith"
+                    email: "john.smith@example.com"
+                    password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                    profilePicture: "https://example.com/john.jpg"
+                    phoneNumber: "987-654-3210"
+                    role: "HOTEL_OWNER"
+
+  /api/users/edit-profile:
+    post:
+      tags:
+        - Users
+      summary: Edit Profile
+      description: Updates the profile information for an authenticated user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: User's ID
+                firstName:
+                  type: string
+                  description: User's first name
+                lastName:
+                  type: string
+                  description: User's last name
+                email:
+                  type: string
+                  description: User's email address
+                profilePicture:
+                  type: string
+                  description: URL to user's profile picture
+                phoneNumber:
+                  type: string
+                  description: User's phone number
+              required:
+                - id
+              example:
+                id: 23
+                firstName: Anna
+                lastName: Bretscher
+                email: anna@email.com
+                profilePicture: profile.picture.com
+                phoneNumber: 123 431 1231
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  email:
+                    type: string
+                  profilePicture:
+                    type: string
+                  phoneNumber:
+                    type: string
+                  role:
+                    type: string
+              example:
+                id: 2
+                firstName: Anna
+                lastName: Bretscher
+                email: anna@email.com
+                profilePicture: profile.picture.com
+                phoneNumber: "123 431 1231"
+                role: HOTEL_OWNER
+
+  /api/users/login:
+    post:
+      tags:
+        - Users
+      summary: Login
+      description: Authenticates a user and returns access and refresh tokens.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - email
+                - password
+              example:
+                email: jane.doe@example.com
+                password: '111'
+      responses:
+        '200':
+          description: Login successful, tokens returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token
+              example:
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0MTQ3NzMzNiwiZXhwIjoxNzQxNDc4MjM2fQ.MaRm8HoIP3rVajQMLwQa1YZPdVx0lN-mCx11Rg86zw8"
+                refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0MTQ3NzMzNiwiZXhwIjoxNzQxNTYzNzM2fQ.yN1N7wY7vW_KQefhJZP8Og7wjzeHN_xlmVNtrwFYkJY"
+
+  /api/users/refresh:
+    post:
+      tags:
+        - Users
+      summary: Refresh Token
+      description: Refreshes an access token using a valid refresh token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: ''
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: New JWT access token
+              example:
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0MTQ3NzUyNiwiZXhwIjoxNzQxNDc4NDI2fQ.pRMheskCGNKO4GdBPEYWkIej44okyg6r2Kj9c4pBAEs"
+
+  /api/autocomplete:
+    get:
+      tags:
+        - Autocomplete
+      summary: Get Suggestions
+      description: Returns autocomplete suggestions for cities and airports based on a query string.
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          example: or
+          description: Partial search term for suggestions
+      responses:
+        '200':
+          description: Suggestions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        type:
+                          type: string
+                          enum: [city, airport]
+              example:
+                suggestions:
+                  - id: 13
+                    name: "New York"
+                    type: "city"
+                  - id: 14
+                    name: "Singapore"
+                    type: "city"
+                  - id: 15
+                    name: "Toronto"
+                    type: "city"
+                  - id: 1
+                    name: "Hartsfield–Jackson Atlanta International Airport (ATL)"
+                    type: "airport"
+
+  /api/flights:
+    get:
+      tags:
+        - AFS
+      summary: Check Date For Flights
+      description: Retrieves available flight options for a given date, origin, and destination.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          example: dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a
+          description: API key for authentication
+        - name: origin
+          in: query
+          schema:
+            type: string
+          example: Zurich
+          description: Departure city or airport
+        - name: destination
+          in: query
+          schema:
+            type: string
+          example: Toronto
+          description: Arrival city or airport
+        - name: date
+          in: query
+          schema:
+            type: string
+          example: '2024-11-26'
+          description: Date of travel (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Flight options retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        legs:
+                          type: integer
+                          description: Number of flight segments
+                        flights:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              flightNumber:
+                                type: string
+                              departureTime:
+                                type: string
+                              arrivalTime:
+                                type: string
+                              originId:
+                                type: string
+                              destinationId:
+                                type: string
+                              duration:
+                                type: integer
+                              price:
+                                type: integer
+                              currency:
+                                type: string
+                              availableSeats:
+                                type: integer
+                              status:
+                                type: string
+                              airline:
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                  name:
+                                    type: string
+                              origin:
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                  name:
+                                    type: string
+                                  city:
+                                    type: string
+                                  country:
+                                    type: string
+                              destination:
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                  name:
+                                    type: string
+                                  city:
+                                    type: string
+                                  country:
+                                    type: string
+              example:
+                results:
+                  - legs: 2
+                    flights:
+                      - id: "01a4053f-8d99-4859-b13c-dd1ec6d99fd6"
+                        flightNumber: "LX3070"
+                        departureTime: "2024-11-26T10:50:00.000Z"
+                        arrivalTime: "2024-11-26T23:15:00.000Z"
+                        originId: "2bcb7925-96aa-4de8-9ec1-3622e954c0b6"
+                        destinationId: "061fc0c6-d34e-4de1-8e08-8297d5e9b7de"
+                        duration: 745
+                        price: 805
+                        currency: "CAD"
+                        availableSeats: 227
+                        status: "SCHEDULED"
+                        airline:
+                          code: "LX"
+                          name: "Swiss International Air Lines"
+                        origin:
+                          code: "ZRH"
+                          name: "Zurich Airport"
+                          city: "Zurich"
+                          country: "Switzerland"
+                        destination:
+                          code: "MNL"
+                          name: "Ninoy Aquino International Airport"
+                          city: "Manila"
+                          country: "Philippines"
+                      - id: "4c1f8110-5e58-4b4d-8c13-ed747b5d0e35"
+                        flightNumber: "PR5631"
+                        departureTime: "2024-11-27T12:35:00.000Z"
+                        arrivalTime: "2024-11-28T00:10:00.000Z"
+                        originId: "061fc0c6-d34e-4de1-8e08-8297d5e9b7de"
+                        destinationId: "370d2633-ba94-47f5-a735-513c0e332224"
+                        duration: 695
+                        price: 1643
+                        currency: "CAD"
+                        availableSeats: 275
+                        status: "SCHEDULED"
+                        airline:
+                          code: "PR"
+                          name: "Philippine Airlines"
+                        origin:
+                          code: "MNL"
+                          name: "Ninoy Aquino International Airport"
+                          city: "Manila"
+                          country: "Philippines"
+                        destination:
+                          code: "YYZ"
+                          name: "Toronto Pearson International Airport"
+                          city: "Toronto"
+                          country: "Canada"
+
+  /api/hotels:
+    get:
+      tags:
+        - Hotels
+      summary: Retrieve Available Hotels
+      description: Fetches a list of hotels available based on check-in/out dates, city, price, and star rating.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: checkInDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-10'
+          description: Check-in date (YYYY-MM-DD)
+        - name: checkOutDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-12'
+          description: Check-out date (YYYY-MM-DD)
+        - name: city
+          in: query
+          schema:
+            type: string
+          example: Vancouver
+          description: City to filter hotels
+        - name: minPrice
+          in: query
+          schema:
+            type: integer
+          example: 150
+          description: Minimum price per night
+        - name: starRating
+          in: query
+          schema:
+            type: integer
+          example: 3
+          description: Minimum star rating
+      responses:
+        '200':
+          description: List of available hotels retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    location:
+                      type: string
+                    starRating:
+                      type: integer
+                    startingPrice:
+                      type: integer
+                    availableRooms:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          pricePerNight:
+                            type: integer
+                          totalRooms:
+                            type: integer
+                          availableRooms:
+                            type: integer
+              example:
+                - id: 2
+                  name: "Ocean View Resort"
+                  location: "Vancouver"
+                  starRating: 5
+                  startingPrice: 300
+                  availableRooms:
+                    - id: 3
+                      name: "Ocean Suite"
+                      pricePerNight: 300
+                      totalRooms: 5
+                      availableRooms: 5
+    post:
+      tags:
+        - Hotels
+      summary: Create New Hotel
+      description: Adds a new hotel to the system, restricted to authorized users (e.g., hotel owners).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the hotel
+                address:
+                  type: string
+                  description: Physical address of the hotel
+                logo:
+                  type: string
+                  description: URL to hotel logo
+                location:
+                  type: string
+                  description: City and country of the hotel
+                starRating:
+                  type: integer
+                  description: Hotel star rating (1-5)
+                ownerId:
+                  type: integer
+                  description: ID of the hotel owner
+                images:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                  description: List of image URLs for the hotel
+              required:
+                - name
+                - address
+                - location
+                - starRating
+                - ownerId
+              example:
+                name: Seaside Resort2
+                address: 123 Ocean Drive
+                logo: https://example.com/logo.png
+                location: Miami, USA
+                starRating: 4
+                ownerId: 24
+                images:
+                  - url: https://example.com/hotel-front.jpg
+                  - url: https://example.com/hotel-pool.jpg
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Hotel created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  logo:
+                    type: string
+                  address:
+                    type: string
+                  location:
+                    type: string
+                  starRating:
+                    type: integer
+                  ownerId:
+                    type: integer
+                  roomTypes:
+                    type: array
+                    items:
+                      type: object
+                  bookings:
+                    type: array
+                    items:
+                      type: object
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        url:
+                          type: string
+                        hotelId:
+                          type: integer
+              example:
+                id: 3
+                name: "Seaside Resort"
+                logo: "https://example.com/logo.png"
+                address: "123 Ocean Drive"
+                location: "Miami, USA"
+                starRating: 4
+                ownerId: 2
+                roomTypes: []
+                bookings: []
+                images:
+                  - id: 3
+                    url: "https://example.com/hotel-front.jpg"
+                    hotelId: 3
+                  - id: 4
+                    url: "https://example.com/hotel-pool.jpg"
+                    hotelId: 3
+
+  /api/hotels/8:
+    get:
+      tags:
+        - Hotels
+      summary: Retrieve Hotel Details
+      description: Fetches detailed information about a specific hotel, including available room types.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: checkInDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-10'
+          description: Check-in date (YYYY-MM-DD)
+        - name: checkOutDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-12'
+          description: Check-out date (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Hotel details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  location:
+                    type: string
+                  starRating:
+                    type: integer
+                  address:
+                    type: string
+                  logo:
+                    type: string
+                  images:
+                    type: array
+                    items:
+                      type: string
+                  roomTypes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        pricePerNight:
+                          type: integer
+                        availableRooms:
+                          type: integer
+                        amenities:
+                          type: array
+                          items:
+                            type: string
+                        images:
+                          type: array
+                          items:
+                            type: string
+              example:
+                id: 1
+                name: "Grand Hotel"
+                location: "Toronto"
+                starRating: 4
+                address: "123 Grand St, Toronto, ON"
+                logo: "https://example.com/grand-hotel-logo.png"
+                images:
+                  - "https://example.com/grand-hotel.jpg"
+                roomTypes:
+                  - id: 1
+                    name: "Deluxe Suite"
+                    pricePerNight: 150
+                    availableRooms: 9
+                    amenities:
+                      - "Wi-Fi"
+                      - "TV"
+                    images:
+                      - "https://example.com/deluxe-suite.jpg"
+                  - id: 2
+                    name: "Standard Room"
+                    pricePerNight: 100
+                    availableRooms: 20
+                    amenities:
+                      - "Wi-Fi"
+                    images:
+                      - "https://example.com/standard-room.jpg"
+
+  /api/rooms/room-types:
+    post:
+      tags:
+        - Room Types
+      summary: Create New Room Type
+      description: Adds a new room type to a hotel, restricted to authorized users (e.g., hotel owners).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the room type
+                totalRooms:
+                  type: integer
+                  description: Total number of rooms of this type
+                pricePerNight:
+                  type: integer
+                  description: Price per night for this room type
+                hotelId:
+                  type: integer
+                  description: ID of the hotel this room type belongs to
+                amenities:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                  description: List of amenities for the room type
+                images:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                  description: List of image URLs for the room type
+              required:
+                - name
+                - totalRooms
+                - pricePerNight
+                - hotelId
+              example:
+                name: Double
+                totalRooms: 10
+                pricePerNight: 160
+                hotelId: 17
+                amenities:
+                  - name: Wi-Fi
+                  - name: TV
+                  - name: Mini Bar
+                images:
+                  - url: https://example.com/double-room-1.jpg
+                  - url: https://example.com/double-room-2.jpg
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Room type created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  totalRooms:
+                    type: integer
+                  pricePerNight:
+                    type: integer
+                  hotelId:
+                    type: integer
+                  amenities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        roomTypeId:
+                          type: integer
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        url:
+                          type: string
+                        roomTypeId:
+                          type: integer
+              example:
+                id: 4
+                name: "Double"
+                totalRooms: 10
+                pricePerNight: 160
+                hotelId: 1
+                amenities:
+                  - id: 6
+                    name: "Wi-Fi"
+                    roomTypeId: 4
+                  - id: 7
+                    name: "TV"
+                    roomTypeId: 4
+                  - id: 8
+                    name: "Mini Bar"
+                    roomTypeId: 4
+                images:
+                  - id: 4
+                    url: "https://example.com/double-room-1.jpg"
+                    roomTypeId: 4
+                  - id: 5
+                    url: "https://example.com/double-room-2.jpg"
+                    roomTypeId: 4
+
+  /api/rooms/room-availabilities:
+    get:
+      tags:
+        - Room Availability
+      summary: Retrieve Room Availability Per Room Type
+      description: Returns availability of room types for a hotel within a date range, filtered by owner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ownerId
+          in: query
+          schema:
+            type: integer
+          example: 24
+          description: ID of the hotel owner
+        - name: startDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-01'
+          description: Start date of the availability range (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+          example: '2025-03-05'
+          description: End date of the availability range (YYYY-MM-DD)
+      responses:
+        '201':
+          description: Room availability retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  availability:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        roomTypeId:
+                          type: integer
+                        name:
+                          type: string
+                        totalRooms:
+                          type: integer
+                        bookedRooms:
+                          type: integer
+                        availableRooms:
+                          type: integer
+                  dateRange:
+                    type: object
+                    properties:
+                      startDate:
+                        type: string
+                      endDate:
+                        type: string
+              example:
+                availability:
+                  - roomTypeId: 1
+                    name: "Deluxe Suite"
+                    totalRooms: 10
+                    bookedRooms: 0
+                    availableRooms: 10
+                  - roomTypeId: 2
+                    name: "Standard Room"
+                    totalRooms: 20
+                    bookedRooms: 0
+                    availableRooms: 20
+                  - roomTypeId: 3
+                    name: "Ocean Suite"
+                    totalRooms: 5
+                    bookedRooms: 0
+                    availableRooms: 5
+                  - roomTypeId: 4
+                    name: "Double"
+                    totalRooms: 10
+                    bookedRooms: 0
+                    availableRooms: 10
+                dateRange:
+                  startDate: "2025-03-01"
+                  endDate: "2025-03-05"
+
+  /api/rooms/room-availabilities/update-availabilities:
+    put:
+      tags:
+        - Room Availability
+      summary: Modify Number of Available Rooms
+      description: Updates the total number of available rooms for a specific room type, restricted to authorized users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roomTypeId:
+                  type: integer
+                  description: ID of the room type to update
+                newTotalRooms:
+                  type: integer
+                  description: New total number of rooms
+              required:
+                - roomTypeId
+                - newTotalRooms
+              example:
+                roomTypeId: 24
+                newTotalRooms: 7
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ownerId
+          in: query
+          schema:
+            type: integer
+          example: 24
+          description: ID of the hotel owner
+      responses:
+        '201':
+          description: Room availability updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  totalRooms:
+                    type: integer
+                  pricePerNight:
+                    type: integer
+                  hotelId:
+                    type: integer
+                  hotel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      logo:
+                        type: string
+                      address:
+                        type: string
+                      location:
+                        type: string
+                      starRating:
+                        type: integer
+                      ownerId:
+                        type: integer
+                  amenities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        roomTypeId:
+                          type: integer
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        url:
+                          type: string
+                        roomTypeId:
+                          type: integer
+              example:
+                id: 1
+                name: "Deluxe Suite"
+                totalRooms: 7
+                pricePerNight: 150
+                hotelId: 1
+                hotel:
+                  id: 1
+                  name: "Grand Hotel"
+                  logo: "https://example.com/grand-hotel-logo.png"
+                  address: "123 Grand St, Toronto, ON"
+                  location: "Toronto"
+                  starRating: 4
+                  ownerId: 2
+                amenities:
+                  - id: 1
+                    name: "Wi-Fi"
+                    roomTypeId: 1
+                  - id: 2
+                    name: "TV"
+                    roomTypeId: 1
+                images:
+                  - id: 1
+                    url: "https://example.com/deluxe-suite.jpg"
+                    roomTypeId: 1
+
+  /api/bookings/hotel-bookings:
+    post:
+      tags:
+        - Bookings > Hotels
+      summary: Create New Hotel Booking
+      description: Creates a new hotel booking for a user, associating it with an itinerary.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hotelId:
+                  type: integer
+                  description: ID of the hotel
+                roomTypeId:
+                  type: integer
+                  description: ID of the room type
+                checkInDate:
+                  type: string
+                  description: Check-in date (YYYY-MM-DD)
+                checkOutDate:
+                  type: string
+                  description: Check-out date (YYYY-MM-DD)
+                userId:
+                  type: integer
+                  description: ID of the user making the booking
+                itineraryId:
+                  type: integer
+                  description: ID of the associated itinerary
+              required:
+                - hotelId
+                - roomTypeId
+                - checkInDate
+                - checkOutDate
+                - userId
+              example:
+                hotelId: 16
+                roomTypeId: 24
+                checkInDate: '2025-03-01'
+                checkOutDate: '2025-03-05'
+                userId: 24
+                itineraryId: 29
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Hotel booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hotelId:
+                    type: integer
+                  roomTypeId:
+                    type: integer
+                  checkInDate:
+                    type: string
+                  checkOutDate:
+                    type: string
+                  status:
+                    type: string
+                  itineraryId:
+                    type: integer
+                  userId:
+                    type: integer
+                  hotel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      logo:
+                        type: string
+                      address:
+                        type: string
+                      location:
+                        type: string
+                      starRating:
+                        type: integer
+                      ownerId:
+                        type: integer
+                  roomType:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      totalRooms:
+                        type: integer
+                      pricePerNight:
+                        type: integer
+                      hotelId:
+                        type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  itinerary:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      userId:
+                        type: integer
+                      creditCardNumber:
+                        type: string
+                      cardExpiry:
+                        type: string
+                      invoiceUrl:
+                        type: string
+                      status:
+                        type: string
+              example:
+                id: 6
+                hotelId: 1
+                roomTypeId: 1
+                checkInDate: "2025-03-01T00:00:00.000Z"
+                checkOutDate: "2025-03-05T00:00:00.000Z"
+                status: "PENDING"
+                itineraryId: 2
+                userId: 2
+                hotel:
+                  id: 1
+                  name: "Grand Hotel"
+                  logo: "https://example.com/grand-hotel-logo.png"
+                  address: "123 Grand St, Toronto, ON"
+                  location: "Toronto"
+                  starRating: 4
+                  ownerId: 2
+                roomType:
+                  id: 1
+                  name: "Deluxe Suite"
+                  totalRooms: 7
+                  pricePerNight: 150
+                  hotelId: 1
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+                itinerary:
+                  id: 2
+                  userId: 2
+                  creditCardNumber: "**** **** **** 4567"
+                  cardExpiry: "06/26"
+                  invoiceUrl: "/invoices/itinerary_2.pdf"
+                  status: "CONFIRMED"
+    get:
+      tags:
+        - Bookings > Hotels
+      summary: Retrieve Hotel Bookings Filtered By Room Type
+      description: Fetches a list of hotel bookings filtered by room type and optionally by owner.
+      parameters:
+        - name: ownerId
+          in: query
+          schema:
+            type: integer
+          example: 18
+          description: ID of the hotel owner (optional)
+        - name: roomTypeId
+          in: query
+          schema:
+            type: integer
+          example: 14
+          description: ID of the room type to filter by
+      responses:
+        '201':
+          description: Hotel bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    hotelId:
+                      type: integer
+                    roomTypeId:
+                      type: integer
+                    checkInDate:
+                      type: string
+                    checkOutDate:
+                      type: string
+                    status:
+                      type: string
+                    itineraryId:
+                      type: integer
+                    userId:
+                      type: integer
+                    hotel:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        location:
+                          type: string
+                    roomType:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        pricePerNight:
+                          type: integer
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        email:
+                          type: string
+                    itinerary:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+              example:
+                - id: 6
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-01T00:00:00.000Z"
+                  checkOutDate: "2025-03-05T00:00:00.000Z"
+                  status: "PENDING"
+                  itineraryId: 2
+                  userId: 2
+                  hotel:
+                    id: 1
+                    name: "Grand Hotel"
+                    location: "Toronto"
+                  roomType:
+                    id: 1
+                    name: "Deluxe Suite"
+                    pricePerNight: 150
+                  user:
+                    id: 2
+                    firstName: "Anna"
+                    lastName: "Bretscher"
+                    email: "anna@email.com"
+                  itinerary:
+                    id: 2
+
+  /api/bookings/hotel-bookings/cancel:
+    post:
+      tags:
+        - Bookings > Hotels
+      summary: Cancel Hotel Reservation
+      description: Cancels an existing hotel booking, restricted to authorized users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bookingId:
+                  type: integer
+                  description: ID of the booking to cancel
+              required:
+                - bookingId
+              example:
+                bookingId: 23
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ownerId
+          in: query
+          schema:
+            type: integer
+          example: 24
+          description: ID of the hotel owner (optional)
+      responses:
+        '200':
+          description: Hotel reservation cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  hotelId:
+                    type: integer
+                  roomTypeId:
+                    type: integer
+                  checkInDate:
+                    type: string
+                  checkOutDate:
+                    type: string
+                  status:
+                    type: string
+                  itineraryId:
+                    type: integer
+                  userId:
+                    type: integer
+                  hotel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      logo:
+                        type: string
+                      address:
+                        type: string
+                      location:
+                        type: string
+                      starRating:
+                        type: integer
+                      ownerId:
+                        type: integer
+                  roomType:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      totalRooms:
+                        type: integer
+                      pricePerNight:
+                        type: integer
+                      hotelId:
+                        type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  itinerary:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      userId:
+                        type: integer
+                      creditCardNumber:
+                        type: string
+                      cardExpiry:
+                        type: string
+                      invoiceUrl:
+                        type: string
+                      status:
+                        type: string
+              example:
+                id: 1
+                hotelId: 1
+                roomTypeId: 1
+                checkInDate: "2025-03-10T14:00:00.000Z"
+                checkOutDate: "2025-03-12T11:00:00.000Z"
+                status: "CANCELLED"
+                itineraryId: 1
+                userId: 1
+                hotel:
+                  id: 1
+                  name: "Grand Hotel"
+                  logo: "https://example.com/grand-hotel-logo.png"
+                  address: "123 Grand St, Toronto, ON"
+                  location: "Toronto"
+                  starRating: 4
+                  ownerId: 2
+                roomType:
+                  id: 1
+                  name: "Deluxe Suite"
+                  totalRooms: 7
+                  pricePerNight: 150
+                  hotelId: 1
+                user:
+                  id: 1
+                  firstName: "Jane"
+                  lastName: "Doe"
+                  email: "jane.doe@example.com"
+                  password: "$2b$10$OkICJ2k4TQLAZDsH.keFUO4KNtjOgZw50QhnULOGBGdvnsgPYmrOC"
+                  profilePicture: "https://example.com/jane.jpg"
+                  phoneNumber: "123-456-7890"
+                  role: "USER"
+                itinerary:
+                  id: 1
+                  userId: 1
+                  creditCardNumber: "**** **** **** 1233"
+                  cardExpiry: "12/25"
+                  invoiceUrl: "/invoices/itinerary_1.pdf"
+                  status: "CONFIRMED"
+
+  /api/bookings/flight-bookings:
+    post:
+      tags:
+        - Bookings > Flights
+      summary: Create New Flight Booking
+      description: Creates a new flight booking for a user, associating it with an itinerary.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passportNumber:
+                  type: string
+                  description: User's passport number
+                flightIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of flight IDs to book
+                userId:
+                  type: integer
+                  description: ID of the user making the booking
+                itineraryId:
+                  type: integer
+                  description: ID of the associated itinerary
+              required:
+                - passportNumber
+                - flightIds
+                - userId
+              example:
+                passportNumber: '123233333'
+                flightIds:
+                  - c9355bd2-a5c0-48f9-a5ff-8d8d112c2426
+                userId: 23
+                itineraryId: 31
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Flight booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  flightBookingRef:
+                    type: string
+                  flightTicketNumber:
+                    type: string
+                  flightPrice:
+                    type: integer
+                  status:
+                    type: string
+                  itineraryId:
+                    type: integer
+                  userId:
+                    type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  itinerary:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      userId:
+                        type: integer
+                      creditCardNumber:
+                        type: string
+                      cardExpiry:
+                        type: string
+                      invoiceUrl:
+                        type: string
+                      status:
+                        type: string
+              example:
+                id: 5
+                flightBookingRef: "89A2A0"
+                flightTicketNumber: "7bd4642021"
+                flightPrice: 587
+                status: "PENDING"
+                itineraryId: 1
+                userId: 2
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+                itinerary:
+                  id: 1
+                  userId: 1
+                  creditCardNumber: "**** **** **** 1233"
+                  cardExpiry: "12/25"
+                  invoiceUrl: "/invoices/itinerary_1.pdf"
+                  status: "CONFIRMED"
+
+  /api/bookings/flight-bookings/cancel:
+    post:
+      tags:
+        - Bookings > Flights
+      summary: Cancel Flight Booking
+      description: Cancels an existing flight booking, restricted to authorized users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                flightBookingId:
+                  type: integer
+                  description: ID of the flight booking to cancel
+              required:
+                - flightBookingId
+              example:
+                flightBookingId: 5
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Flight booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  flightBookingRef:
+                    type: string
+                  flightTicketNumber:
+                    type: string
+                  flightPrice:
+                    type: integer
+                  status:
+                    type: string
+                  itineraryId:
+                    type: integer
+                  userId:
+                    type: integer
+              example:
+                id: 5
+                flightBookingRef: "89A2A0"
+                flightTicketNumber: "7bd4642021"
+                flightPrice: 587
+                status: "CANCELLED"
+                itineraryId: 1
+                userId: 2
+
+  /api/bookings/flight-bookings/verify:
+    get:
+      tags:
+        - Bookings > Flights
+      summary: Verify Flight Booking
+      description: Verifies the status of a flight booking using last name and booking reference.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lastName
+          in: query
+          schema:
+            type: string
+          example: Doe
+          description: Last name of the booking holder
+        - name: bookingReference
+          in: query
+          schema:
+            type: string
+          example: 9BAAAF
+          description: Booking reference number
+      responses:
+        '200':
+          description: Flight booking verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flightStatuses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        flightId:
+                          type: string
+                        flightNumber:
+                          type: string
+                        origin:
+                          type: string
+                        destination:
+                          type: string
+                        status:
+                          type: string
+                  hasIssues:
+                    type: boolean
+              example:
+                flightStatuses:
+                  - flightId: "c9355bd2-a5c0-48f9-a5ff-8d8d112c2426"
+                    flightNumber: "KL5000"
+                    origin: "3bb318ef-7f81-4c10-98d7-1a67b80944b8"
+                    destination: "370d2633-ba94-47f5-a735-513c0e332224"
+                    status: "SCHEDULED"
+                hasIssues: false
+
+  /api/itinerary/retrieve:
+    get:
+      tags:
+        - Itineraries
+      summary: Retrieve Itinerary Data
+      description: Fetches detailed information about a specific itinerary.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          example: 29
+          description: ID of the itinerary to retrieve
+      responses:
+        '200':
+          description: Itinerary data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                  creditCardNumber:
+                    type: string
+                  cardExpiry:
+                    type: string
+                  invoiceUrl:
+                    type: string
+                  status:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  hotelBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      hotelId:
+                        type: integer
+                      roomTypeId:
+                        type: integer
+                      checkInDate:
+                        type: string
+                      checkOutDate:
+                        type: string
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                      hotel:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          logo:
+                            type: string
+                          address:
+                            type: string
+                          location:
+                            type: string
+                          starRating:
+                            type: integer
+                          ownerId:
+                            type: integer
+                      roomType:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          totalRooms:
+                            type: integer
+                          pricePerNight:
+                            type: integer
+                          hotelId:
+                            type: integer
+                  flightBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      flightBookingRef:
+                        type: string
+                      flightTicketNumber:
+                        type: string
+                      flightPrice:
+                        type: integer
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+              example:
+                id: 2
+                userId: 2
+                creditCardNumber: "**** **** **** 4567"
+                cardExpiry: "06/26"
+                invoiceUrl: "/invoices/itinerary_2.pdf"
+                status: "CONFIRMED"
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+                hotelBooking:
+                  id: 6
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-01T00:00:00.000Z"
+                  checkOutDate: "2025-03-05T00:00:00.000Z"
+                  status: "PENDING"
+                  itineraryId: 2
+                  userId: 2
+                  hotel:
+                    id: 1
+                    name: "Grand Hotel"
+                    logo: "https://example.com/grand-hotel-logo.png"
+                    address: "123 Grand St, Toronto, ON"
+                    location: "Toronto"
+                    starRating: 4
+                    ownerId: 2
+                  roomType:
+                    id: 1
+                    name: "Deluxe Suite"
+                    totalRooms: 7
+                    pricePerNight: 150
+                    hotelId: 1
+                flightBooking:
+                  id: 2
+                  flightBookingRef: "04B014"
+                  flightTicketNumber: "5717e2810a"
+                  flightPrice: 1392
+                  status: "CONFIRMED"
+                  itineraryId: 2
+                  userId: 2
+
+  /api/itinerary/active:
+    post:
+      tags:
+        - Itineraries
+      summary: Get Active Itinerary
+      description: Retrieves the active itinerary for a specific user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: ID of the user
+              required:
+                - userId
+              example:
+                userId: 24
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Active itinerary retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                  creditCardNumber:
+                    type: string
+                  cardExpiry:
+                    type: string
+                  invoiceUrl:
+                    type: string
+                  status:
+                    type: string
+                  hotelBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      hotelId:
+                        type: integer
+                      roomTypeId:
+                        type: integer
+                      checkInDate:
+                        type: string
+                      checkOutDate:
+                        type: string
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                  flightBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      flightBookingRef:
+                        type: string
+                      flightTicketNumber:
+                        type: string
+                      flightPrice:
+                        type: integer
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+              example:
+                id: 3
+                userId: 2
+                creditCardNumber: "**** **** **** 4567"
+                cardExpiry: "06/26"
+                invoiceUrl: "/invoices/itinerary_3.pdf"
+                status: "PENDING"
+                hotelBooking:
+                  id: 3
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-10T14:00:00.000Z"
+                  checkOutDate: "2025-03-12T11:00:00.000Z"
+                  status: "PENDING"
+                  itineraryId: 3
+                  userId: 2
+                flightBooking:
+                  id: 3
+                  flightBookingRef: "3F5257"
+                  flightTicketNumber: "cb37ba920e"
+                  flightPrice: 595
+                  status: "PENDING"
+                  itineraryId: 3
+                  userId: 2
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+
+  /api/itinerary/checkout:
+    post:
+      tags:
+        - Itineraries
+      summary: Checkout Itinerary
+      description: Completes the checkout process for an itinerary, confirming bookings and payment.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itineraryId:
+                  type: integer
+                  description: ID of the itinerary to checkout
+                creditCardNumber:
+                  type: string
+                  description: Credit card number for payment
+                cardExpiry:
+                  type: string
+                  description: Card expiry date (MM/YY)
+              required:
+                - itineraryId
+                - creditCardNumber
+                - cardExpiry
+              example:
+                itineraryId: 30
+                creditCardNumber: 1111 1111 1111 1111
+                cardExpiry: 11/25
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Itinerary checked out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                  creditCardNumber:
+                    type: string
+                  cardExpiry:
+                    type: string
+                  invoiceUrl:
+                    type: string
+                  status:
+                    type: string
+                  hotelBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      hotelId:
+                        type: integer
+                      roomTypeId:
+                        type: integer
+                      checkInDate:
+                        type: string
+                      checkOutDate:
+                        type: string
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                  flightBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      flightBookingRef:
+                        type: string
+                      flightTicketNumber:
+                        type: string
+                      flightPrice:
+                        type: integer
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+              example:
+                id: 3
+                userId: 2
+                creditCardNumber: "**** **** **** 1111"
+                cardExpiry: "11/25"
+                invoiceUrl: "/invoices/itinerary_3.pdf"
+                status: "CONFIRMED"
+                hotelBooking:
+                  id: 3
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-10T14:00:00.000Z"
+                  checkOutDate: "2025-03-12T11:00:00.000Z"
+                  status: "CONFIRMED"
+                  itineraryId: 3
+                  userId: 2
+                flightBooking:
+                  id: 3
+                  flightBookingRef: "3F5257"
+                  flightTicketNumber: "cb37ba920e"
+                  flightPrice: 595
+                  status: "CONFIRMED"
+                  itineraryId: 3
+                  userId: 2
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+
+  /api/notifications/unread-count:
+    get:
+      tags:
+        - Notifications
+      summary: Retrieve Unread Notification Count
+      description: Returns the number of unread notifications for a specific user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+          example: 24
+          description: ID of the user
+      responses:
+        '201':
+          description: Unread notification count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  unreadCount:
+                    type: integer
+                    description: Number of unread notifications
+              example:
+                unreadCount: 4
+
+  /api/notifications/31/read:
+    put:
+      tags:
+        - Notifications
+      summary: Update Notification To Be Read
+      description: Marks a specific notification as read for a user.
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+          example: 24
+          description: ID of the user
+      responses:
+        '201':
+          description: Notification marked as read successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                  message:
+                    type: string
+                  isRead:
+                    type: boolean
+                  hotelBookingId:
+                    type: integer
+                    nullable: true
+                  flightBookingId:
+                    type: integer
+                    nullable: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  hotelBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      hotelId:
+                        type: integer
+                      roomTypeId:
+                        type: integer
+                      checkInDate:
+                        type: string
+                      checkOutDate:
+                        type: string
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                    nullable: true
+                  flightBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      flightBookingRef:
+                        type: string
+                      flightTicketNumber:
+                        type: string
+                      flightPrice:
+                        type: integer
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                    nullable: true
+              example:
+                id: 6
+                userId: 2
+                message: "New booking for Double room from 2025-03-01 to 2025-03-05"
+                isRead: true
+                hotelBookingId: 1
+                flightBookingId: null
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+                hotelBooking:
+                  id: 1
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-10T14:00:00.000Z"
+                  checkOutDate: "2025-03-12T11:00:00.000Z"
+                  status: "CANCELLED"
+                  itineraryId: 1
+                  userId: 1
+                flightBooking: null
+
+  /api/notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Create New Notification
+      description: Creates a new notification for a user, optionally linked to a booking.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: ID of the user receiving the notification
+                message:
+                  type: string
+                  description: Notification message
+                hotelBookingId:
+                  type: integer
+                  description: ID of the associated hotel booking (optional)
+                  nullable: true
+              required:
+                - userId
+                - message
+              example:
+                userId: 24
+                message: New booking for Double room from 2025-03-01 to 2025-03-05
+                hotelBookingId: 27
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '201':
+          description: Notification created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                  message:
+                    type: string
+                  isRead:
+                    type: boolean
+                  hotelBookingId:
+                    type: integer
+                    nullable: true
+                  flightBookingId:
+                    type: integer
+                    nullable: true
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+                      password:
+                        type: string
+                      profilePicture:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      role:
+                        type: string
+                  hotelBooking:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      hotelId:
+                        type: integer
+                      roomTypeId:
+                        type: integer
+                      checkInDate:
+                        type: string
+                      checkOutDate:
+                        type: string
+                      status:
+                        type: string
+                      itineraryId:
+                        type: integer
+                      userId:
+                        type: integer
+                    nullable: true
+              example:
+                id: 6
+                userId: 2
+                message: "New booking for Double room from 2025-03-01 to 2025-03-05"
+                isRead: false
+                hotelBookingId: 1
+                flightBookingId: null
+                user:
+                  id: 2
+                  firstName: "Anna"
+                  lastName: "Bretscher"
+                  email: "anna@email.com"
+                  password: "$2b$10$nrYml23Gp.DX73H6UERY3OypHB1eW5xk1HIWdDHsBgWLgTEnPMkRa"
+                  profilePicture: "profile.picture.com"
+                  phoneNumber: "123 431 1231"
+                  role: "HOTEL_OWNER"
+                hotelBooking:
+                  id: 1
+                  hotelId: 1
+                  roomTypeId: 1
+                  checkInDate: "2025-03-10T14:00:00.000Z"
+                  checkOutDate: "2025-03-12T11:00:00.000Z"
+                  status: "CANCELLED"
+                  itineraryId: 1
+                  userId: 1
+
+  /api/bookings:
+    post:
+      tags:
+        - AFS
+      summary: Make Booking
+      description: Creates a new flight booking through the Advanced Flight System (AFS).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address
+                firstName:
+                  type: string
+                  description: User's first name
+                flightIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of flight IDs to book
+                lastName:
+                  type: string
+                  description: User's last name
+                passportNumber:
+                  type: string
+                  description: User's passport number
+              required:
+                - email
+                - firstName
+                - flightIds
+                - lastName
+                - passportNumber
+              example:
+                email: test@test.com
+                firstName: Ali
+                flightIds:
+                  - 4dce2a75-2d6f-4906-a5b0-2d5a5e0c468d
+                  - f572ee8c-7db6-47ef-ac7d-fe1405c31323
+                lastName: Marez
+                passportNumber: '123239934'
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          example: dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a
+          description: API key for authentication
+      responses:
+        '200':
+          description: Flight booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookingReference:
+                    type: string
+                  ticketNumber:
+                    type: string
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  email:
+                    type: string
+                  passportNumber:
+                    type: string
+                  status:
+                    type: string
+                  agencyId:
+                    type: string
+                  createdAt:
+                    type: string
+                  flights:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        flightNumber:
+                          type: string
+                        departureTime:
+                          type: string
+                        arrivalTime:
+                          type: string
+                        originId:
+                          type: string
+                        destinationId:
+                          type: string
+                        duration:
+                          type: integer
+                        price:
+                          type: integer
+                        currency:
+                          type: string
+                        availableSeats:
+                          type: integer
+                        status:
+                          type: string
+                        airline:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+                        origin:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+                            city:
+                              type: string
+                            country:
+                              type: string
+                        destination:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+                            city:
+                              type: string
+                            country:
+                              type: string
+              example:
+                bookingReference: "228784"
+                ticketNumber: "e26ee6ad89"
+                firstName: "Ali"
+                lastName: "Marez"
+                email: "test@test.com"
+                passportNumber: "123239934"
+                status: "CONFIRMED"
+                agencyId: "1d201d0d-1292-4725-b08b-cb4d0de04a8e"
+                createdAt: "2025-03-09T00:00:05"
