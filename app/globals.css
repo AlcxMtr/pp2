@@ -35,7 +35,7 @@ body {
 
 /* Forms and Containers */
 .register-hotel-container, .booking-container, .room-type-container, .update-availability-container, .cancel-booking-container {
-  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg; /* Lavender form in dark mode */
+  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg; 
 }
 .register-hotel-title, .booking-title, .room-type-title, .update-availability-title, .cancel-booking-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
@@ -45,7 +45,6 @@ body {
 }
 .form-input {
   @apply w-full p-3 border-2 border-[var(--lavender)] rounded-lg focus:outline-none focus:border-[var(--light-green)] bg-[var(--light-green)] dark:bg-white text-[var(--text-dark)] placeholder-[var(--deep-purple)];
-  /* Ensure placeholder visibility */
   &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
     @apply text-[var(--deep-purple)] opacity-70;
   }
@@ -58,15 +57,13 @@ body {
   &:-moz-placeholder { /* Firefox 18- */
     @apply text-[var(--deep-purple)] opacity-70;
   }
-  /* Keep spin buttons for number inputs */
   &[type="number"] {
     -webkit-appearance: spinner;
     -moz-appearance: number-input;
     appearance: number-input;
   }
-  /* Style select dropdowns */
   &[type="select"], select {
-    @apply appearance-none; /* Remove default arrow for custom styling if desired */
+    @apply appearance-none;
     background-image: url('data:image/svg+xml;utf8,<svg fill="%233D2959" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 0.7rem center;
@@ -88,7 +85,7 @@ body {
   @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 .room-card {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md hover:shadow-xl transition-shadow; /* Lavender card in dark mode */
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md hover:shadow-xl transition-shadow;
 }
 .room-title {
   @apply text-xl font-semibold text-[var(--deep-purple)];
@@ -108,7 +105,7 @@ body {
   @apply space-y-4;
 }
 .booking-item {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md; /* Lavender item in dark mode */
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
 }
 .booking-detail {
   @apply text-[var(--text-dark)];

@@ -5,14 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
-  const [darkMode, setDarkMode] = useState(false);
   const { accessToken, logout } = useAuth();
   const router = useRouter();
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
-  };
 
   const handleLogout = () => {
     logout();
@@ -34,9 +28,6 @@ export default function Navbar() {
           {accessToken && (
             <Link href="/hotels/my-hotels" className="navbar-link">My Hotels</Link>
           )}
-          <button onClick={toggleDarkMode} className="dark-mode-toggle">
-            {darkMode ? 'Light' : 'Dark'}
-          </button>
           {accessToken ? (
             <button onClick={handleLogout} className="navbar-link">Logout</button>
           ) : (
