@@ -105,19 +105,40 @@ export async function POST(request) {
   }
 }
 
-
 export async function GET(req) {
-  const checkInDate = req.nextUrl.searchParams.get('checkInDate');
-  const checkOutDate = req.nextUrl.searchParams.get('checkOutDate');
-  const city = req.nextUrl.searchParams.get('city');
-  const name = req.nextUrl.searchParams.get('name');
-  const starRating = req.nextUrl.searchParams.get('starRating');
-  const minPrice = req.nextUrl.searchParams.get('minPrice');
-  const maxPrice = req.nextUrl.searchParams.get('maxPrice');
+  const { searchParams } = new URL(req.url);
+  const checkInDate = searchParams.get('checkInDate');
+  const checkOutDate = searchParams.get('checkOutDate');
+  const city = searchParams.get('city');
+  const name = searchParams.get('name');
+  const starRating = searchParams.get('starRating');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const ownerId = searchParams.get('ownerId');
+  const getCities = searchParams.get('getCities') === 'true';
 
-  if (!checkInDate || !checkOutDate || !city) {
+  // If getCities is true, return all unique cities
+  if (getCities) {
+    try {
+      const cities = await prisma.hotel.findMany({
+        select: { location: true },
+        distinct: ['location'],
+      });
+      const uniqueCities = cities.map((hotel) => hotel.location).sort();
+      return NextResponse.json(uniqueCities);
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      return NextResponse.json(
+        { message: 'Failed to fetch cities' },
+        { status: 500 }
+      );
+    }
+  }
+
+
+  if (!ownerId && (!checkInDate || !checkOutDate || !city)) {
     return NextResponse.json(
-      { message: 'Check-in date, check-out date, and hotel city required!' },
+      { message: 'Check-in date, check-out date, and hotel city required unless ownerId is provided!' },
       { status: 400 }
     );
   }
@@ -125,17 +146,19 @@ export async function GET(req) {
   try {
     const hotels = await prisma.hotel.findMany({
       where: {
-        location: { contains: city },
-        name: name ? { contains: name } : undefined,
-        starRating: starRating ? { gte: parseInt(starRating) } : undefined,
-        roomTypes: {
-          some: {
-            pricePerNight: {
-              gte: minPrice ? parseFloat(minPrice) : undefined,
-              lte: maxPrice ? parseFloat(maxPrice) : undefined,
+        ...(ownerId ? { ownerId: parseInt(ownerId) } : {
+          location: { contains: city },
+          name: name ? { contains: name } : undefined,
+          starRating: starRating ? { gte: parseInt(starRating) } : undefined,
+          roomTypes: {
+            some: {
+              pricePerNight: {
+                gte: minPrice ? parseFloat(minPrice) : undefined,
+                lte: maxPrice ? parseFloat(maxPrice) : undefined,
+              },
             },
           },
-        },
+        }),
       },
       include: {
         roomTypes: {
@@ -149,6 +172,9 @@ export async function GET(req) {
       },
     });
 
+    if (ownerId) {
+      return NextResponse.json(hotels);
+    }
 
     const availableHotels = await Promise.all(
       hotels.map(async (hotel) => {

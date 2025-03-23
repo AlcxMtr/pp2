@@ -119,6 +119,7 @@ export async function GET(request) {
           totalRooms: roomType.totalRooms,
           bookedRooms: overlappingBookings,
           availableRooms,
+          hotelId: roomType.hotelId,
         };
       })
     );

@@ -3,19 +3,217 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --deep-purple: #3D2959;
+  --lavender: #C5B7D9;
+  --light-green: #CBD9B0;
+  --beige: #D9D7CB;
+  --text-light: #ffffff;
+  --text-dark: #1a1a1a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* General Styles */
+body {
+  @apply min-h-screen bg-[var(--beige)] text-[var(--text-dark)] font-sans transition-colors duration-300;
+}
+
+/* Navbar */
+.navbar {
+  @apply shadow-md p-4 bg-[var(--deep-purple)] text-[var(--text-light)];
+}
+.navbar-container {
+  @apply container mx-auto flex justify-between items-center;
+}
+.navbar-brand {
+  @apply text-2xl font-bold tracking-wide hover:text-[var(--lavender)] transition-colors;
+}
+.navbar-links {
+  @apply flex space-x-4 items-center;
+}
+.navbar-link {
+  @apply text-[var(--text-light)] hover:text-[var(--light-green)] transition-colors;
+}
+
+/* Forms and Containers */
+.register-hotel-container, .booking-container, .room-type-container, .update-availability-container, .cancel-booking-container {
+  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg; /* Lavender form in dark mode */
+}
+.register-hotel-title, .booking-title, .room-type-title, .update-availability-title, .cancel-booking-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.register-hotel-form, .booking-form, .room-type-form, .update-availability-form, .cancel-booking-form {
+  @apply space-y-4;
+}
+.form-input {
+  @apply w-full p-3 border-2 border-[var(--lavender)] rounded-lg focus:outline-none focus:border-[var(--light-green)] bg-[var(--light-green)] dark:bg-white text-[var(--text-dark)] placeholder-[var(--deep-purple)];
+  /* Ensure placeholder visibility */
+  &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    @apply text-[var(--deep-purple)] opacity-70;
+  }
+  &::-moz-placeholder { /* Firefox 19+ */
+    @apply text-[var(--deep-purple)] opacity-70;
+  }
+  &:-ms-input-placeholder { /* IE 10+ */
+    @apply text-[var(--deep-purple)] opacity-70;
+  }
+  &:-moz-placeholder { /* Firefox 18- */
+    @apply text-[var(--deep-purple)] opacity-70;
+  }
+  /* Keep spin buttons for number inputs */
+  &[type="number"] {
+    -webkit-appearance: spinner;
+    -moz-appearance: number-input;
+    appearance: number-input;
+  }
+  /* Style select dropdowns */
+  &[type="select"], select {
+    @apply appearance-none; /* Remove default arrow for custom styling if desired */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%233D2959" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1.5em;
   }
 }
+.submit-button {
+  @apply w-full p-3 bg-[var(--deep-purple)] text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] hover:text-[var(--deep-purple)] transition-colors disabled:opacity-50;
+}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* Rooms */
+.rooms-container, .availability-container {
+  @apply mt-8 mx-auto max-w-4xl;
+}
+.rooms-title, .availability-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.rooms-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+.room-card {
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md hover:shadow-xl transition-shadow; /* Lavender card in dark mode */
+}
+.room-title {
+  @apply text-xl font-semibold text-[var(--deep-purple)];
+}
+.room-price, .room-availability, .room-amenities {
+  @apply text-[var(--text-dark)] mt-1;
+}
+
+/* Hotel Bookings */
+.hotel-bookings-container {
+  @apply mt-8 mx-auto max-w-4xl;
+}
+.hotel-bookings-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.bookings-list {
+  @apply space-y-4;
+}
+.booking-item {
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md; /* Lavender item in dark mode */
+}
+.booking-detail {
+  @apply text-[var(--text-dark)];
+}
+
+/* Notifications */
+.notification-container {
+  @apply relative;
+}
+.notification-button {
+  @apply px-3 py-1 rounded-full bg-[var(--lavender)] text-[var(--deep-purple)] hover:bg-[var(--light-green)] transition-colors;
+}
+.notification-badge {
+  @apply absolute -top-1 -right-1 bg-[var(--deep-purple)] text-[var(--text-light)] text-xs rounded-full h-5 w-5 flex items-center justify-center;
+}
+.notification-list {
+  @apply absolute bg-white dark:bg-[var(--lavender)] shadow-lg p-2 mt-2 rounded-lg w-64 z-10; /* Lavender list in dark mode */
+}
+.notification-item {
+  @apply p-2 text-[var(--text-dark)] hover:bg-[var(--light-green)] hover:text-[var(--deep-purple)] transition-colors;
+}
+
+/* Misc */
+.loading-text {
+  @apply text-center text-[var(--deep-purple)] text-lg mt-8;
+}
+
+/* My Hotels */
+.my-hotels-container {
+  @apply mt-8 mx-auto max-w-4xl;
+}
+.my-hotels-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.hotels-list {
+  @apply space-y-6;
+}
+.hotel-item {
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md flex justify-between items-center;
+}
+.hotel-info {
+  @apply flex-1;
+}
+.hotel-name {
+  @apply text-xl font-semibold text-[var(--deep-purple)];
+}
+.hotel-detail {
+  @apply text-[var(--text-dark)] mt-1;
+}
+.hotel-actions {
+  @apply flex space-x-2;
+}
+.action-button {
+  @apply px-3 py-1 bg-[var(--lavender)] text-[var(--deep-purple)] rounded-lg hover:bg-[var(--light-green)] transition-colors;
+}
+.no-hotels-text {
+  @apply text-[var(--text-dark)] text-center;
+}
+
+.add-availability-container {
+  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg;
+}
+.add-availability-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.add-availability-form {
+  @apply space-y-4;
+}
+
+.toggle-container {
+  @apply my-4;
+}
+.toggle-label {
+  @apply text-[var(--text-dark)];
+}
+
+.my-bookings-container {
+  @apply mt-8 mx-auto max-w-4xl;
+}
+.my-bookings-title {
+  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+.no-bookings-text {
+  @apply text-[var(--text-dark)] text-center;
+}
+.bookings-list {
+  @apply space-y-4;
+}
+.booking-item {
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
+}
+.booking-detail {
+  @apply text-[var(--text-dark)];
+}
+
+/* My Hotels - Bookings Section */
+.bookings-section {
+  @apply mt-4 p-4 bg-[var(--light-green)] dark:bg-[var(--deep-purple)] rounded-lg;
+}
+.bookings-list {
+  @apply space-y-4;
+}
+.booking-item {
+  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
+}
+.booking-detail {
+  @apply text-[var(--text-dark)];
 }

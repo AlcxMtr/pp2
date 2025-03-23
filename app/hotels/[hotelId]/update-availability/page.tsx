@@ -1,0 +1,169 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+
+interface RoomType {
+  roomTypeId: number;
+  name: string;
+  totalRooms: number;
+  hotelId: number;
+}
+
+export default function UpdateAvailability() {
+  const { hotelId: hotelIdString } = useParams();
+  const hotelId = Number(hotelIdString);
+  const { accessToken, userId } = useAuth();
+  const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+  const [form, setForm] = useState({
+    roomTypeId: '',
+    newTotalRooms: '',
+    checkInDate: '',
+    checkOutDate: '',
+    useDateRange: false,
+  });
+  const [loadingRooms, setLoadingRooms] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!accessToken || !userId) {
+      router.push('/login');
+      return;
+    }
+    const fetchRoomTypes = async () => {
+      try {
+        const res = await fetch(`/api/rooms/room-availabilities?ownerId=${userId}&startDate=2000-01-01&endDate=2100-12-31`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log('API Response:', data); // Debug: Log the full response
+          const hotelRoomTypes = data.availability.filter((rt: RoomType) => rt.hotelId === hotelId);
+          console.log('Filtered Room Types:', hotelRoomTypes); // Debug: Log filtered results
+          setRoomTypes(hotelRoomTypes);
+        } else {
+          throw new Error(await res.text());
+        }
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+        alert('Failed to load room types');
+      } finally {
+        setLoadingRooms(false);
+      }
+    };
+    fetchRoomTypes();
+  }, [accessToken, userId, hotelId, router]);
+
+  const handleUpdate = async () => {
+    if (!accessToken || !userId) {
+      router.push('/login');
+      return;
+    }
+    if (!form.roomTypeId || (!form.useDateRange && !form.newTotalRooms)) {
+      alert('Please select a room type and provide either a new total or date range');
+      return;
+    }
+    if (form.useDateRange && (!form.checkInDate || !form.checkOutDate)) {
+      alert('Please provide both check-in and check-out dates when using a date range');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const url = form.useDateRange
+        ? `/api/rooms/room-availabilities/update-availabilities?ownerId=${userId}&startDate=${form.checkInDate}&endDate=${form.checkOutDate}`
+        : `/api/rooms/room-availabilities/update-availabilities?ownerId=${userId}`;
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          roomTypeId: Number(form.roomTypeId),
+          newTotalRooms: Number(form.newTotalRooms || 0),
+        }),
+      });
+      if (res.ok) {
+        alert('Availability updated!');
+        router.push(`/hotels/${hotelId}/rooms`);
+      } else {
+        throw new Error(await res.text());
+      }
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      alert('Error updating availability');
+    }
+    setSubmitting(false);
+  };
+
+  if (loadingRooms) return <p className="loading-text">Loading room types...</p>;
+
+  return (
+    <div className="update-availability-container">
+      <h1 className="update-availability-title">Update Room Availability</h1>
+      <div className="update-availability-form">
+        <select
+          value={form.roomTypeId}
+          onChange={(e) => setForm({ ...form, roomTypeId: e.target.value })}
+          className="form-input"
+          disabled={roomTypes.length === 0}
+        >
+          <option value="">Select a Room Type</option>
+          {roomTypes.length === 0 ? (
+            <option value="">No room types available</option>
+          ) : (
+            roomTypes.map((room) => (
+              <option key={room.roomTypeId} value={room.roomTypeId}>
+                {room.name} (Current: {room.totalRooms} rooms)
+              </option>
+            ))
+          )}
+        </select>
+
+        <label className="text-[var(--text-dark)]">
+          <input
+            type="checkbox"
+            checked={form.useDateRange}
+            onChange={(e) => setForm({ ...form, useDateRange: e.target.checked, newTotalRooms: '' })}
+            className="mr-2"
+          />
+          Use Date Range
+        </label>
+
+        {form.useDateRange ? (
+          <>
+            <input
+              type="date"
+              value={form.checkInDate}
+              onChange={(e) => setForm({ ...form, checkInDate: e.target.value })}
+              className="form-input"
+              placeholder="Check-in Date"
+            />
+            <input
+              type="date"
+              value={form.checkOutDate}
+              onChange={(e) => setForm({ ...form, checkOutDate: e.target.value })}
+              className="form-input"
+              placeholder="Check-out Date"
+            />
+          </>
+        ) : (
+          <input
+            type="number"
+            placeholder="New Total Rooms"
+            value={form.newTotalRooms}
+            onChange={(e) => setForm({ ...form, newTotalRooms: e.target.value })}
+            className="form-input"
+            min="0"
+          />
+        )}
+
+        <button onClick={handleUpdate} disabled={submitting} className="submit-button">
+          {submitting ? 'Updating...' : 'Update Availability'}
+        </button>
+      </div>
+    </div>
+  );
+}
