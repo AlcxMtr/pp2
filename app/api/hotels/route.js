@@ -135,7 +135,6 @@ export async function GET(req) {
     }
   }
 
-
   if (!ownerId && (!checkInDate || !checkOutDate || !city)) {
     return NextResponse.json(
       { message: 'Check-in date, check-out date, and hotel city required unless ownerId is provided!' },
@@ -161,12 +160,11 @@ export async function GET(req) {
         }),
       },
       include: {
+        images: true,
         roomTypes: {
-          select: {
-            id: true,
-            name: true,
-            pricePerNight: true,
-            totalRooms: true,
+          include: {
+            amenities: true,
+            images: true,
           },
         },
       },
@@ -178,41 +176,45 @@ export async function GET(req) {
 
     const availableHotels = await Promise.all(
       hotels.map(async (hotel) => {
-        const availableRoomTypes = await Promise.all(
+        const roomTypesWithAvailability = await Promise.all(
           hotel.roomTypes.map(async (roomType) => {
             const availableRooms = await getAvailableRooms(
               roomType.id,
               new Date(checkInDate),
               new Date(checkOutDate)
             );
-            return { ...roomType, availableRooms };
+            return {
+              ...roomType,
+              availableRooms,
+              amenities: roomType.amenities.map((amenity) => amenity.name),
+              images: roomType.images.map((image) => image.url),
+            };
           })
         );
 
         // Filter out room types with no availability
-        const filteredRoomTypes = availableRoomTypes.filter((room) => room.availableRooms > 0);
+        const filteredRoomTypes = roomTypesWithAvailability.filter((room) => room.availableRooms > 0);
 
         return {
-          ...hotel,
+          id: hotel.id,
+          name: hotel.name,
+          location: hotel.location,
+          starRating: hotel.starRating,
+          address: hotel.address,
+          logo: hotel.logo,
+          images: hotel.images.map((image) => image.url),
           roomTypes: filteredRoomTypes,
+          startingPrice: filteredRoomTypes.length > 0 
+            ? Math.min(...filteredRoomTypes.map((room) => room.pricePerNight))
+            : null,
         };
       })
     );
 
     // Filter out hotels with no available rooms
-    const results = availableHotels
-      .filter((hotel) => hotel.roomTypes.length > 0)
-      .map((hotel) => ({
-        id: hotel.id,
-        name: hotel.name,
-        location: hotel.location,
-        starRating: hotel.starRating,
-        startingPrice: Math.min(...hotel.roomTypes.map((room) => room.pricePerNight)),
-        availableRooms: hotel.roomTypes,
-      }));
+    const results = availableHotels.filter((hotel) => hotel.roomTypes.length > 0);
 
     return NextResponse.json(results);
-
   } catch (error) {
     console.error('Error searching hotels:', error);
     return NextResponse.json(

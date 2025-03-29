@@ -13,12 +13,12 @@
 
 /* General Styles */
 body {
-  @apply min-h-screen bg-[var(--beige)] text-[var(--text-dark)] font-sans transition-colors duration-300;
+  @apply min-h-screen bg-gray-300 text-[var(--text-dark)] font-sans transition-colors duration-300;
 }
 
 /* Navbar */
 .navbar {
-  @apply shadow-md p-4 bg-[var(--deep-purple)] text-[var(--text-light)];
+  @apply shadow-md p-4 bg-black text-[var(--text-light)];
 }
 .navbar-container {
   @apply container mx-auto flex justify-between items-center;
@@ -213,4 +213,20 @@ body {
 }
 .booking-detail {
   @apply text-[var(--text-dark)];
+}
+
+
+/* React Slideshow Styling */
+.each-slide-effect > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+}
+
+.each-slide-effect span {
+  padding: 20px;
+  font-size: 20px;
+  background: #efefef;
+  text-align: center;
 }
