@@ -184,7 +184,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className='flex flex-col justify-center bg-gray-100 rounded-lg'>
+    <div className='search-page-container'>
     <div className="flex items-start justify-center p-10 bg-gray-500">
       <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
         {/* Search Type Switch */}

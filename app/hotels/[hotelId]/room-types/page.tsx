@@ -1,14 +1,21 @@
 'use client';
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AddRoomType() {
-  const { hotelId: hotelIdString } = useParams(); // Renamed to clarify it's a string
-  const hotelId = Number(hotelIdString); // Convert to number
+  const { hotelId: hotelIdString } = useParams();
+  const hotelId = Number(hotelIdString);
   const { accessToken, userId } = useAuth();
-  const [form, setForm] = useState({ name: '', totalRooms: '', pricePerNight: '', amenities: [], images: [] });
+  const [form, setForm] = useState({
+    name: '',
+    totalRooms: '',
+    pricePerNight: '',
+    amenities: [] as string[],
+    images: [] as { url: string }[],
+  });
+  const [amenityInput, setAmenityInput] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -16,6 +23,10 @@ export default function AddRoomType() {
     e.preventDefault();
     if (!accessToken || !userId) {
       router.push('/login');
+      return;
+    }
+    if (!form.name || !form.totalRooms || !form.pricePerNight) {
+      alert('Please fill in all required fields: Name, Total Rooms, and Price per Night');
       return;
     }
     setLoading(true);
@@ -27,28 +38,49 @@ export default function AddRoomType() {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          ...form,
+          name: form.name,
           totalRooms: Number(form.totalRooms),
           pricePerNight: Number(form.pricePerNight),
-          hotelId, // Already a number
+          hotelId,
+          amenities: form.amenities.map((name) => ({ name })),
+          images: form.images,
         }),
       });
       if (res.ok) {
-        alert('Room type added!');
-        router.push(`/hotels/${hotelId}/rooms`); // Redirect to view rooms after success
+        router.push(`/hotels/${hotelId}/manage`);
       } else {
         throw new Error(await res.text());
       }
     } catch (error) {
       console.error('Error adding room type:', error);
       alert('Error adding room type');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const addAmenity = () => {
+    if (amenityInput.trim() && !form.amenities.includes(amenityInput.trim())) {
+      setForm({ ...form, amenities: [...form.amenities, amenityInput.trim()] });
+      setAmenityInput('');
+    }
+  };
+
+  const removeAmenity = (index: number) => {
+    setForm({
+      ...form,
+      amenities: form.amenities.filter((_, i) => i !== index),
+    });
   };
 
   return (
     <div className="room-type-container">
-      <h1 className="room-type-title">Add Room Type</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="room-type-title">Add Room Type</h1>
+        <Link href={`/hotels/${hotelId}/manage`} className="back-button">
+          Back
+        </Link>
+      </div>
       <form onSubmit={handleSubmit} className="room-type-form">
         <input
           type="text"
@@ -56,6 +88,7 @@ export default function AddRoomType() {
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           className="form-input"
+          required
         />
         <input
           type="number"
@@ -63,6 +96,8 @@ export default function AddRoomType() {
           value={form.totalRooms}
           onChange={(e) => setForm({ ...form, totalRooms: e.target.value })}
           className="form-input"
+          min="1"
+          required
         />
         <input
           type="number"
@@ -70,7 +105,47 @@ export default function AddRoomType() {
           value={form.pricePerNight}
           onChange={(e) => setForm({ ...form, pricePerNight: e.target.value })}
           className="form-input"
+          min="0.01"
+          step="0.01"
+          required
         />
+        <div className="amenities-section">
+          <label className="amenities-label">Amenities (Optional)</label>
+          <div className="amenity-input-group">
+            <input
+              type="text"
+              placeholder="Add an amenity (e.g., Wi-Fi)"
+              value={amenityInput}
+              onChange={(e) => setAmenityInput(e.target.value)}
+              className="form-input"
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAmenity())}
+            />
+            <button
+              type="button"
+              onClick={addAmenity}
+              className="add-amenity-button"
+              disabled={!amenityInput.trim()}
+            >
+              Add
+            </button>
+          </div>
+          {form.amenities.length > 0 && (
+            <ul className="amenities-list">
+              {form.amenities.map((amenity, index) => (
+                <li key={index} className="amenity-item">
+                  {amenity}
+                  <button
+                    type="button"
+                    onClick={() => removeAmenity(index)}
+                    className="remove-amenity-button"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <button type="submit" disabled={loading} className="submit-button">
           {loading ? 'Adding...' : 'Add Room Type'}
         </button>

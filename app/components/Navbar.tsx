@@ -3,8 +3,15 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { FiSun, FiMoon } from 'react-icons/fi';
+import Notification from './Notification';
 
-export default function Navbar() {
+interface NavbarProps {
+  onToggleTheme: () => void;
+  theme: string;
+}
+
+export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
   const { accessToken, logout } = useAuth();
   const router = useRouter();
 
@@ -18,7 +25,7 @@ export default function Navbar() {
       <div className="navbar-container">
         <Link href="/" className="navbar-brand">FlyNext</Link>
         <div className="navbar-links">
-          <Link href="/" className="navbar-link">Search</Link>
+          <Link href="/search" className="navbar-link">Search</Link>
           {accessToken && (
             <Link href="/book" className="navbar-link">Book</Link>
           )}
@@ -33,6 +40,10 @@ export default function Navbar() {
           ) : (
             <Link href="/login" className="navbar-link">Login</Link>
           )}
+          <button onClick={onToggleTheme} className="navbar-link flex items-center">
+            {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
+          </button>
+          {accessToken && <Notification />}
         </div>
       </div>
     </nav>

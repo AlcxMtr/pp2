@@ -99,3 +99,38 @@ export async function POST(request) {
     );
   }
 }
+
+// GET Fetch all notifications for a user
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = parseInt(searchParams.get('userId') || '', 10);
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing required parameter: userId' }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const authResult = verifyToken(request);
+    if (authResult instanceof NextResponse) return authResult;
+    const authUserId = authResult.userId;
+
+    if (userId !== authUserId) {
+      return NextResponse.json({ error: "Invalid user ID or credentials" }, { status: 400 });
+    }
+
+    const notifications = await prisma.notification.findMany({
+      where: { userId },
+      include: { hotelBooking: true, flightBooking: true },
+    });
+
+    return NextResponse.json(notifications, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

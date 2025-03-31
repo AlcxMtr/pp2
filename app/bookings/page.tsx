@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import LoadingMessage from '../components/LoadingMessage';
 
 interface Booking {
   id: number;
@@ -44,7 +45,7 @@ export default function MyBookings() {
     fetchBookings();
   }, [accessToken, userId, router]);
 
-  if (loading) return <p className="loading-text">Loading your bookings...</p>;
+  if (loading) return <LoadingMessage message="Loading your bookings..." />;
 
   return (
     <div className="my-bookings-container">

@@ -9,16 +9,31 @@
   --beige: #D9D7CB;
   --text-light: #ffffff;
   --text-dark: #1a1a1a;
+  --gray-bg-light: #f5f5f5; 
+  --gray-bg-dark: #6b7381;  
+  --card-bg-light: #ffffff;
+  --card-bg-dark: #374151;
 }
 
-/* General Styles */
+/* Light mode default */
 body {
-  @apply min-h-screen bg-gray-300 text-[var(--text-dark)] font-sans transition-colors duration-300;
+  @apply min-h-screen bg-[var(--gray-bg-light)] text-[var(--text-dark)] font-sans transition-colors duration-300;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-[var(--gray-bg-dark)] text-[var(--text-light)];
+  }
+}
+
+[data-theme="dark"] body {
+  @apply bg-[var(--gray-bg-dark)] text-[var(--text-light)];
 }
 
 /* Navbar */
 .navbar {
-  @apply shadow-md p-4 bg-black text-[var(--text-light)];
+  @apply shadow-md p-4 bg-gray-800 text-[var(--text-light)];
 }
 .navbar-container {
   @apply container mx-auto flex justify-between items-center;
@@ -35,43 +50,39 @@ body {
 
 /* Forms and Containers */
 .register-hotel-container, .booking-container, .room-type-container, .update-availability-container, .cancel-booking-container {
-  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg; 
+  @apply max-w-lg mx-auto mt-8 p-6 bg-[var(--card-bg-light)] rounded-lg shadow-lg;
+}
+[data-theme="dark"] .register-hotel-container,
+[data-theme="dark"] .booking-container,
+[data-theme="dark"] .room-type-container,
+[data-theme="dark"] .update-availability-container,
+[data-theme="dark"] .cancel-booking-container {
+  @apply bg-[var(--card-bg-dark)];
 }
 .register-hotel-title, .booking-title, .room-type-title, .update-availability-title, .cancel-booking-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+[data-theme="dark"] .register-hotel-title,
+[data-theme="dark"] .booking-title,
+[data-theme="dark"] .room-type-title,
+[data-theme="dark"] .update-availability-title,
+[data-theme="dark"] .cancel-booking-title {
+  @apply text-[var(--lavender)];
 }
 .register-hotel-form, .booking-form, .room-type-form, .update-availability-form, .cancel-booking-form {
   @apply space-y-4;
 }
 .form-input {
-  @apply w-full p-3 border-2 border-[var(--lavender)] rounded-lg focus:outline-none focus:border-[var(--light-green)] bg-[var(--light-green)] dark:bg-white text-[var(--text-dark)] placeholder-[var(--deep-purple)];
-  &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-    @apply text-[var(--deep-purple)] opacity-70;
-  }
-  &::-moz-placeholder { /* Firefox 19+ */
-    @apply text-[var(--deep-purple)] opacity-70;
-  }
-  &:-ms-input-placeholder { /* IE 10+ */
-    @apply text-[var(--deep-purple)] opacity-70;
-  }
-  &:-moz-placeholder { /* Firefox 18- */
-    @apply text-[var(--deep-purple)] opacity-70;
-  }
-  &[type="number"] {
-    -webkit-appearance: spinner;
-    -moz-appearance: number-input;
-    appearance: number-input;
-  }
-  &[type="select"], select {
-    @apply appearance-none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%233D2959" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 0.7rem center;
-    background-size: 1.5em;
-  }
+  @apply w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[var(--light-green)] bg-white text-[var(--text-dark)] placeholder-gray-500;
+}
+[data-theme="dark"] .form-input {
+  @apply border-gray-600 bg-gray-700 text-[var(--text-light)] placeholder-gray-400;
 }
 .submit-button {
-  @apply w-full p-3 bg-[var(--deep-purple)] text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] hover:text-[var(--deep-purple)] transition-colors disabled:opacity-50;
+  @apply w-full p-3 bg-[var(--deep-purple)] text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] transition-colors disabled:opacity-50;
+}
+[data-theme="dark"] .submit-button {
+  @apply hover:text-[var(--text-dark)];
 }
 
 /* Rooms */
@@ -81,34 +92,43 @@ body {
 .rooms-title, .availability-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
 }
+[data-theme="dark"] .rooms-title, [data-theme="dark"] .availability-title {
+  @apply text-[var(--lavender)];
+}
 .rooms-grid {
   @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 .room-card {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md hover:shadow-xl transition-shadow;
+  @apply p-4 bg-[var(--card-bg-light)] rounded-lg shadow-md hover:shadow-xl transition-shadow;
 }
-.room-title {
-  @apply text-xl font-semibold text-[var(--deep-purple)];
-}
-.room-price, .room-availability, .room-amenities {
-  @apply text-[var(--text-dark)] mt-1;
+[data-theme="dark"] .room-card {
+  @apply bg-[var(--card-bg-dark)];
 }
 
 /* Hotel Bookings */
-.hotel-bookings-container {
+.my-bookings-container, .hotel-bookings-container {
   @apply mt-8 mx-auto max-w-4xl;
 }
-.hotel-bookings-title {
+.my-bookings-title, .hotel-bookings-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+}
+[data-theme="dark"] .my-bookings-title, [data-theme="dark"] .hotel-bookings-title {
+  @apply text-[var(--lavender)];
 }
 .bookings-list {
   @apply space-y-4;
 }
 .booking-item {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
+  @apply p-4 bg-[var(--card-bg-light)] rounded-lg shadow-md;
+}
+[data-theme="dark"] .booking-item {
+  @apply bg-[var(--card-bg-dark)];
 }
 .booking-detail {
   @apply text-[var(--text-dark)];
+}
+[data-theme="dark"] .booking-detail {
+  @apply text-[var(--text-light)];
 }
 
 /* Notifications */
@@ -118,19 +138,17 @@ body {
 .notification-button {
   @apply px-3 py-1 rounded-full bg-[var(--lavender)] text-[var(--deep-purple)] hover:bg-[var(--light-green)] transition-colors;
 }
+[data-theme="dark"] .notification-button {
+  @apply bg-gray-600 text-[var(--text-light)] hover:bg-gray-500;
+}
 .notification-badge {
   @apply absolute -top-1 -right-1 bg-[var(--deep-purple)] text-[var(--text-light)] text-xs rounded-full h-5 w-5 flex items-center justify-center;
 }
 .notification-list {
-  @apply absolute bg-white dark:bg-[var(--lavender)] shadow-lg p-2 mt-2 rounded-lg w-64 z-10; /* Lavender list in dark mode */
+  @apply absolute bg-[var(--card-bg-light)] shadow-lg p-2 mt-2 rounded-lg w-64 z-10;
 }
-.notification-item {
-  @apply p-2 text-[var(--text-dark)] hover:bg-[var(--light-green)] hover:text-[var(--deep-purple)] transition-colors;
-}
-
-/* Misc */
-.loading-text {
-  @apply text-center text-[var(--deep-purple)] text-lg mt-8;
+[data-theme="dark"] .notification-list {
+  @apply bg-[var(--card-bg-dark)];
 }
 
 /* My Hotels */
@@ -140,93 +158,186 @@ body {
 .my-hotels-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
 }
+[data-theme="dark"] .my-hotels-title {
+  @apply text-[var(--lavender)];
+}
 .hotels-list {
   @apply space-y-6;
 }
 .hotel-item {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md flex justify-between items-center;
+  @apply p-4 bg-[var(--card-bg-light)] rounded-lg shadow-md flex justify-between items-center;
 }
-.hotel-info {
-  @apply flex-1;
+[data-theme="dark"] .hotel-item {
+  @apply bg-[var(--card-bg-dark)];
 }
 .hotel-name {
   @apply text-xl font-semibold text-[var(--deep-purple)];
 }
-.hotel-detail {
-  @apply text-[var(--text-dark)] mt-1;
+[data-theme="dark"] .hotel-name {
+  @apply text-[var(--lavender)];
 }
-.hotel-actions {
-  @apply flex space-x-2;
+.hotel-detail {
+  @apply text-[var(--text-dark)];
+}
+[data-theme="dark"] .hotel-detail {
+  @apply text-[var(--text-light)];
 }
 .action-button {
   @apply px-3 py-1 bg-[var(--lavender)] text-[var(--deep-purple)] rounded-lg hover:bg-[var(--light-green)] transition-colors;
 }
-.no-hotels-text {
-  @apply text-[var(--text-dark)] text-center;
+[data-theme="dark"] .action-button {
+  @apply bg-gray-600 text-[var(--text-light)] hover:bg-gray-500;
 }
 
-.add-availability-container {
-  @apply max-w-lg mx-auto mt-8 p-6 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-lg;
-}
-.add-availability-title {
-  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
-}
-.add-availability-form {
-  @apply space-y-4;
-}
-
-.toggle-container {
-  @apply my-4;
-}
-.toggle-label {
-  @apply text-[var(--text-dark)];
-}
-
-.my-bookings-container {
+/* Manage Hotel */
+.manage-hotel-container {
   @apply mt-8 mx-auto max-w-4xl;
 }
-.my-bookings-title {
+.manage-hotel-title {
   @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
 }
-.no-bookings-text {
-  @apply text-[var(--text-dark)] text-center;
+[data-theme="dark"] .manage-hotel-title {
+  @apply text-[var(--lavender)];
 }
-.bookings-list {
-  @apply space-y-4;
+.hotel-info {
+  @apply p-4 bg-[var(--card-bg-light)] rounded-lg shadow-md;
 }
-.booking-item {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
+[data-theme="dark"] .hotel-info {
+  @apply bg-[var(--card-bg-dark)];
 }
-.booking-detail {
-  @apply text-[var(--text-dark)];
+.manage-actions {
+  @apply flex flex-wrap gap-4;
 }
-
-/* My Hotels - Bookings Section */
 .bookings-section {
-  @apply mt-4 p-4 bg-[var(--light-green)] dark:bg-[var(--deep-purple)] rounded-lg;
+  @apply mt-6;
 }
-.bookings-list {
+
+/* Room Type - Amenities */
+.amenities-section {
+  @apply mt-4;
+}
+.amenities-label {
+  @apply text-[var(--text-dark)] font-semibold mb-2;
+}
+[data-theme="dark"] .amenities-label {
+  @apply text-[var(--text-light)];
+}
+.amenity-input-group {
+  @apply flex gap-2;
+}
+.add-amenity-button {
+  @apply bg-[var(--deep-purple)] text-white px-4 py-2 rounded-lg hover:bg-[var(--lavender)] disabled:bg-gray-400 disabled:cursor-not-allowed;
+}
+[data-theme="dark"] .add-amenity-button {
+  @apply hover:text-[var(--text-dark)];
+}
+.amenities-list {
+  @apply mt-2 space-y-2;
+}
+.amenity-item {
+  @apply flex justify-between items-center bg-[var(--card-bg-light)] p-2 rounded-lg shadow-sm;
+}
+[data-theme="dark"] .amenity-item {
+  @apply bg-[var(--card-bg-dark)];
+}
+.remove-amenity-button {
+  @apply text-red-500 hover:text-red-700 font-bold ml-2;
+}
+
+/* Additional Components */
+.back-button {
+  @apply bg-[var(--deep-purple)] text-white px-4 py-2 rounded-lg hover:bg-[var(--lavender)] transition-colors;
+}
+[data-theme="dark"] .back-button {
+  @apply hover:text-[var(--text-dark)];
+}
+.edit-button, .cancel-button, .confirm-button {
+  @apply px-4 py-1 rounded-lg mt-2;
+}
+.edit-button {
+  @apply bg-[var(--deep-purple)] text-white hover:bg-[var(--lavender)];
+}
+[data-theme="dark"] .edit-button {
+  @apply hover:text-[var(--text-dark)];
+}
+.cancel-button {
+  @apply bg-red-500 text-white hover:bg-red-600;
+}
+.confirm-button {
+  @apply bg-red-500 text-white hover:bg-red-600;
+}
+.modal-content {
+  @apply bg-[var(--card-bg-light)] p-6 rounded-lg shadow-lg;
+}
+[data-theme="dark"] .modal-content {
+  @apply bg-[var(--card-bg-dark)];
+}
+.modal-actions {
+  @apply flex gap-4 mt-4 justify-center;
+}
+.edit-room-title {
+  @apply text-xl font-bold text-[var(--deep-purple)] mb-4;
+}
+[data-theme="dark"] .edit-room-title {
+  @apply text-[var(--lavender)];
+}
+.edit-room-form {
   @apply space-y-4;
 }
-.booking-item {
-  @apply p-4 bg-white dark:bg-[var(--lavender)] rounded-lg shadow-md;
-}
-.booking-detail {
-  @apply text-[var(--text-dark)];
-}
 
-
-/* React Slideshow Styling */
-.each-slide-effect > div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
+/* Search Page Alignment */
+.search-page-container {
+  @apply flex flex-col justify-center bg-[var(--gray-bg-light)] rounded-lg;
+}
+[data-theme="dark"] .search-page-container {
+  @apply bg-[var(--gray-bg-dark)];
 }
 
-.each-slide-effect span {
-  padding: 20px;
-  font-size: 20px;
-  background: #efefef;
-  text-align: center;
+/* Loading */
+.loading-container {
+  @apply flex items-center justify-center min-h-[200px] w-full;
+}
+.loading-text {
+  @apply text-lg font-medium text-[var(--deep-purple)];
+}
+[data-theme="dark"] .loading-text {
+  @apply text-[var(--lavender)];
+}
+
+/* Notifications */
+.notification-container {
+  @apply relative;
+}
+.notification-button {
+  @apply px-3 py-1 rounded-full bg-[var(--lavender)] text-[var(--deep-purple)] hover:bg-[var(--light-green)] transition-colors;
+}
+[data-theme="dark"] .notification-button {
+  @apply bg-gray-600 text-[var(--text-light)] hover:bg-gray-500;
+}
+.notification-badge {
+  @apply absolute -top-1 -right-1 bg-red-500 text-[var(--text-light)] text-xs rounded-full h-5 w-5 flex items-center justify-center;
+}
+.notification-list {
+  @apply absolute right-0 bg-[var(--card-bg-light)] shadow-lg p-2 mt-2 rounded-lg w-72 max-h-80 overflow-y-auto z-20;
+}
+[data-theme="dark"] .notification-list {
+  @apply bg-[var(--card-bg-dark)];
+}
+.notification-item {
+  @apply p-2 rounded-md cursor-pointer;
+}
+.notification-item.unread {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
+.notification-item.read {
+  @apply bg-[var(--card-bg-light)] dark:bg-[var(--card-bg-dark)];
+}
+.notification-item:hover {
+  @apply bg-[var(--light-green)] dark:bg-[var(--lavender)];
+}
+.notification-item p {
+  @apply text-[var(--text-dark)] dark:text-[var(--text-light)] text-sm;
+}
+.notification-item span {
+  @apply text-xs;
 }

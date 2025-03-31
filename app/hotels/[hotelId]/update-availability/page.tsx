@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface RoomType {
   roomTypeId: number;
@@ -39,9 +39,7 @@ export default function UpdateAvailability() {
         });
         if (res.ok) {
           const data = await res.json();
-          console.log('API Response:', data); // Debug: Log the full response
           const hotelRoomTypes = data.availability.filter((rt: RoomType) => rt.hotelId === hotelId);
-          console.log('Filtered Room Types:', hotelRoomTypes); // Debug: Log filtered results
           setRoomTypes(hotelRoomTypes);
         } else {
           throw new Error(await res.text());
@@ -86,23 +84,28 @@ export default function UpdateAvailability() {
         }),
       });
       if (res.ok) {
-        alert('Availability updated!');
-        router.push(`/hotels/${hotelId}/rooms`);
+        router.push(`/hotels/${hotelId}/manage`);
       } else {
         throw new Error(await res.text());
       }
     } catch (error) {
       console.error('Error updating availability:', error);
       alert('Error updating availability');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   if (loadingRooms) return <p className="loading-text">Loading room types...</p>;
 
   return (
     <div className="update-availability-container">
-      <h1 className="update-availability-title">Update Room Availability</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="update-availability-title">Update Room Availability</h1>
+        <Link href={`/hotels/${hotelId}/manage`} className="back-button">
+          Back
+        </Link>
+      </div>
       <div className="update-availability-form">
         <select
           value={form.roomTypeId}
@@ -121,7 +124,6 @@ export default function UpdateAvailability() {
             ))
           )}
         </select>
-
         <label className="text-[var(--text-dark)]">
           <input
             type="checkbox"
@@ -131,7 +133,6 @@ export default function UpdateAvailability() {
           />
           Use Date Range
         </label>
-
         {form.useDateRange ? (
           <>
             <input
@@ -159,7 +160,6 @@ export default function UpdateAvailability() {
             min="0"
           />
         )}
-
         <button onClick={handleUpdate} disabled={submitting} className="submit-button">
           {submitting ? 'Updating...' : 'Update Availability'}
         </button>
