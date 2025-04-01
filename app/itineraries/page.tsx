@@ -10,6 +10,7 @@ export default function itinerariesPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [flightBookings, setFlightBookings] = useState<Map<string, FlightBookingInfo>>(new Map());
   const router = useRouter();
 
   useEffect(() => {
@@ -64,38 +65,33 @@ export default function itinerariesPage() {
     fetchBookings();
   }, [authLoading]);
 
-  // TODO: Fetch flight booking info for each booking
-/*   useEffect(() => {
-    // Loop over each booking and check if it has a flight booking
-
-    const fetchFlightInfo = async (bookingRef: String) => {
+  useEffect(() => {
+    const fetchFlightInfo = async (bookingRef: string) => {
       try {
-        const response = await fetch(`/api/users/flight-bookings/verify?lastName=${userProfile?.lastName}&bookingReference=${bookingRef}`, {
+        const response = await fetch(`/api/bookings/flight-bookings/verify?lastName=${userProfile?.lastName}&bookingReference=${bookingRef}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: Number(userId),
-          }),
+          }
         });
-        if (!response.ok) throw new Error('Failed to fetch user profile');
+        if (!response.ok) throw new Error('Failed to fetch flight info');
         const data = await response.json();
-        console.log('Flight Booking Info:', data);
+        setFlightBookings((prev) => new Map(prev).set(bookingRef, data));
       } catch (err) {
         console.error(err);
       }
     };
 
+    // Loop over each booking and check if it has a flight booking, then add info to map
     bookings.forEach((booking) => {
-      if (booking.flightBooking) {
-        // Extract flight booking details using https://advanced-flights-system.replit.app/api/bookings/retrieve?lastName=Doe&bookingReference=1A381D
-        //const flightBooking: FlightBooking = booking.flightBooking;
-        fetchFlightInfo(booking.flightBooking.flightBookingRef);
+      if (!flightBookings.has(booking.flightBooking?.flightBookingRef || '')){
+        if (accessToken && booking.flightBooking) {
+          fetchFlightInfo(booking.flightBooking.flightBookingRef);
+        }
       }
     });
-  }, [bookings, userProfile]); */
+  }, [bookings, userProfile]);
 
   const pendingBookings = bookings.filter(
     (booking) => booking.status === 'PENDING'
@@ -104,7 +100,9 @@ export default function itinerariesPage() {
     (booking) => booking.status === 'CONFIRMED'
   );
 
-  const renderBookingCard = (booking: Booking) => (
+  const renderBookingCard = (booking: Booking) => {
+    let flightBookingInfo = flightBookings.get(booking.flightBooking?.flightBookingRef || '');
+    return (
     <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md mb-4">
       <div className="flex justify-between items-center mb-4">
         {booking.creditCardNumber && (
@@ -127,7 +125,7 @@ export default function itinerariesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {booking.hotelBooking && (
           <div>
-            <div className="font-medium text-gray-800">Hotel Booking</div>
+            <div className="font-medium text-gray-800 mb-1">Hotel Booking</div>
             <p className="text-sm text-gray-600">
               {booking.hotelBooking.hotel.address}
             </p>
@@ -149,12 +147,18 @@ export default function itinerariesPage() {
 
         {booking.flightBooking && (
           <div>
-            <h4 className="font-medium text-gray-800">Flight Booking</h4>
+            <h4 className="font-medium text-gray-800 mb-1">Flight Booking</h4>
+            <p className="text-sm text-gray-600">
+              {flightBookingInfo?.origin} → {flightBookingInfo?.destination}
+            </p>
             <p className="text-sm text-gray-600">
               Ref: {booking.flightBooking.flightBookingRef}
             </p>
             <p className="text-sm text-gray-600">
               Ticket: {booking.flightBooking.flightTicketNumber}
+            </p>
+            <p className="text-sm text-gray-600">
+              Number of Legs: {flightBookingInfo?.numLegs}
             </p>
             <p className="text-sm text-gray-600">
               Price: ${booking.flightBooking.flightPrice}
@@ -163,7 +167,8 @@ export default function itinerariesPage() {
         )}
       </div>
     </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
