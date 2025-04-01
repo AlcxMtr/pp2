@@ -24,10 +24,13 @@ export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
     <nav className="navbar">
       <div className="navbar-container">
         <Link href="/" className="navbar-brand">FlyNext</Link>
-        <div className="navbar-links">
+        <div className="navbar-links">  
           <Link href="/search" className="navbar-link">Search</Link>
           {accessToken && (
             <Link href="/book" className="navbar-link">Book</Link>
+          )}
+          {accessToken && (
+            <Link href="/itineraries" className="navbar-link">Itineraries</Link>
           )}
           {accessToken && (
             <Link href="/hotels/register" className="navbar-link">Register Hotel</Link>

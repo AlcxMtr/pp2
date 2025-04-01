@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useAuth } from '../contexts/AuthContext';
 import { FiClock, FiMapPin, FiCalendar, FiLayers, FiDollarSign } from 'react-icons/fi';
 
 
@@ -38,6 +39,8 @@ export interface FlightItinerary {
 }
 
 const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => {
+  
+  const { accessToken } = useAuth();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -76,6 +79,42 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
   if (itinerary.legs === 0 || itinerary.flights.length === 0) {
     return null;
   }
+  
+  const [addFlightLoading, setAddFlightLoading] = React.useState(false);
+
+  // Function to handle adding flight to itinerary
+  const handleAddToItinerary = async () => {
+    if (!accessToken) {
+      // Redirect to login
+      window.location.href = '/login';
+      return;
+    }
+
+    setAddFlightLoading(true);
+    try {
+      const response = await fetch('/api/bookings/flight-bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          passportNumber: "123233333",
+          flightIds: ["c9355bd2-a5c0-48f9-a5ff-8d8d112c2426"],
+          userId: 23,
+          itineraryId: 31
+        })
+      });
+
+      const data = await response.json();
+      // Handle the response data as needed
+      console.log('API Response:', data);
+    } catch (error) {
+      console.error('Error adding to itinerary:', error);
+    } finally {
+      setAddFlightLoading(false);
+    }
+  };
 
   return (
     <div className="border border-gray-200 rounded-lg shadow-lg overflow-hidden mb-6">
@@ -187,8 +226,19 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
       </div>
 
       <div className='text-center p-3'>
-        <button className='bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-700 p-2'>Add To Itinerary</button>
-      </div>
+      <button
+        className={`bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-700 p-2
+           ${addFlightLoading ? 'opacity-75' : ''}`}
+        onClick={handleAddToItinerary}
+        disabled={addFlightLoading}
+      >
+        {addFlightLoading 
+          ? 'Adding...' 
+          : accessToken 
+            ? 'Add To Itinerary' 
+            : 'Login to Book'}
+      </button>
+    </div>
     </div>
   );
 };

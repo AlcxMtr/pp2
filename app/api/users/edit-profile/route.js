@@ -23,14 +23,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if at least one field is provided
-    if (!firstName && !lastName && !email && !profilePicture && !phoneNumber) {
-      return NextResponse.json(
-        { error: 'At least one field (firstName, lastName, email, profilePicture, phoneNumber) must be provided' },
-        { status: 400 }
-      );
-    }
-
     if ((firstName && (!isString(firstName) || (firstName.trim() === ''))) ||
         (lastName && (!isString(lastName) || (lastName.trim() === ''))) ||
         (email && (!isString(email) || (email.trim() === ''))) ||

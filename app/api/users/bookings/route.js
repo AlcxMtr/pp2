@@ -45,10 +45,7 @@ export async function GET(request) {
     // Fetch all itineraries for the user with related bookings
     const itineraries = await prisma.itinerary.findMany({
       where: {
-        userId,
-        status: {
-          not: 'PENDING', // Exclude PENDING itineraries
-        },
+        userId: userId,
       },
       include: {
         hotelBooking: {

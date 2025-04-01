@@ -1921,6 +1921,12 @@ paths:
                           type: string
                   hasIssues:
                     type: boolean
+                  numLegs:
+                    type: integer
+                  origin:
+                    type: string
+                  destination:
+                    type: string
               example:
                 flightStatuses:
                   - flightId: "c9355bd2-a5c0-48f9-a5ff-8d8d112c2426"
@@ -1929,6 +1935,9 @@ paths:
                     destination: "370d2633-ba94-47f5-a735-513c0e332224"
                     status: "SCHEDULED"
                 hasIssues: false
+                numLegs: 1
+                origin: "Frankfurt"
+                destination: "Zurich"
 
   /api/itinerary/retrieve:
     get:
