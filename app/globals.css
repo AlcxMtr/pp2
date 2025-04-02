@@ -23,7 +23,7 @@ body {
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   body {
-    @apply bg-[var(--gray-bg-dark)] text-[var(--text-light)];
+    @apply bg-[var(--gray-bg-dark)];
   }
 }
 

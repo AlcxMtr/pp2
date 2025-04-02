@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
 import { FiMapPin, FiStar, FiDollarSign, FiHome, FiX } from 'react-icons/fi';
+import dynamic from "next/dynamic";
+import { useMemo } from "react";
 
 
 
@@ -50,6 +52,14 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
     };
 
     const rooms = hotel.roomTypes;
+
+    const Map = useMemo(() => dynamic(
+        () => import('./Map'),
+        {
+            loading: () => <p>A map is loading</p>,
+            ssr: false
+        }
+    ), [])
 
     return (
     <>
@@ -131,7 +141,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
         <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-            <h2 className="text-xl font-bold text-gray-900">{hotel.name}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{hotel.name}</h2>
             <button
                 onClick={() => setShowRoomsModal(false)}
                 className="text-gray-500 hover:text-gray-700 p-1"
@@ -142,6 +152,8 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
 
             {/* Modal Content - Scrollable Area */}
             <div className="overflow-y-auto p-4 flex-1">
+            <div className='font-bold text-xl text-center mb-5'>Location</div>
+            <Map posix={[4.79029, -75.69003]} />
             {rooms.map((room) => (
                 <div key={room.id} className="mb-6 last:mb-0">
                 <h3 className="text-lg font-semibold mb-2">{room.name}</h3>
