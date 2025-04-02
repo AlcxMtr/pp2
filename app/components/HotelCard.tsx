@@ -163,9 +163,9 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
             <h2 className="text-4xl font-bold text-gray-900">{hotel.name}</h2>
             <button
                 onClick={() => setShowRoomsModal(false)}
-                className="text-black hover:text-gray-700 p-1 bg-white font-bold border-2 rounded-full border-black"
+                className="text-sm text-white hover:text-gray-300 p-1 bg-black border-2 rounded-full border-black"
             >
-                <FiX className="w-6 h-6" />
+                <FiX className="w-5 h-5" />
             </button>
             </div>
 

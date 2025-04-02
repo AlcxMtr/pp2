@@ -70,6 +70,10 @@ export async function GET(req) {
       if (!originLocation || !destinationLocation) {
         return NextResponse.json({ message: 'Origin/destination location not found!' }, { status: 400 });
       }
+
+      if (originLocation.city === destinationLocation.city){
+        return NextResponse.json({ message: 'Origin and destination cities must be distinct!' }, { status: 400 });
+      }
   
       const fetchFlights = async (origin, destination, date) => {
         const response = await axios.get(`${AFS_BASE_URL}/api/flights`, {

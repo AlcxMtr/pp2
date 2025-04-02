@@ -279,7 +279,6 @@ export default function SearchPage() {
     } catch (err: any) {
       setError(err.message || 'An error occurred while fetching flights. Please try again.');
       setFlightResults({ outbound: null, inbound: null }); // Clear results on error
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -349,7 +348,7 @@ export default function SearchPage() {
 
   return (
     <div className='flex flex-col justify-center bg-gray-100 rounded-lg'>
-      <div className="flex items-start justify-center p-10 bg-gray-500">
+      <div className="flex items-start justify-center p-10 bg-gray-500 dark:bg-gray-900">
         <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 dark:bg-black">
           {/* Search Type Switch */}
           <div className="flex justify-center mb-6">
@@ -617,8 +616,8 @@ export default function SearchPage() {
         <div className="w-full flex flex-col gap-6 items-center pt-10 dark:bg-black">
           <h1 className='text-3xl font-bold mt-5 dark:text-gray-300'>Search Results</h1>
           <div className="w-full pr-20 pl-20">
-            <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-300">Outbound Flights</h2>
-            <div className="max-h-[80vh] overflow-y-auto rounded-lg shadow-lg p-4 overscroll-contain mb-20 bg-white dark:bg-gray-700">
+            <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-black dark:text-gray-300 dark:border-gray-300">Outbound Flights</h2>
+            <div className="max-h-[80vh] overflow-y-auto rounded-lg shadow-lg p-4 overscroll-contain mb-20 bg-white dark:bg-gray-900">
               {flightResults.outbound.map((itinerary, index) => (
                 <FlightCard key={index} itinerary={itinerary} />
               ))}
@@ -627,8 +626,8 @@ export default function SearchPage() {
 
           {isReturnFlight && (
             <div className="w-full p-20 pt-5">
-              <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-300">Return Flights</h2>
-              <div className="max-h-[60vh] overflow-y-auto p-4 rounded-lg shadow-lg overscroll-contain mb-20 bg-white dark:bg-gray-700">
+              <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-black dark:text-gray-300 dark:border-gray-300">Return Flights</h2>
+              <div className="max-h-[60vh] overflow-y-auto p-4 rounded-lg shadow-lg overscroll-contain mb-20 bg-white dark:bg-gray-900">
                 {(flightResults.inbound && flightResults.inbound.length > 0) ? (
                   flightResults.inbound.map((itinerary, index) => (
                     <FlightCard key={index} itinerary={itinerary} />
