@@ -90,7 +90,7 @@ export default function Notification() {
         <div className="notification-list">
           {notifications.length === 0 ? (
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)] p-2">
-              No notifications
+              You're all caught up!
             </p>
           ) : (
             notifications.map((n) => (

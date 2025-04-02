@@ -31,7 +31,6 @@ const Map = (Map: MapProps) => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <Marker position={posix} draggable={false}>
-                <Popup>Hey ! I study here</Popup>
             </Marker>
         </MapContainer>
     )

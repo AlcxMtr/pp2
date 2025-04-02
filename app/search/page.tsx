@@ -350,7 +350,7 @@ export default function SearchPage() {
   return (
     <div className='flex flex-col justify-center bg-gray-100 rounded-lg'>
       <div className="flex items-start justify-center p-10 bg-gray-500">
-        <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
+        <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 dark:bg-black">
           {/* Search Type Switch */}
           <div className="flex justify-center mb-6">
             <div className="bg-gray-200 rounded-full p-1 flex gap-1">
@@ -469,7 +469,7 @@ export default function SearchPage() {
                 </div>
 
                 <Button 
-                  className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-700" 
+                  className="w-full bg-black text-white font-semibold py-2 rounded-lg hover:bg-gray-700 hover:text-white dark:bg-white dark:text-black" 
                   type="submit"
                   isDisabled={isLoading}
                 >
@@ -585,7 +585,7 @@ export default function SearchPage() {
                 </div>
 
                 <Button 
-                  className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-700"
+                  className="w-full bg-black text-white font-semibold py-2 rounded-lg hover:bg-gray-700 hover:text-white dark:bg-white dark:text-black"
                   type='submit'
                   isDisabled={isLoading}
                 >
@@ -614,11 +614,11 @@ export default function SearchPage() {
 
       {/* Flight Results */}
       {searchType === 'flights' && flightResults.outbound && flightResults.outbound.length > 0 && (
-        <div className="w-full flex flex-col gap-6 items-center pt-10">
-          <h1 className='text-3xl font-bold mt-5'>Search Results</h1>
+        <div className="w-full flex flex-col gap-6 items-center pt-10 dark:bg-black">
+          <h1 className='text-3xl font-bold mt-5 dark:text-gray-300'>Search Results</h1>
           <div className="w-full pr-20 pl-20">
-            <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5">Outbound Flights</h2>
-            <div className="max-h-[80vh] overflow-y-auto rounded-lg shadow-lg p-4 overscroll-contain mb-20">
+            <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-300">Outbound Flights</h2>
+            <div className="max-h-[80vh] overflow-y-auto rounded-lg shadow-lg p-4 overscroll-contain mb-20 bg-white dark:bg-gray-700">
               {flightResults.outbound.map((itinerary, index) => (
                 <FlightCard key={index} itinerary={itinerary} />
               ))}
@@ -627,14 +627,14 @@ export default function SearchPage() {
 
           {isReturnFlight && (
             <div className="w-full p-20 pt-5">
-              <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5">Return Flights</h2>
-              <div className="max-h-[60vh] overflow-y-auto p-4 rounded-lg shadow-lg overscroll-contain mb-20">
+              <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-300">Return Flights</h2>
+              <div className="max-h-[60vh] overflow-y-auto p-4 rounded-lg shadow-lg overscroll-contain mb-20 bg-white dark:bg-gray-700">
                 {(flightResults.inbound && flightResults.inbound.length > 0) ? (
                   flightResults.inbound.map((itinerary, index) => (
                     <FlightCard key={index} itinerary={itinerary} />
                   ))
                 ) : (
-                  <p className="text-red-800 text-xl font-medium text-center">No return flights found :(</p>
+                  <p className="text-red-800 text-xl font-medium text-center dark:text-red-400">No return flights found :(</p>
                 )}
               </div>
             </div>
@@ -643,8 +643,8 @@ export default function SearchPage() {
       )}
 
       {searchType === 'flights' && hasSearchedFlights && flightResults.outbound && flightResults.outbound.length === 0 && !isLoading && !error && (
-        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20">
-          <p className="text-red-800 text-xl font-medium text-center">
+        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20 dark:bg-black">
+          <p className="text-red-800 text-xl font-medium text-center dark:text-red-400">
             No flights found :(
           </p>
         </div>
@@ -652,8 +652,8 @@ export default function SearchPage() {
 
       {/* Hotel Results */}
       {searchType === 'hotels' && hotelResults.length > 0 && (
-        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20">
-          <h1 className='text-3xl font-bold mt-5'>Hotel Search Results</h1>
+        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20 dark:bg-black">
+          <h1 className='text-3xl font-bold mt-5 dark:text-gray-300 mb-10'>Hotel Search Results</h1>
           <div className="w-full px-20">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {hotelResults.map((hotel) => (
@@ -665,8 +665,8 @@ export default function SearchPage() {
       )}
 
       {searchType === 'hotels' && hasSearchedHotels && hotelResults.length === 0 && !isLoading && !error && (
-        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20">
-          <p className="text-red-800 text-xl font-medium text-center">
+        <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20 dark:bg-black">
+          <p className="text-red-800 text-xl font-medium text-center dark:text-red-400">
             No hotels found :(
           </p>
         </div>

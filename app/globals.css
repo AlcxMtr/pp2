@@ -2,10 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 :root {
-  --deep-purple: #3D2959;
-  --lavender: #C5B7D9;
-  --light-green: #CBD9B0;
+  --deep-purple: #000000;
+  --lavender: #dedde8;
+  --light-green: #929391;
   --beige: #D9D7CB;
   --text-light: #ffffff;
   --text-dark: #1a1a1a;
@@ -33,7 +35,7 @@ body {
 
 /* Navbar */
 .navbar {
-  @apply shadow-md p-4 bg-gray-800 text-[var(--text-light)];
+  @apply shadow-md p-4 bg-gray-700 text-[var(--text-light)];
 }
 .navbar-container {
   @apply container mx-auto flex justify-between items-center;
@@ -45,7 +47,19 @@ body {
   @apply flex space-x-4 items-center;
 }
 .navbar-link {
-  @apply text-[var(--text-light)] hover:text-[var(--light-green)] transition-colors;
+  @apply font-semibold text-[var(--text-light)] hover:text-[var(--light-green)] transition-colors;
+}
+
+[data-theme="dark"] .navbar-link {
+  @apply text-black;
+}
+
+[data-theme="dark"] .navbar-brand {
+  @apply text-black;
+}
+
+[data-theme="dark"] .navbar {
+  @apply bg-gray-200;
 }
 
 /* Forms and Containers */
@@ -60,7 +74,7 @@ body {
   @apply bg-[var(--card-bg-dark)];
 }
 .register-hotel-title, .booking-title, .room-type-title, .update-availability-title, .cancel-booking-title {
-  @apply text-3xl font-extrabold text-[var(--deep-purple)] mb-6;
+  @apply text-3xl font-extrabold text-black mb-6;
 }
 [data-theme="dark"] .register-hotel-title,
 [data-theme="dark"] .booking-title,
@@ -79,7 +93,7 @@ body {
   @apply border-gray-600 bg-gray-700 text-[var(--text-light)] placeholder-gray-400;
 }
 .submit-button {
-  @apply w-full p-3 bg-[var(--deep-purple)] text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] transition-colors disabled:opacity-50;
+  @apply w-full p-3 bg-black text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] transition-colors disabled:opacity-50;
 }
 [data-theme="dark"] .submit-button {
   @apply hover:text-[var(--text-dark)];
@@ -145,7 +159,7 @@ body {
   @apply absolute -top-1 -right-1 bg-[var(--deep-purple)] text-[var(--text-light)] text-xs rounded-full h-5 w-5 flex items-center justify-center;
 }
 .notification-list {
-  @apply absolute bg-[var(--card-bg-light)] shadow-lg p-2 mt-2 rounded-lg w-64 z-10;
+  @apply absolute bg-[var(--card-bg-light)] shadow-lg p-2 mt-10 rounded-lg w-64 z-10;
 }
 [data-theme="dark"] .notification-list {
   @apply bg-[var(--card-bg-dark)];

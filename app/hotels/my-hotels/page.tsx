@@ -52,7 +52,8 @@ export default function MyHotels() {
       {hotels.length === 0 ? (
         <p className="no-hotels-text">
           You don’t have any hotels yet.{' '}
-          <Link href="/hotels/register" className="text-[var(--deep-purple)] hover:text-[var(--lavender)]">
+          <br></br>
+          <Link href="/hotels/register" className="text-blue-800 hover:text-[var(--lavender)]">
             Register one now!
           </Link>
         </p>

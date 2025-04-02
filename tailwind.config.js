@@ -16,7 +16,7 @@ module.exports = {
       },
     },
   },
-  darkMode: "class",
+  darkMode: ['selector', '[data-theme="dark"]'],
   plugins: [heroui()],
 }
 

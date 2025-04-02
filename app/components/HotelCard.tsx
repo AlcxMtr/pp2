@@ -35,6 +35,24 @@ interface HotelCardProps {
 }
 
 
+interface CityCoordinates {
+    [key: string]: [number, number];
+}
+
+const cityCoordinates: CityCoordinates = {
+    "Toronto": [43.653226, -79.383184],
+    "Paris": [48.856614, 2.352222],
+    "New York": [40.712775, -74.005973],
+    "London": [51.507351, -0.127758],
+    "Tokyo": [35.676192, 139.650311],
+    "Los Angeles": [34.052234, -118.243685],
+    "Sydney": [-33.868820, 151.209295],
+    "Beijing": [39.904211, 116.407395],
+    "Moscow": [55.755826, 37.617300],
+    "Dubai": [25.204849, 55.270783]
+};
+
+
 const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
     const [showRoomsModal, setShowRoomsModal] = useState(false);
 
@@ -56,7 +74,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
     const Map = useMemo(() => dynamic(
         () => import('./Map'),
         {
-            loading: () => <p>A map is loading</p>,
+            loading: () => <p>Loading map...</p>,
             ssr: false
         }
     ), [])
@@ -128,7 +146,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
 
         <button
             onClick={() => setShowRoomsModal(true)}
-            className="mt-4 w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200"
+            className="mt-4 w-full py-2 px-4 bg-black hover:bg-blue-900 text-white rounded-md transition duration-200"
         >
             View Details
         </button>
@@ -141,10 +159,11 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
         <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-            <h2 className="text-3xl font-bold text-gray-900">{hotel.name}</h2>
+            <img src={hotel.logo} className='h-10'></img>
+            <h2 className="text-4xl font-bold text-gray-900">{hotel.name}</h2>
             <button
                 onClick={() => setShowRoomsModal(false)}
-                className="text-gray-500 hover:text-gray-700 p-1"
+                className="text-black hover:text-gray-700 p-1 bg-white font-bold border-2 rounded-full border-black"
             >
                 <FiX className="w-6 h-6" />
             </button>
@@ -152,11 +171,12 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
 
             {/* Modal Content - Scrollable Area */}
             <div className="overflow-y-auto p-4 flex-1">
-            <div className='font-bold text-xl text-center mb-5'>Location</div>
-            <Map posix={[4.79029, -75.69003]} />
+            <div className='font-bold text-3xl text-center mb-5 text-black'>Location</div>
+            <Map posix={cityCoordinates[hotel.location] || [43.5483, -79.6627]}  />
+            <div className='mt-5 text-black text-3xl font-bold text-center mb-5'>Available Rooms</div>
             {rooms.map((room) => (
                 <div key={room.id} className="mb-6 last:mb-0">
-                <h3 className="text-lg font-semibold mb-2">{room.name}</h3>
+                <h3 className="text-2xl font-semibold mb-2 text-black">{room.name}</h3>
                 
                 {/* Room Images - Fixed Height Container */}
                 <div className="h-80 bg-gray-100 rounded-lg overflow-hidden mb-4">
@@ -173,7 +193,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
                             <img
                             src={image}
                             alt={`${room.name} ${index + 1}`}
-                            className="w-full h-full object-fill"
+                            className="w-full h-full object-cover"
                             />
                         </div>
                         ))}
@@ -190,7 +210,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
                     <div className="md:col-span-2">
                     <div className="mb-4">
                         <h4 className="font-medium text-gray-900 mb-1">Price</h4>
-                        <p className="text-2xl font-bold">
+                        <p className="text-2xl font-bold text-black">
                         {room.pricePerNight} CAD
                         <span className="text-sm font-normal text-gray-500"> / night</span>
                         </p>
@@ -217,7 +237,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
                     </div>
 
                     <div className="flex flex-col justify-end">
-                    <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-200">
+                    <button className="w-full py-3 bg-black hover:bg-green-900 text-white font-medium rounded-md transition duration-200">
                     Add To Itinerary
                     </button>
                     </div>
