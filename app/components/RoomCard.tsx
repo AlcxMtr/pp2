@@ -17,9 +17,9 @@ export default function RoomCard({ room, onEdit }: { room: Room; onEdit?: (room:
     <div className="room-card">
       <h3 className="room-name">{room.name}</h3>
       <p className="room-detail">Price: ${room.pricePerNight}/night</p>
-      <p className="room-detail">Total Rooms: {room.totalRooms !== undefined ? room.totalRooms : 'N/A'}</p>
+      <p className="room-detail">Total Rooms of Type: {room.totalRooms !== undefined ? room.totalRooms : 'N/A'}</p>
       {room.availableRooms !== undefined && (
-        <p className="room-detail">Available: {room.availableRooms}</p>
+        <p className="room-detail">Num Rooms Available for Date Range: {room.availableRooms}</p>
       )}
       {room.amenities && room.amenities.length > 0 && (
         <p className="room-detail">Amenities: {room.amenities.map(a => a.name).join(', ')}</p>

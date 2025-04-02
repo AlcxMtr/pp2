@@ -77,7 +77,7 @@ export default function AddRoomType() {
     <div className="room-type-container">
       <div className="flex justify-between items-center mb-4">
         <h1 className="room-type-title">Add Room Type</h1>
-        <Link href={`/hotels/${hotelId}/manage`} className="back-button">
+        <Link href={`/hotels/${hotelId}/rooms`} className="back-button">
           Back
         </Link>
       </div>

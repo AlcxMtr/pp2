@@ -59,12 +59,12 @@ export default function UpdateAvailability() {
       router.push('/login');
       return;
     }
-    if (!form.roomTypeId || (!form.useDateRange && !form.newTotalRooms)) {
-      alert('Please select a room type and provide either a new total or date range');
+    if (!form.roomTypeId || !form.newTotalRooms) {
+      alert('Please select a room type and provide a new total number of rooms');
       return;
     }
     if (form.useDateRange && (!form.checkInDate || !form.checkOutDate)) {
-      alert('Please provide both check-in and check-out dates when using a date range');
+      alert('Please provide both check-in and check-out dates when using a date range for cancellations');
       return;
     }
     setSubmitting(true);
@@ -80,7 +80,7 @@ export default function UpdateAvailability() {
         },
         body: JSON.stringify({
           roomTypeId: Number(form.roomTypeId),
-          newTotalRooms: Number(form.newTotalRooms || 0),
+          newTotalRooms: Number(form.newTotalRooms),
         }),
       });
       if (res.ok) {
@@ -107,6 +107,9 @@ export default function UpdateAvailability() {
         </Link>
       </div>
       <div className="update-availability-form">
+        <p className="text-[var(--text-dark)] mb-2">
+          Update the total number of rooms for a room type. This is a permanent change.
+        </p>
         <select
           value={form.roomTypeId}
           onChange={(e) => setForm({ ...form, roomTypeId: e.target.value })}
@@ -124,16 +127,24 @@ export default function UpdateAvailability() {
             ))
           )}
         </select>
-        <label className="text-[var(--text-dark)]">
+        <input
+          type="number"
+          placeholder="New Total Rooms"
+          value={form.newTotalRooms}
+          onChange={(e) => setForm({ ...form, newTotalRooms: e.target.value })}
+          className="form-input"
+          min="0"
+        />
+        <label className="text-[var(--text-dark)] mt-2">
           <input
             type="checkbox"
             checked={form.useDateRange}
-            onChange={(e) => setForm({ ...form, useDateRange: e.target.checked, newTotalRooms: '' })}
+            onChange={(e) => setForm({ ...form, useDateRange: e.target.checked })}
             className="mr-2"
           />
-          Use Date Range
+          Limit cancellations to a date range (optional)
         </label>
-        {form.useDateRange ? (
+        {form.useDateRange && (
           <>
             <input
               type="date"
@@ -150,18 +161,9 @@ export default function UpdateAvailability() {
               placeholder="Check-out Date"
             />
           </>
-        ) : (
-          <input
-            type="number"
-            placeholder="New Total Rooms"
-            value={form.newTotalRooms}
-            onChange={(e) => setForm({ ...form, newTotalRooms: e.target.value })}
-            className="form-input"
-            min="0"
-          />
         )}
         <button onClick={handleUpdate} disabled={submitting} className="submit-button">
-          {submitting ? 'Updating...' : 'Update Availability'}
+          {submitting ? 'Updating...' : 'Update Total Rooms'}
         </button>
       </div>
     </div>

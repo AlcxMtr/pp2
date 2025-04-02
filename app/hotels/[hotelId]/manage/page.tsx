@@ -12,15 +12,20 @@ interface Hotel {
   starRating: number;
 }
 
+interface RoomType {
+  id: number;
+  name: string;
+}
+
 interface Booking {
   id: number;
-  hotel: { name: string; location: string };
-  roomType: { name: string };
+  hotel: { name: string; location: string; id: number };
+  roomType: { name: string; id: number };
   checkInDate: string;
   checkOutDate: string;
   user: { firstName: string; lastName: string; email: string };
   itinerary?: { id: number };
-  status: string; // Added status field (e.g., "CONFIRMED", "CANCELLED")
+  status: string;
 }
 
 export default function ManageHotel() {
@@ -29,10 +34,17 @@ export default function ManageHotel() {
   const { accessToken, userId } = useAuth();
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [showBookings, setShowBookings] = useState(false);
   const [loadingHotel, setLoadingHotel] = useState(true);
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
+  const [filters, setFilters] = useState({
+    checkInDate: '',
+    checkOutDate: '',
+    roomTypeId: '',
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -40,29 +52,41 @@ export default function ManageHotel() {
       router.push('/login');
       return;
     }
-    const fetchHotel = async () => {
+
+    const fetchHotelAndRoomTypes = async () => {
       try {
-        const res = await fetch(`/api/hotels/${hotelId}`, {
+        const hotelRes = await fetch(`/api/hotels/${hotelId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        if (res.ok) {
-          const data = await res.json();
+        if (hotelRes.ok) {
+          const data = await hotelRes.json();
           setHotel(data);
         } else {
-          throw new Error(await res.text());
+          throw new Error(await hotelRes.text());
+        }
+
+        const roomTypesRes = await fetch(`/api/hotels/${hotelId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (roomTypesRes.ok) {
+          const hotelData = await roomTypesRes.json();
+          setRoomTypes(hotelData.roomTypes || []);
+        } else {
+          throw new Error(await roomTypesRes.text());
         }
       } catch (error) {
-        console.error('Error fetching hotel:', error);
+        console.error('Error fetching hotel or room types:', error);
         alert('Failed to load hotel details');
       } finally {
         setLoadingHotel(false);
       }
     };
-    fetchHotel();
+
+    fetchHotelAndRoomTypes();
   }, [accessToken, userId, hotelId, router]);
 
   const fetchBookings = async () => {
-    if (!accessToken || !userId || bookings.length > 0) return;
+    if (!accessToken || !userId) return;
 
     setLoadingBookings(true);
     try {
@@ -73,6 +97,7 @@ export default function ManageHotel() {
         const allBookings = await res.json();
         const hotelBookings = allBookings.filter((b: Booking) => b.hotel.id === hotelId);
         setBookings(hotelBookings);
+        applyFilters(hotelBookings, filters); // Apply initial filters
       } else {
         throw new Error(await res.text());
       }
@@ -85,8 +110,38 @@ export default function ManageHotel() {
   };
 
   const toggleBookings = () => {
-    if (!showBookings) fetchBookings();
+    if (!showBookings && bookings.length === 0) fetchBookings();
     setShowBookings(!showBookings);
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters(prev => {
+      const newFilters = { ...prev, [name]: value };
+      applyFilters(bookings, newFilters);
+      return newFilters;
+    });
+  };
+
+  const applyFilters = (bookingsToFilter: Booking[], currentFilters: typeof filters) => {
+    let filtered = bookingsToFilter.filter(b => b.status === 'CONFIRMED');
+
+    if (currentFilters.checkInDate) {
+      const filterCheckIn = new Date(currentFilters.checkInDate);
+      filtered = filtered.filter(b => new Date(b.checkInDate) >= filterCheckIn);
+    }
+
+    if (currentFilters.checkOutDate) {
+      const filterCheckOut = new Date(currentFilters.checkOutDate);
+      filtered = filtered.filter(b => new Date(b.checkOutDate) <= filterCheckOut);
+    }
+
+    if (currentFilters.roomTypeId) {
+      const roomTypeIdNum = Number(currentFilters.roomTypeId);
+      filtered = filtered.filter(b => b.roomType.id === roomTypeIdNum);
+    }
+
+    setFilteredBookings(filtered);
   };
 
   const handleCancelBooking = async (bookingId: number) => {
@@ -104,7 +159,9 @@ export default function ManageHotel() {
         body: JSON.stringify({ bookingId }),
       });
       if (res.ok) {
-        setBookings(bookings.filter((b) => b.id !== bookingId));
+        const updatedBookings = bookings.filter((b) => b.id !== bookingId);
+        setBookings(updatedBookings);
+        applyFilters(updatedBookings, filters);
         alert('Booking cancelled successfully!');
       } else {
         throw new Error(await res.text());
@@ -116,9 +173,6 @@ export default function ManageHotel() {
       setCancelBookingId(null);
     }
   };
-
-  // Filter bookings to show only CONFIRMED ones
-  const confirmedBookings = bookings.filter((booking) => booking.status === 'CONFIRMED');
 
   if (loadingHotel) return <LoadingMessage message="Loading hotel details..." />;
 
@@ -144,13 +198,42 @@ export default function ManageHotel() {
       </div>
       {showBookings && (
         <div className="bookings-section">
+          <div className="filters mb-6 flex flex-wrap gap-4">
+            <input
+              type="date"
+              name="checkInDate"
+              value={filters.checkInDate}
+              onChange={handleFilterChange}
+              className="form-input"
+              placeholder="Check-In Date"
+            />
+            <input
+              type="date"
+              name="checkOutDate"
+              value={filters.checkOutDate}
+              onChange={handleFilterChange}
+              className="form-input"
+              placeholder="Check-Out Date"
+            />
+            <select
+              name="roomTypeId"
+              value={filters.roomTypeId}
+              onChange={handleFilterChange}
+              className="form-input"
+            >
+              <option value="">All Room Types</option>
+              {roomTypes.map((rt) => (
+                <option key={rt.id} value={rt.id}>{rt.name}</option>
+              ))}
+            </select>
+          </div>
           {loadingBookings ? (
             <LoadingMessage message="Loading bookings..." />
-          ) : confirmedBookings.length === 0 ? (
-            <p className="no-bookings-text text-center">No confirmed bookings for this hotel yet.</p>
+          ) : filteredBookings.length === 0 ? (
+            <p className="no-bookings-text text-center">No confirmed bookings match your filters.</p>
           ) : (
             <div className="rooms-grid">
-              {confirmedBookings.map((booking) => (
+              {filteredBookings.map((booking) => (
                 <div key={booking.id} className="booking-item">
                   <p className="booking-detail">Guest: {booking.user.firstName} {booking.user.lastName} ({booking.user.email})</p>
                   <p className="booking-detail">Room: {booking.roomType.name}</p>
