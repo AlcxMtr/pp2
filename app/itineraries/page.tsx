@@ -75,30 +75,43 @@ export default function itinerariesPage() {
   useEffect(() => {
     const fetchFlightInfo = async (bookingRef: string) => {
       try {
-        const response = await fetch(`/api/bookings/flight-bookings/verify?lastName=${userProfile?.lastName}&bookingReference=${bookingRef}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          `/api/bookings/flight-bookings/verify?lastName=${userProfile?.lastName}&bookingReference=${bookingRef}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
           }
-        });
-        if (!response.ok) return; //throw new Error('Failed to fetch flight info');
-        const data = await response.json();
-        setFlightBookings((prev) => new Map(prev).set(bookingRef, data));
+        );
+        if (!response.ok) return null; // Return null if fetch fails
+        return await response.json(); // Return fetched data
       } catch (err) {
         console.error(err);
+        return null; // Return null if an error occurs
       }
     };
-
-    // Loop over each booking and check if it has a flight booking, then add info to map
-    bookings.forEach((booking) => {
-      if (!flightBookings.has(booking.flightBooking?.flightBookingRef || '')){
-        if (accessToken && booking.flightBooking) {
-          fetchFlightInfo(booking.flightBooking.flightBookingRef);
+  
+    const updateFlightBookings = async () => {
+      const newEntries = new Map(); // Temporary map to store new data
+  
+      const fetchPromises = bookings.map(async (booking) => {
+        const bookingRef = booking.flightBooking?.flightBookingRef;
+        if (bookingRef && accessToken) {
+          const data = await fetchFlightInfo(bookingRef);
+          if (data) newEntries.set(bookingRef, data);
         }
-      }
-    });
-  }, [bookings, userProfile]);
+      });
+  
+      await Promise.all(fetchPromises); // Wait for all fetches to complete
+  
+      // Update state using functional form to ensure the latest state is used
+      setFlightBookings((prev) => new Map([...prev, ...newEntries]));
+    };
+  
+    updateFlightBookings();
+  }, [bookings, accessToken, userProfile]); // Dependencies
 
   const pendingBookings = bookings.filter(
     (booking) => booking.status === 'PENDING'
@@ -224,10 +237,10 @@ export default function itinerariesPage() {
               Status: {booking.flightBooking.status}
             </p>
             <p className="text-gray-700">
-              Ref: {booking.flightBooking.flightBookingRef}
+              Dep. Date: {flightBookingInfo?.departureDate.substring(0, 10)}
             </p>
             <p className="text-gray-700">
-              Ticket: {booking.flightBooking.flightTicketNumber}
+              Dep. Time: {flightBookingInfo?.departureDate.substring(11, 16)} (24h)
             </p>
             <p className="text-gray-700">
               Number of Legs: {flightBookingInfo?.numLegs}

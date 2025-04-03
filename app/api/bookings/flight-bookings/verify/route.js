@@ -69,10 +69,10 @@ export async function GET(request) {
 
     const afsData = await afsResponse.json();
     const numLegs = afsData.flights.length;
-    const origin = afsData.flights[0].origin.city;
-    const departureDate = afsData.flights[0].departureTime;
-    const returnDate = afsData.flights[numLegs - 1].arrivalTime;
-    const destination = afsData.flights[numLegs - 1].destination.city;
+    const origin = afsData.flights[numLegs -1].origin.city;
+    const departureDate = afsData.flights[numLegs - 1].departureTime;
+    const returnDate = afsData.flights[0].arrivalTime;
+    const destination = afsData.flights[0].destination.city;
 
     // Extract flight statuses
     const flightStatuses = afsData.flights.map(flight => ({
