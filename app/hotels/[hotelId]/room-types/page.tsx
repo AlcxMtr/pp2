@@ -136,7 +136,7 @@ export default function AddRoomType() {
               <Input
                 isRequired
                 type="number"
-                label="Price per Night"
+                label="Price Per Night"
                 labelPlacement="outside"
                 placeholder="Enter price per night"
                 value={form.pricePerNight}

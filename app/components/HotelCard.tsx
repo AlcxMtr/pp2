@@ -173,7 +173,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
         <div className="p-4 flex flex-col space-between">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 line-clamp-1">{hotel.name}</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1">{hotel.name}</h3>
               <div className="flex items-center mt-1">
                 {renderStars(hotel.starRating)}
                 <span className="text-sm text-gray-500 ml-2">{hotel.starRating} stars</span>
@@ -181,7 +181,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">{isOwnerView ? 'Listed at' : 'Starting from'}</p>
-              <p className="text-xl font-bold text-gray-900">
+              <p className="text-xl font-bold text-gray-900 text-white">
                 {hotel.startingPrice} CAD
               </p>
             </div>
@@ -190,7 +190,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
           <div className="mt-3 flex space-between">
             <FiMapPin className="text-gray-500 mr-2 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm text-gray-900">{hotel.location}</p>
+              <p className="text-sm text-gray-900 dark:text-white">{hotel.location}</p>
               {'address' in hotel && (
                 <p className="text-xs text-gray-500 line-clamp-1">{hotel.address}</p>
               )}
@@ -200,14 +200,14 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
           {isOwnerView ? (
             <Link
               href={`/hotels/${hotel.id}/manage`}
-              className="mt-4 w-full py-2 px-4 bg-black hover:bg-blue-900 text-white rounded-md transition duration-200 text-center"
+              className="mt-4 w-full py-2 px-4 bg-black hover:bg-blue-900 text-white rounded-md transition duration-200 text-center dark:bg-white dark:text-black"
             >
               Manage
             </Link>
           ) : (
             <button
               onClick={() => setShowRoomsModal(true)}
-              className="mt-4 w-full py-2 px-4 bg-black hover:bg-blue-900 text-white rounded-md transition duration-200"
+              className="mt-4 w-full py-2 px-4 bg-black hover:bg-blue-900 text-white rounded-md transition duration-200 dark:bg-white dark:text-black"
             >
               View Details
             </button>
@@ -221,7 +221,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
           <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-              <img src={hotel.logo} className="h-10" alt={`${hotel.name} logo`} />
+              {hotel.logo && <img src={hotel.logo} className="h-10" alt={`${hotel.name} logo`} />}
               <h2 className="text-4xl font-bold text-gray-900">{hotel.name}</h2>
               <button
                 onClick={() => setShowRoomsModal(false)}

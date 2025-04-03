@@ -35,15 +35,15 @@ export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
           {accessToken && (
             <Link href="/hotels/my-hotels" className="navbar-link">My Hotels</Link>
           )}
+          {accessToken ? (
+            <button onClick={handleLogout} className="navbar-auth">Log Out</button>
+          ) : (
+            <Link href="/login" className="navbar-auth">Sign In</Link>
+          )}
           <button onClick={onToggleTheme} className="navbar-link flex items-center">
             {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
           </button>
           {accessToken && <Notification />}
-          {accessToken ? (
-            <button onClick={handleLogout} className="navbar-link">Logout</button>
-          ) : (
-            <Link href="/login" className="navbar-link">Login</Link>
-          )}
         </div>
       </div>
     </nav>

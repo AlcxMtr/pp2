@@ -69,7 +69,7 @@ export default function RegisterHotel() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-10 bg-[var(--gray-bg-light)] dark:bg-[var(--gray-bg-dark)]">
+    <div className="flex flex-col items-center min-h-screen p-10 bg-[var(--gray-bg-light)] dark:bg-gray-900">
       <div className="w-full max-w-2xl bg-[var(--card-bg-light)] dark:bg-black rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold mb-8 text-center text-[var(--text-dark)] dark:text-[var(--lavender)]">
           Register Hotel
