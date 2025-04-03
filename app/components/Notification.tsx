@@ -64,9 +64,11 @@ export default function Notification() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
-        // Remove the notification from the list instead of just marking it as read
-        setNotifications(notifications.filter(n => n.id !== notificationId));
-        setUnreadCount(prev => Math.max(0, prev - 1)); // Decrease count, ensure no negative
+        // Update the notification's isRead status locally
+        setNotifications(notifications.map(n =>
+          n.id === notificationId ? { ...n, isRead: true } : n
+        ));
+        setUnreadCount(prev => Math.max(0, prev - 1)); // Decrease unread count
       } else {
         console.error('Failed to mark notification as read:', await res.text());
       }
@@ -76,30 +78,41 @@ export default function Notification() {
   };
 
   return (
-    <div className="notification-container">
+    <div className="notification-container relative">
       <button
         onClick={() => setShowNotifications(!showNotifications)}
-        className="notification-button flex items-center gap-2 relative"
+        className="notification-button flex items-center gap-2 relative text-[var(--text-dark)] dark:text-[var(--text-light)]"
       >
         <FiBell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="notification-badge">{unreadCount}</span>
+          <span className="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            {unreadCount}
+          </span>
         )}
       </button>
       {showNotifications && (
-        <div className="notification-list">
+        <div className="notification-list absolute right-0 mt-2 w-80 bg-[var(--card-bg-light)] dark:bg-black rounded-lg shadow-lg p-4 z-10">
           {notifications.length === 0 ? (
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)] p-2">
               You're all caught up!
             </p>
           ) : (
-            notifications.map((n) => (
-              <div
-                key={n.id}
-                className={`notification-item ${n.isRead ? 'read' : 'unread'}`}
-                onClick={() => !n.isRead && markAsRead(n.id)}
-              >
-                <p>{n.message}</p>
+            notifications.map((n, index) => (
+              <div key={n.id}>
+                <div
+                  className={`notification-item relative p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${n.isRead ? 'read' : 'unread'}`}
+                  onClick={() => !n.isRead && markAsRead(n.id)}
+                >
+                  <p className="text-[var(--text-dark)] dark:text-[var(--text-light)] pr-6">
+                    {n.message}
+                  </p>
+                  {!n.isRead && (
+                    <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full" />
+                  )}
+                </div>
+                {index < notifications.length - 1 && (
+                  <hr className="border-t border-gray-200 dark:border-gray-700" />
+                )}
               </div>
             ))
           )}

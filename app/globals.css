@@ -314,7 +314,7 @@ body {
 .loading-text {
   @apply text-lg font-medium text-[var(--deep-purple)];
 }
-[data-theme="dark"] .loading-text {
+.loading-text {
   @apply text-[var(--lavender)];
 }
 

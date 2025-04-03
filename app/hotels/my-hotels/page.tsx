@@ -4,17 +4,30 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoadingMessage from '../../components/LoadingMessage';
+import HotelCard from '../../components/HotelCard';
 
-interface Hotel {
-  id: number;
+interface HotelSummary {
+  id: string;
   name: string;
+  logo: string;
   location: string;
+  address: string;
   starRating: number;
+  startingPrice: number;
+  roomTypes: {
+    id: string;
+    name: string;
+    pricePerNight: number;
+    availableRooms: number;
+    amenities: string[];
+    images: string[];
+  }[];
+  images: string[];
 }
 
 export default function MyHotels() {
   const { accessToken, userId } = useAuth();
-  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [hotels, setHotels] = useState<HotelSummary[]>([]);
   const [loadingHotels, setLoadingHotels] = useState(true);
   const router = useRouter();
 
@@ -47,34 +60,29 @@ export default function MyHotels() {
   if (loadingHotels) return <LoadingMessage message="Loading your hotels..." />;
 
   return (
-    <div className="my-hotels-container">
-      <h1 className="my-hotels-title">My Hotels</h1>
-      {hotels.length === 0 ? (
-        <p className="no-hotels-text">
-          You don’t have any hotels yet.{' '}
-          <br></br>
-          <Link href="/hotels/register" className="text-blue-800 hover:text-[var(--lavender)]">
-            Register one now!
-          </Link>
+    <div className='flex flex-col justify-center rounded-lg bg-[var(--gray-bg-light)] dark:bg-[var(--gray-500)]'>
+          {/* Hotel Results */}
+          {hotels.length > 0 ? (
+            <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20 dark:bg-black">
+              <h1 className='text-3xl font-bold mt-5 dark:text-gray-300 mb-10'>My Hotels</h1>
+              <div className="w-full px-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">                 
+                    {hotels.map((hotel) => (
+                      <HotelCard key={hotel.id} hotel={hotel} isOwnerView={true} />
+                    ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="no-hotels-text text-center text-[var(--text-dark)] dark:text-[var(--lavender)]">
+            <Link
+              href="/hotels/register"
+              className="text-blue-800 hover:text-[var(--lavender)] dark:text-blue-400 dark:hover:text-[var(--lavender)]"
+            >
+              Register one now!
+            </Link>
         </p>
-      ) : (
-        <ul className="hotels-list">
-          {hotels.map((hotel) => (
-            <li key={hotel.id} className="hotel-item">
-              <div className="hotel-info">
-                <h2 className="hotel-name">{hotel.name}</h2>
-                <p className="hotel-detail">Location: {hotel.location}</p>
-                <p className="hotel-detail">Stars: {hotel.starRating}</p>
-              </div>
-              <div className="hotel-actions">
-                <Link href={`/hotels/${hotel.id}/manage`} className="action-button">
-                  Manage
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
+          )
+            }
+      </div>
+    )}

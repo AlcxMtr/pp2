@@ -27,9 +27,6 @@ export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
         <div className="navbar-links">  
           <Link href="/search" className="navbar-link">Search</Link>
           {accessToken && (
-            <Link href="/book" className="navbar-link">Book</Link>
-          )}
-          {accessToken && (
             <Link href="/itineraries" className="navbar-link">Itineraries</Link>
           )}
           {accessToken && (
@@ -38,15 +35,15 @@ export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
           {accessToken && (
             <Link href="/hotels/my-hotels" className="navbar-link">My Hotels</Link>
           )}
+          <button onClick={onToggleTheme} className="navbar-link flex items-center">
+            {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
+          </button>
+          {accessToken && <Notification />}
           {accessToken ? (
             <button onClick={handleLogout} className="navbar-link">Logout</button>
           ) : (
             <Link href="/login" className="navbar-link">Login</Link>
           )}
-          <button onClick={onToggleTheme} className="navbar-link flex items-center">
-            {theme === 'light' ? <FiMoon className="w-5 h-5" /> : <FiSun className="w-5 h-5" />}
-          </button>
-          {accessToken && <Notification />}
         </div>
       </div>
     </nav>

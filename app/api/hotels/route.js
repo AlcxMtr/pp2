@@ -171,7 +171,28 @@ export async function GET(req) {
     });
 
     if (ownerId) {
-      return NextResponse.json(hotels);
+      // Map response to match HotelSummary format for owners
+      const ownerHotels = hotels.map((hotel) => ({
+        id: hotel.id.toString(), // Convert to string to match HotelSummary
+        name: hotel.name,
+        logo: hotel.logo,
+        location: hotel.location,
+        address: hotel.address,
+        starRating: hotel.starRating,
+        images: hotel.images.map((image) => image.url), // Map to strings
+        roomTypes: hotel.roomTypes.map((room) => ({
+          id: room.id.toString(),
+          name: room.name,
+          pricePerNight: room.pricePerNight,
+          availableRooms: room.totalRooms, // No date range, use totalRooms
+          amenities: room.amenities.map((amenity) => amenity.name),
+          images: room.images.map((image) => image.url),
+        })),
+        startingPrice: hotel.roomTypes.length > 0
+          ? Math.min(...hotel.roomTypes.map((room) => room.pricePerNight))
+          : null,
+      }));
+      return NextResponse.json(ownerHotels);
     }
 
     const availableHotels = await Promise.all(
@@ -196,7 +217,7 @@ export async function GET(req) {
         const filteredRoomTypes = roomTypesWithAvailability.filter((room) => room.availableRooms > 0);
 
         return {
-          id: hotel.id,
+          id: hotel.id.toString(), // Convert to string
           name: hotel.name,
           location: hotel.location,
           starRating: hotel.starRating,
@@ -204,7 +225,7 @@ export async function GET(req) {
           logo: hotel.logo,
           images: hotel.images.map((image) => image.url),
           roomTypes: filteredRoomTypes,
-          startingPrice: filteredRoomTypes.length > 0 
+          startingPrice: filteredRoomTypes.length > 0
             ? Math.min(...filteredRoomTypes.map((room) => room.pricePerNight))
             : null,
         };
