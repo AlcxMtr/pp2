@@ -115,65 +115,140 @@ async function seed() {
       }
     }
 
-    // Create Hotels and Room Types (owned by John)
-    const hotel1 = await prisma.hotel.create({
-      data: {
-        name: 'Grand Hotel',
-        logo: 'https://example.com/grand-hotel-logo.png',
-        address: '123 Grand St, Toronto, ON',
-        location: 'Toronto',
-        starRating: 4,
-        ownerId: user2.id,
-        roomTypes: {
-          create: [
-            {
-              name: 'Deluxe Suite',
-              totalRooms: 10,
-              pricePerNight: 150.0,
-              amenities: { create: [{ name: 'Wi-Fi' }, { name: 'TV' }] },
-              images: { create: [{ url: 'https://example.com/deluxe-suite.jpg' }] },
-            },
-            {
-              name: 'Standard Room',
-              totalRooms: 20,
-              pricePerNight: 100.0,
-              amenities: { create: [{ name: 'Wi-Fi' }] },
-              images: { create: [{ url: 'https://example.com/standard-room.jpg' }] },
-            },
-          ],
-        },
-        images: { create: [{ url: 'https://example.com/grand-hotel.jpg' }] },
-      },
-    });
+    const hotelImages = [
+      "https://images.unsplash.com/photo-1455587734955-081b22074882?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1495365200479-c4ed1d35e1aa?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=3124&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    ];
+    
+    const roomImages = [
+      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1572987669554-0ba2ba9aee1f?w=2940&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTh8fGhvdGVsJTIwcm9vbXxlbnwwfHwwfHx8Mg%3D%3D",
+      "https://images.unsplash.com/photo-1631049307290-bb947b114627?w=2940&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjR8fGhvdGVsJTIwcm9vbXxlbnwwfHwwfHx8MA%3D%3D",
+      "https://images.unsplash.com/photo-1605346576608-92f1346b67d6?w=2940&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzF8fGhvdGVsJTIwcm9vbXxlbnwwfHwwfHx8MA%3D%3D",
+      "https://images.unsplash.com/photo-1609602126247-4ab7188b4aa1?w=2940&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA0fHxob3RlbCUyMHJvb218ZW58MHx8MHx8fDA%3D",
+    ];
+    
+    const logoUrl = "https://images.unsplash.com/photo-1667840562960-ecd7c03fc6a7?q=80&w=2960&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+    
+    const hotelCities = [
+      "Toronto", "Paris", "New York", "London", "Tokyo",
+      "Los Angeles", "Sydney", "Beijing", "Moscow", "Dubai"
+    ];
+    
+    const hotelPrefixes = [
+      "Grand", "Royal", "Elite", "Premier", "Luxury",
+      "Imperial", "Regal", "Golden", "Plaza", "Majestic", "Prestige", "Central", "Crown", "Park", "Central"
+    ];
+    
+    const hotelTypes = [
+      "Hotel", "Inn", "Resort", "Lodge", "Suites"
+    ];
+    
+    const amenitiesList = [
+      "Wi-Fi", "TV", "Mini Bar", "Sea View", "Laundry Service",
+      "Coffee Maker", "Upgraded Bedding", "In-Room Dining", "Balcony", "Hot Tub"
+    ];
+    
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    function getRandomAmenities() {
+      const shuffled = amenitiesList.sort(() => 0.5 - Math.random());
+      const count = getRandomInt(2, 5); // 2 to 5 amenities
+      return shuffled.slice(0, count).map(name => ({ name }));
+    }
+    
+    function generateHotelName(city, index) {
+      const prefix = hotelPrefixes[index % hotelPrefixes.length];
+      const type = hotelTypes[index % hotelTypes.length];
+      return `${prefix} ${city} ${type}`;
+    }
+    
 
-    const hotel2 = await prisma.hotel.create({
-      data: {
-        name: 'Ocean View Resort',
-        logo: 'https://example.com/ocean-view-logo.png',
-        address: '456 Beach Rd, Vancouver, BC',
-        location: 'Vancouver',
-        starRating: 5,
-        ownerId: user2.id,
+    const ownerId = user2.id;
+  
+    const hotels = [];
+  
+    // Generate 50 hotels
+    for (let i = 0; i < 50; i++) {
+      const city = hotelCities[i % hotelCities.length]; // Cycle through cities
+
+      function shuffleArr (array){
+        for (var i = array.length - 1; i > 0; i--) {
+            var rand = Math.floor(Math.random() * (i + 1));
+            [array[i], array[rand]] = [array[rand], array[i]]
+        }
+      }
+
+      shuffleArr(hotelImages);
+      
+      hotels.push({
+        name: generateHotelName(city, getRandomInt(1, 100)),
+        logo: logoUrl,
+        address: `${getRandomInt(1, 999)} ${city} Boulevard, ${city}`,
+        location: city,
+        starRating: getRandomInt(1, 5),
+        ownerId: ownerId,
+        images: {
+          create: hotelImages.map(url => ({ url })),
+        },
         roomTypes: {
           create: [
             {
-              name: 'Ocean Suite',
-              totalRooms: 5,
-              pricePerNight: 300.0,
-              amenities: { create: [{ name: 'Wi-Fi' }, { name: 'Balcony' }] },
-              images: { create: [{ url: 'https://example.com/ocean-suite.jpg' }] },
+              name: "Single",
+              totalRooms: getRandomInt(1, 30),
+              pricePerNight: 80.0 + (i * 5), // Vary price slightly
+              amenities: {
+                create: getRandomAmenities(),
+              },
+              images: {
+                create: [roomImages[0], roomImages[1]].map(url => ({ url })),
+              },
+            },
+            {
+              name: "Double",
+              totalRooms: getRandomInt(10, 20), // 2 to 12 rooms
+              pricePerNight: 120.0 + (i * 10),
+              amenities: {
+                create: getRandomAmenities(),
+              },
+              images: {
+                create: [roomImages[2], roomImages[3]].map(url => ({ url })),
+              },
+            },
+            {
+              name: "Suite",
+              totalRooms: getRandomInt(1, 10), // 1 to 5 rooms (rarer)
+              pricePerNight: 200.0 + (i * 20),
+              amenities: {
+                create: getRandomAmenities(),
+              },
+              images: {
+                create: [roomImages[4]].map(url => ({ url })),
+              },
             },
           ],
         },
-        images: { create: [{ url: 'https://example.com/ocean-view.jpg' }] },
-      },
-    });
+      });
+    }
+
+    for (const hotel of hotels) {
+      await prisma.hotel.create({
+        data: hotel,
+      });
+    }
 
     // Fetch Room Type IDs
     const roomTypes = await prisma.roomType.findMany();
-    const deluxeSuiteId = roomTypes.find(rt => rt.name === 'Deluxe Suite').id;
-    const standardRoomId = roomTypes.find(rt => rt.name === 'Standard Room').id;
-    const oceanSuiteId = roomTypes.find(rt => rt.name === 'Ocean Suite').id;
+    const deluxeSuiteId = roomTypes.find(rt => rt.name === 'Suite').id;
+    const standardRoomId = roomTypes.find(rt => rt.name === 'Single').id;
+    const oceanSuiteId = roomTypes.find(rt => rt.name === 'Double').id;
+    hotelsCreated = await prisma.hotel.findMany();
+    const hotel1 = hotelsCreated[0];
+    const hotel2 = hotelsCreated[1];
 
     // Create Itineraries
     const itinerary1 = await prisma.itinerary.create({

@@ -38,7 +38,7 @@ export default function Register() {
 
   return (
     <div className="register-hotel-container">
-      <h1 className="register-hotel-title">Register</h1>
+      <h1 className="register-hotel-title">Sign Up</h1>
       <form onSubmit={handleRegister} className="register-hotel-form">
         <input
           type="text"
@@ -81,8 +81,8 @@ export default function Register() {
       </form>
       <p className="text-center mt-4 text-[var(--text-dark)]">
         Already have an account?{' '}
-        <Link href="/login" className="text-[var(--deep-purple)] hover:text-[var(--lavender)]">
-          Login
+        <Link href="/login" className="text-blue-500 hover:text-black">
+          Login here!
         </Link>
       </p>
     </div>

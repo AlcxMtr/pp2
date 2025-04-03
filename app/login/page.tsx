@@ -36,7 +36,7 @@ export default function Login() {
 
   return (
     <div className="register-hotel-container">
-      <h1 className="register-hotel-title">Login</h1>
+      <h1 className="register-hotel-title">Sign In</h1>
       <form onSubmit={handleLogin} className="register-hotel-form">
         <input
           type="email"
@@ -58,8 +58,8 @@ export default function Login() {
       </form>
       <p className="text-center mt-4 text-[var(--text-dark)]">
         Don’t have an account?{' '}
-        <Link href="/register" className="text-[var(--deep-purple)] hover:text-[var(--lavender)]">
-          Register
+        <Link href="/register" className="text-blue-500 hover:text-black">
+          Register now!
         </Link>
       </p>
     </div>

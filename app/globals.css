@@ -93,7 +93,7 @@ body {
   @apply border-gray-600 bg-gray-700 text-[var(--text-light)] placeholder-gray-400;
 }
 .submit-button {
-  @apply w-full p-3 bg-black text-[var(--text-light)] rounded-lg hover:bg-[var(--lavender)] transition-colors disabled:opacity-50;
+  @apply w-full p-3 bg-black text-[var(--text-light)] rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50;
 }
 [data-theme="dark"] .submit-button {
   @apply hover:text-[var(--text-dark)];
