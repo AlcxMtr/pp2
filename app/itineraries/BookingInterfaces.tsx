@@ -67,4 +67,6 @@ export interface FlightBookingInfo {
   numLegs: number; // e.g., 1
   origin: string; // City name, e.g., "Frankfurt"
   destination: string; // City name, e.g., "Zurich"
+  departureDate: string; // e.g., "2023-10-01T12:00:00Z"
+  returnDate: string; // e.g., "2023-10-01T14:00:00Z"
 }

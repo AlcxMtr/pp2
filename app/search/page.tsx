@@ -656,7 +656,7 @@ export default function SearchPage() {
           <div className="w-full px-20">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {hotelResults.map((hotel) => (
-                <HotelCard key={hotel.id} hotel={hotel} />
+                <HotelCard key={hotel.id} hotel={hotel} checkInDate={checkInDate} checkOutDate={checkOutDate}/>
               ))}
             </div>
           </div>

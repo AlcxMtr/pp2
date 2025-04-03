@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { FiClock, FiMapPin, FiCalendar, FiLayers, FiDollarSign } from 'react-icons/fi';
+import { it } from 'node:test';
 
 
 export interface Airport {
@@ -40,7 +41,7 @@ export interface FlightItinerary {
 
 const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => {
   
-  const { accessToken } = useAuth();
+  const { accessToken, userId } = useAuth();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -89,8 +90,29 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
       window.location.href = '/login';
       return;
     }
-
     setAddFlightLoading(true);
+
+    let itineraryId = 0;
+    const passportNumber = "482473977"; // Temp
+
+    try {
+      const response = await fetch('/api/itinerary/active', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          userId: Number(userId)
+        })
+      });
+
+      const data = await response.json();
+      itineraryId = data.id;
+    } catch (error) {
+      console.error('Error requesting itinerary:', error);
+    }
+
     try {
       const response = await fetch('/api/bookings/flight-bookings', {
         method: 'POST',
@@ -99,20 +121,19 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
           'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          passportNumber: "123233333",
-          flightIds: ["c9355bd2-a5c0-48f9-a5ff-8d8d112c2426"],
-          userId: 23,
-          itineraryId: 31
+          passportNumber: passportNumber,
+          flightIds: itinerary.flights.map(flight => flight.id),
+          userId: Number(userId),
+          itineraryId: itineraryId,
         })
       });
 
       const data = await response.json();
-      // Handle the response data as needed
-      console.log('API Response:', data);
     } catch (error) {
       console.error('Error adding to itinerary:', error);
     } finally {
       setAddFlightLoading(false);
+      alert('Flight booking request completed!');
     }
   };
 

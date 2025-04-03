@@ -10,7 +10,7 @@ export async function POST(request) {
     // Validate required flightBookingId
     if (!flightBookingId || isNaN(parseInt(flightBookingId, 10))) {
       return NextResponse.json(
-        { error: 'Missing or invalid flightBookingId' },
+        { error: 'Missing or invalid flightBookingId: ' + flightBookingId },
         { status: 400 }
       );
     }
@@ -70,27 +70,22 @@ export async function POST(request) {
       }),
     ];
 
-    // If linked to an itinerary, update its status to CANCELLED as well
-    if (flightBooking.itinerary && flightBooking.itinerary.status !== 'CANCELLED') {
+    // if linked to an itinerary, remove from itinerary
+    if (flightBooking.itinerary) {
       updates.push(
         prisma.itinerary.update({
           where: { id: flightBooking.itineraryId },
-          data: { status: 'CANCELLED' },
+          data: {
+            flightBooking: {
+              delete: { id: flightBooking.id },
+            },
+          },
         })
       );
     }
 
     // Execute updates in a transaction
     await prisma.$transaction(updates);
-
-    // Send notification to the user
-    await prisma.notification.create({
-      data: {
-        userId: flightBooking.userId,
-        message: `Flight booking ${flightBooking.flightBookingRef} has been cancelled.`,
-        flightBookingId: flightBooking.id,
-      },
-    });
 
     // Fetch updated flight booking for response
     const updatedFlightBooking = await prisma.flightBooking.findUnique({

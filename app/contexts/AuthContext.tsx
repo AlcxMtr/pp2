@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
     const storedUserId = localStorage.getItem('userId');

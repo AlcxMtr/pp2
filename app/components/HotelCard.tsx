@@ -5,6 +5,7 @@ import 'react-slideshow-image/dist/styles.css';
 import { FiMapPin, FiStar, FiDollarSign, FiHome, FiX } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
 
 interface RoomType {
@@ -31,6 +32,8 @@ interface HotelSummary {
 interface HotelCardProps {
   hotel: HotelSummary;
   isOwnerView?: boolean; // New prop to distinguish owner view
+  checkInDate: string;
+  checkOutDate: string;
 }
 
 interface CityCoordinates {
@@ -50,8 +53,10 @@ const cityCoordinates: CityCoordinates = {
   Dubai: [25.204849, 55.270783],
 };
 
-const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false }) => {
+const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, checkInDate, checkOutDate }) => {
   const [showRoomsModal, setShowRoomsModal] = useState(false);
+  const { accessToken, userId } = useAuth();
+  const [addHotelLoading, setAddHotelLoading] = React.useState(false);
 
   const renderStars = (rating: number) => {
     return (
@@ -76,6 +81,60 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false }) => 
       }),
     []
   );
+
+  const handleAddToItinerary = async (roomTypeId: number) => {
+  if (!accessToken) {
+    // Redirect to login
+    window.location.href = '/login';
+    return;
+  }
+  setAddHotelLoading(true);
+
+  let itineraryId = 0;
+
+  try {
+    const response = await fetch('/api/itinerary/active', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        userId: Number(userId)
+      })
+    });
+
+    const data = await response.json();
+    itineraryId = data.id;
+  } catch (error) {
+    console.error('Error requesting itinerary:', error);
+  }
+
+  try {
+    const response = await fetch('/api/bookings/hotel-bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        hotelId: Number(hotel.id),
+        roomTypeId: Number(roomTypeId),
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
+        userId: Number(userId),
+        itineraryId: itineraryId,
+      })
+    });
+
+    const data = await response.json();
+  } catch (error) {
+    console.error('Error adding to itinerary:', error);
+  } finally {
+    setAddHotelLoading(false);
+    alert('Hotel booking request completed!');
+  }
+  }
 
   return (
     <>
@@ -243,9 +302,17 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false }) => 
                     </div>
 
                     <div className="flex flex-col justify-end">
-                      <button className="w-full py-3 bg-black hover:bg-green-900 text-white font-medium rounded-md transition duration-200 ">
-                        Add To Itinerary
-                      </button>
+                        <button
+                        onClick={() => handleAddToItinerary(Number(room.id))}
+                        className={`bg-black text-white font-bold py-2 rounded-lg hover:bg-gray-700 p-2 dark:text-gray-300
+                          ${addHotelLoading ? 'opacity-75' : ''}`}
+                        >
+                          {addHotelLoading 
+                            ? 'Adding...' 
+                            : accessToken 
+                              ? 'Add To Itinerary' 
+                              : 'Login to Book'}
+                        </button>
                     </div>
                   </div>
                 </div>

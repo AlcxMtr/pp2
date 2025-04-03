@@ -70,6 +70,8 @@ export async function GET(request) {
     const afsData = await afsResponse.json();
     const numLegs = afsData.flights.length;
     const origin = afsData.flights[0].origin.city;
+    const departureDate = afsData.flights[0].departureTime;
+    const returnDate = afsData.flights[numLegs - 1].arrivalTime;
     const destination = afsData.flights[numLegs - 1].destination.city;
 
     // Extract flight statuses
@@ -105,6 +107,8 @@ export async function GET(request) {
       numLegs,
       origin,
       destination,
+      departureDate,
+      returnDate,
     }, { status: 200 });
   } catch (error) {
     console.error('Error verifying flight booking:', error.message, error.stack);

@@ -38,17 +38,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-  
-      /************************* 
-       TODO: NEED TO GENERATE INVOICE HERE 
-      **************************/
 
-      /* if (invoiceUrl && typeof invoiceUrl !== 'string') {
-        return NextResponse.json(
-          { error: 'invoiceUrl must be a string' },
-          { status: 400 }
-        );
-      } */
 
     // Validate creditCardNumber (four 4-digit groups, e.g., "2343 0231 1231 1233")
     if (!/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/.test(creditCardNumber)) {
@@ -125,6 +115,42 @@ export async function POST(request) {
         { error: 'No pending hotel or flight bookings to finalize' },
         { status: 400 }
       );
+    }
+
+    // Check if hotel bookings are still available
+    if (hasHotelBooking) {
+      const roomTypeId = itinerary.hotelBooking.roomTypeId;
+
+      const roomType = await prisma.roomType.findUnique({
+        where: { id: roomTypeId },  
+      });
+
+      if (!roomType) {
+        return NextResponse.json(
+          { error: 'Room type not found or does not belong to the specified hotel' },
+          { status: 404 }
+        );
+      }
+
+      const overlappingBookings = await prisma.hotelBooking.count({
+        where: {
+          roomTypeId: roomTypeId,
+          status: 'CONFIRMED',
+          OR: [
+            {
+              checkInDate: { lte: itinerary.hotelBooking.checkOutDate },
+              checkOutDate: { gte: itinerary.hotelBooking.checkInDate },
+            },
+          ],
+        },
+      });
+        
+      if (overlappingBookings >= roomType.totalRooms) {
+        return NextResponse.json(
+          { error: 'No more rooms available for the specified date range' },
+          { status: 409 }
+        );
+      }
     }
 
     const updates = [];

@@ -29,7 +29,7 @@ export async function POST(request) {
     // Check id
     if (!userId || userId !== authUserId) {
       return NextResponse.json(
-        { error: "Invalid user ID or credentials" },
+        { error: "Invalid user ID or credentials. userId: " + userId + ", authUserId: " + authUserId },
         { status: 400 }
       );
     }

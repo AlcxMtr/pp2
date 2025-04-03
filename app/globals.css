@@ -266,7 +266,7 @@ body {
   @apply hover:text-[var(--text-dark)];
 }
 .edit-button, .cancel-button, .confirm-button {
-  @apply px-4 py-1 rounded-lg mt-2;
+  @apply px-4 py-1 rounded-lg;
 }
 .edit-button {
   @apply bg-[var(--deep-purple)] text-white hover:bg-[var(--lavender)];

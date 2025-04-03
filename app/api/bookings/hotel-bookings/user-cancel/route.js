@@ -5,19 +5,8 @@ import { verifyToken } from '@/middleware/auth';
 // POST Cancel a hotel booking
 export async function POST(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const ownerId = parseInt(searchParams.get('ownerId'), 10);
-
     const body = await request.json();
     const { bookingId } = body;
-
-    // Validation for required fields
-    if (!ownerId) {
-      return NextResponse.json(
-        { error: 'Missing required parameter: ownerId' },
-        { status: 400 }
-      );
-    }
 
     // Authenticate user
     const authResult = verifyToken(request);
@@ -25,14 +14,6 @@ export async function POST(request) {
       return authResult; // Return error response directly
     }
     const authUserId = authResult.userId;
-
-    // Check id
-    if (!ownerId || ownerId !== authUserId) {
-      return NextResponse.json(
-        { error: "Invalid user ID or credentials" },
-        { status: 400 }
-      );
-    }
 
     if (!bookingId) {
       return NextResponse.json(
@@ -52,12 +33,13 @@ export async function POST(request) {
         { status: 404 }
       );
     }
+    const userId = booking.userId;
 
-    // Does hotel even belong to owner? 
-    if (booking.hotel.ownerId !== ownerId) {
+    // Check id
+    if (!userId || userId !== authUserId) {
       return NextResponse.json(
-        { error: 'You do not have permission to cancel this booking' },
-        { status: 403 }
+        { error: "Invalid user ID or credentials" },
+        { status: 400 }
       );
     }
 
@@ -98,16 +80,6 @@ export async function POST(request) {
         },
       });
     }
-
-    // Create a notification for the user that their booking has been cancelled
-    await prisma.notification.create({
-      data: {
-        userId: updatedBooking.userId,
-        message: `Your booking for ${updatedBooking.hotel.name} has been cancelled.`,
-        type: 'CANCELLED',
-        bookingId: updatedBooking.id,
-      },
-    });
 
     return NextResponse.json(updatedBooking, { status: 200 });
   } catch (error) {
