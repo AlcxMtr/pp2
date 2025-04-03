@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Input, Button, Card } from '@heroui/react';
+import { Booking, UserProfile, FlightBookingInfo } from '../itineraries/BookingInterfaces';
 
 interface FlightDetails {
   airline: string;
@@ -21,8 +22,13 @@ interface HotelDetails {
 }
 
 export default function ItineraryCheckout() {
-  const { accessToken } = useAuth();
+  const { accessToken, userId, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Itinerary data
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [flightBookings, setFlightBookings] = useState<Map<string, FlightBookingInfo>>(new Map());
 
   const [payment, setPayment] = useState({
     creditCardNumber: '',
@@ -44,6 +50,101 @@ export default function ItineraryCheckout() {
     checkIn: '2025-06-15',
     checkOut: '2025-06-18',
   };
+
+  // Fetch user profile and bookings
+  useEffect(() => {
+    if (authLoading) return;
+    if (!accessToken || !userId) {
+      console.log('No access token or user ID found. Redirecting to login...');
+      router.push('/login');
+      return;
+    }
+
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch('/api/users/edit-profile', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: Number(userId),
+          }),
+        });
+        if (!response.ok) throw new Error('Failed to fetch user profile');
+        const data = await response.json();
+        setUserProfile(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    
+  // Fetch flight booking info for each booking
+  useEffect(() => {
+    const fetchFlightInfo = async (bookingRef: string) => {
+      try {
+        const response = await fetch(
+          `/api/bookings/flight-bookings/verify?lastName=${userProfile?.lastName}&bookingReference=${bookingRef}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (!response.ok) return null; // Return null if fetch fails
+        return await response.json(); // Return fetched data
+      } catch (err) {
+        console.error(err);
+        return null; // Return null if an error occurs
+      }
+    };
+  
+    const updateFlightBookings = async () => {
+      const newEntries = new Map(); // Temporary map to store new data
+  
+      const fetchPromises = bookings.map(async (booking) => {
+        const bookingRef = booking.flightBooking?.flightBookingRef;
+        if (bookingRef && accessToken) {
+          const data = await fetchFlightInfo(bookingRef);
+          if (data) newEntries.set(bookingRef, data);
+        }
+      });
+  
+      await Promise.all(fetchPromises); // Wait for all fetches to complete
+  
+      // Update state using functional form to ensure the latest state is used
+      setFlightBookings((prev) => new Map([...prev, ...newEntries]));
+    };
+  
+    updateFlightBookings();
+  }, [bookings, accessToken, userProfile]);
+
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch(
+          `/api/users/bookings?userId=${userId}`,
+          { method: 'GET',  
+            headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json' } }
+        );
+        if (!response.ok) throw new Error('Failed to fetch bookings');
+        const data = await response.json();
+        setBookings(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+    fetchBookings();
+  }, [authLoading]);
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +203,7 @@ export default function ItineraryCheckout() {
           <p><strong>Check-out:</strong> {hotelBooking.checkOut}</p>
         </Card>
 
-        <form onSubmit={handlePayment} className="space-y-6">
+        <form onSubmit={handlePayment} className="space-y-10 mt-10">
           <Input
             isRequired
             label="Credit Card Number"
