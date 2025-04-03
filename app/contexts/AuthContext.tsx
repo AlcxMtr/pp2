@@ -1,4 +1,8 @@
 'use client';
+import { user } from '@heroui/react';
+import { clear } from 'console';
+import { set } from 'lodash';
+import { init } from 'next/dist/compiled/webpack/webpack';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
@@ -21,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
 
   useEffect(() => {
+    console.log('AuthProvider mounted');
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
     const storedUserId = localStorage.getItem('userId');
@@ -28,8 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessToken(storedAccessToken);
       setRefreshToken(storedRefreshToken);
       setUserId(storedUserId);
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const refreshAccessToken = async (refreshToken: string) => {
@@ -73,9 +78,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ? 0 // Refresh immediately if overdue
       : REFRESH_INTERVAL - timeSinceLastRefresh;
 
+    console.log("initialDelay: " + initialDelay);
+
     // Initial refresh with calculated delay
     const timeout = setTimeout(() => {
-
       console.log('REFRESHING ACCESS TOKEN');
       refreshAccessToken(refreshToken);
 
@@ -83,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const interval = setInterval(() => {
         refreshAccessToken(refreshToken);
       }, REFRESH_INTERVAL);
+
 
       // Cleanup both timeout and interval
       return () => {
@@ -92,6 +99,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => clearTimeout(timeout);
   }, []);
+/* 
+  useEffect(() => {
+    console.log("userId changed: " + userId);
+  }, [userId]); */
 
   const login = (newAccessToken: string, newRefreshToken: string, newUserId: string) => {
     setAccessToken(newAccessToken);
@@ -112,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userId');
     localStorage.removeItem('lastRefreshTime');
-    setLoading(false);
+    setLoading(true);
   };
 
   return (

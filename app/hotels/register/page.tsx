@@ -40,7 +40,7 @@ export default function RegisterHotel() {
         body: JSON.stringify({
           ...form,
           starRating: Number(form.starRating),
-          ownerId: userId,
+          ownerId: Number(userId),
         }),
       });
       if (res.ok) {

@@ -138,12 +138,12 @@ export default function itinerariesPage() {
     }
     let flightBookingInfo = flightBookings.get(booking.flightBooking?.flightBookingRef || '');
     return (
-    <div key={booking.id} className="relative bg-white p-6 rounded-lg shadow-md mb-4">
+    <div key={booking.id} className="relative bg-white p-6 rounded-lg shadow-md mb-4 bg-[var(--text-light)] dark:bg-[var(--text-dark)]">
       <div className="absolute top-0 right-0 mt-4 mr-4 flex flex-col space-y-2">
         {booking.status === "CONFIRMED" && (
           <Button
             onPress={viewInvoice}
-            className="bg-black text-white hover:bg-gray-700 dark:bg-white dark:text-black"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
           >
             View Invoice
           </Button>
@@ -152,7 +152,7 @@ export default function itinerariesPage() {
         {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => setCancelHotelId(booking.hotelBooking?.id || null)}
-            className="bg-black text-white hover:bg-red-700 dark:bg-white dark:text-black size:sm"
+            className="hover:bg-red-700"
           >
             Cancel Hotel Stay
           </Button>
@@ -161,7 +161,7 @@ export default function itinerariesPage() {
         {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => setCancelFlightId(booking.flightBooking?.id || null)}
-            className="bg-black text-white hover:bg-red-700 dark:bg-white dark:text-black size:sm"
+            className="hover:bg-red-700"
           >
             Cancel Flight
           </Button>
@@ -170,7 +170,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/checkout')}
-            className="bg-black text-white hover:bg-gray-700 dark:bg-white dark:text-black"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
           >
             Checkout
           </Button>
@@ -178,7 +178,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/search')}
-            className="bg-black text-white hover:bg-gray-700 dark:bg-white dark:text-black"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
           >
             Edit
           </Button>
@@ -186,7 +186,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && booking.flightBooking && (
             <Button
             onPress={() => router.push(`/search?searchType=hotels&city=${flightBookingInfo?.destination}&checkInDate=${flightBookingInfo?.departureDate.substring(0, 10)}&checkOutDate=${flightBookingInfo?.returnDate.substring(0, 10)}`)}
-            className="bg-black text-white hover:bg-gray-700 dark:bg-white dark:text-black"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
             >
             Suggest Hotels
             </Button>
@@ -195,7 +195,7 @@ export default function itinerariesPage() {
           <Button
             onPress={() => router.push(`/search?searchType=flights&origin=Toronto&destination=${booking.hotelBooking?.hotel.location}&departureDate=${booking.hotelBooking?.checkInDate.substring(0, 10)}&returnDate=${booking.hotelBooking?.checkOutDate.substring(0, 10)}`
             )}
-            className="bg-black text-white hover:bg-gray-700 dark:bg-white dark:text-black"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
           >
             Suggest Flights
           </Button>
@@ -205,23 +205,23 @@ export default function itinerariesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {booking.hotelBooking && !deletedHotelBookings.includes(booking.hotelBooking.id) && (
           <div>
-            <div className="text-lg font-medium text-gray-800 mb-1">Hotel Booking</div>
-            <p className="text-gray-700">
+            <div className="text-lg font-medium text-[var(--text-dark)] dark:text-[var(--text-light)] mb-1">Hotel Booking</div>
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               {booking.hotelBooking.hotel.address}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               {booking.hotelBooking.hotel.name} - {booking.hotelBooking.roomType.name}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               From: {new Date(booking.hotelBooking.checkInDate).toLocaleDateString()}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Until: {new Date(booking.hotelBooking.checkOutDate).toLocaleDateString()}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Star Rating: {booking.hotelBooking.hotel.starRating}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Price: ${booking.hotelBooking.roomType.pricePerNight}/night
             </p>
           </div>
@@ -229,23 +229,23 @@ export default function itinerariesPage() {
 
         {booking.flightBooking && !deletedFlightBookings.includes(booking.flightBooking.id) && (
           <div className="">
-            <h4 className="text-lg font-medium text-gray-800 mb-1">Flight Booking</h4>
-            <p className="text-md text-gray-700">
+            <h4 className="text-lg font-medium text-[var(--text-dark)] dark:text-[var(--text-light)] mb-1">Flight Booking</h4>
+            <p className="text-md text-[var(--text-dark)] dark:text-[var(--text-light)]">
               {flightBookingInfo?.origin} → {flightBookingInfo?.destination}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Status: {booking.flightBooking.status}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Dep. Date: {flightBookingInfo?.departureDate.substring(0, 10)}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Dep. Time: {flightBookingInfo?.departureDate.substring(11, 16)} (24h)
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Number of Legs: {flightBookingInfo?.numLegs}
             </p>
-            <p className="text-gray-700">
+            <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Price: ${booking.flightBooking.flightPrice}
             </p>
           </div>
@@ -323,52 +323,42 @@ export default function itinerariesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--gray-bg-light)] dark:bg-[var(--gray-bg-dark)] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Itineraries</h1>
+        <h1 className="text-3xl font-bold text-[var(--text-dark)] dark:text-[var(--text-light)] mb-8">My Itineraries</h1>
 
         {/* Pending Bookings */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+        <section className="mb-10 p-4 rounded-lg shadow-md bg-[var(--beige)] dark:bg-[var(--card-bg-dark)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-dark)] dark:text-[var(--text-light)] mb-4">
             Pending Itinerary
           </h2>
-          {pendingBookings.length > 0 ? (
-            pendingBookings.map(renderBookingCard)
-          ) : (
-            <p className="text-gray-600">No pending itinerary found.</p>
+          {pendingBookings.length > 0 ? pendingBookings.map(renderBookingCard) : (
+            <p className="text-[var(--text-muted-dark)] dark:text-[var(--text-muted-light)]">No pending itinerary found.</p>
           )}
         </section>
 
         {/* Confirmed Bookings */}
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+        <section className="mb-12 p-4 rounded-lg shadow-md bg-[var(--beige)] dark:bg-[var(--card-bg-dark)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-dark)] dark:text-[var(--text-light)] mb-4">
             Confirmed Itineraries ({confirmedBookings.length - deletedBookings.size})
           </h2>
-          {confirmedBookings.length > 0 ? (
-            confirmedBookings.map(renderBookingCard)
-          ) : (
-            <p className="text-gray-600">No confirmed itineraries found.</p>
+          {confirmedBookings.length > 0 ? confirmedBookings.map(renderBookingCard) : (
+            <p className="text-[var(--text-muted-dark)] dark:text-[var(--text-muted-light)]">No confirmed itineraries found.</p>
           )}
         </section>
 
         {/* Confirmation Modal for Cancel Hotel Booking */}
         {cancelHotelId && (
-          <div className="confirmation-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="modal-content bg-[var(--card-bg-light)] dark:bg-black p-6 rounded-lg shadow-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-[var(--card-bg-light)] dark:bg-black p-6 rounded-lg shadow-lg">
               <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
                 Are you sure you want to cancel this booking?
               </p>
-              <div className="modal-actions flex justify-center">
-                <Button
-                  onClick={() => handleCancelHotel(cancelHotelId)}
-                  className="confirm-button bg-red-500 text-white hover:bg-red-600"
-                >
+              <div className="flex justify-center mt-4">
+                <Button onClick={() => handleCancelHotel(cancelHotelId)} className="bg-red-500 text-white hover:bg-red-600">
                   Yes
                 </Button>
-                <Button
-                  onClick={() => setCancelHotelId(null)}
-                  className="cancel-modal-button bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-                >
+                <Button onClick={() => setCancelHotelId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4">
                   No
                 </Button>
               </div>
@@ -376,23 +366,18 @@ export default function itinerariesPage() {
           </div>
         )}
 
+        {/* Confirmation Modal for Cancel Flight Booking */}
         {cancelFlightId && (
-          <div className="confirmation-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="modal-content bg-[var(--card-bg-light)] dark:bg-black p-6 rounded-lg shadow-lg">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-[var(--card-bg-light)] dark:bg-black p-6 rounded-lg shadow-lg">
               <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
                 Are you sure you want to cancel this booking?
               </p>
-              <div className="modal-actions flex justify-center">
-                <Button
-                  onClick={() => handleCancelFlight(cancelFlightId)}
-                  className="confirm-button bg-red-500 text-white hover:bg-red-600"
-                >
+              <div className="flex justify-center mt-4">
+                <Button onClick={() => handleCancelFlight(cancelFlightId)} className="bg-red-500 text-white hover:bg-red-600">
                   Yes
                 </Button>
-                <Button
-                  onClick={() => setCancelFlightId(null)}
-                  className="cancel-modal-button bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-                >
+                <Button onClick={() => setCancelFlightId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4">
                   No
                 </Button>
               </div>

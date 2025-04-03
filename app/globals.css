@@ -2,13 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 :root {
   --deep-purple: #000000;
   --lavender: #dedde8;
   --light-green: #929391;
   --beige: #D9D7CB;
+  --beige-dark: #403f39;
   --text-light: #ffffff;
   --text-dark: #1a1a1a;
   --gray-bg-light: #f5f5f5; 
@@ -47,7 +46,7 @@ body {
   @apply flex space-x-4 items-center;
 }
 .navbar-link {
-  @apply font-semibold text-[var(--text-light)] hover:text-[var(--light-green)] transition-colors;
+  @apply font-semibold text-[var(--text-light)] hover:text-[var(--light-green)];
 }
 
 [data-theme="dark"] .navbar-link {
