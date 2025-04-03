@@ -32,8 +32,8 @@ interface HotelSummary {
 interface HotelCardProps {
   hotel: HotelSummary;
   isOwnerView?: boolean; // New prop to distinguish owner view
-  checkInDate: string;
-  checkOutDate: string;
+  checkInDate?: string;
+  checkOutDate?: string;
 }
 
 interface CityCoordinates {
@@ -109,6 +109,8 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
   } catch (error) {
     console.error('Error requesting itinerary:', error);
   }
+
+  if (!checkInDate || !checkOutDate) return;
 
   try {
     const response = await fetch('/api/bookings/hotel-bookings', {
