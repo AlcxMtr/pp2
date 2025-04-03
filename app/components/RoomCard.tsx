@@ -25,7 +25,7 @@ export default function RoomCard({ room, onEdit }: { room: Room; onEdit?: (room:
         <p className="room-detail">Amenities: {room.amenities.map(a => a.name).join(', ')}</p>
       )}
       {accessToken && onEdit && (
-        <button onClick={() => onEdit(room)} className="edit-button">
+        <button onClick={() => onEdit(room)} className="edit-button dark:bg-white dark:text-black">
           Edit
         </button>
       )}

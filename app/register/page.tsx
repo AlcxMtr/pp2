@@ -75,11 +75,11 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
           className="form-input"
         />
-        <button type="submit" disabled={loading} className="submit-button">
+        <button type="submit" disabled={loading} className="submit-button dark:text-black">
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
-      <p className="text-center mt-4 text-[var(--text-dark)]">
+      <p className="text-center mt-4 text-[var(--text-dark)] dark:text-white">
         Already have an account?{' '}
         <Link href="/login" className="text-blue-500 hover:text-black">
           Login here!

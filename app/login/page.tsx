@@ -52,11 +52,11 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           className="form-input"
         />
-        <button type="submit" disabled={loading} className="submit-button">
+        <button type="submit" disabled={loading} className="submit-button dark:text-black">
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p className="text-center mt-4 text-[var(--text-dark)]">
+      <p className="text-center mt-4 text-[var(--text-dark)] dark:text-white">
         Don’t have an account?{' '}
         <Link href="/register" className="text-blue-500 hover:text-black">
           Register now!

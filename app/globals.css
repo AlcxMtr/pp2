@@ -19,7 +19,7 @@
 
 /* Light mode default */
 body {
-  @apply min-h-screen bg-[var(--gray-bg-light)] text-[var(--text-dark)] font-sans transition-colors duration-300;
+  @apply min-h-screen bg-gray-400 text-[var(--text-dark)] font-sans transition-colors duration-300;
 }
 
 /* Dark mode */
@@ -30,12 +30,12 @@ body {
 }
 
 [data-theme="dark"] body {
-  @apply bg-[var(--gray-bg-dark)] text-[var(--text-light)];
+  @apply bg-gray-900 text-[var(--text-light)];
 }
 
 /* Navbar */
 .navbar {
-  @apply shadow-md p-4 bg-gray-700 text-[var(--text-light)];
+  @apply shadow-md p-4 bg-gray-600 text-[var(--text-light)];
 }
 .navbar-container {
   @apply container mx-auto flex justify-between items-center;
@@ -49,9 +49,16 @@ body {
 .navbar-link {
   @apply font-semibold text-[var(--text-light)] hover:text-[var(--light-green)] transition-colors;
 }
+.navbar-auth {
+  @apply font-semibold text-red-600 hover:text-[var(--light-green)] transition-colors;
+}
 
 [data-theme="dark"] .navbar-link {
   @apply text-black;
+}
+
+[data-theme="dark"] .navbar-auth {
+  @apply text-red-600;
 }
 
 [data-theme="dark"] .navbar-brand {
@@ -71,7 +78,7 @@ body {
 [data-theme="dark"] .room-type-container,
 [data-theme="dark"] .update-availability-container,
 [data-theme="dark"] .cancel-booking-container {
-  @apply bg-[var(--card-bg-dark)];
+  @apply bg-black border-2 border-white;
 }
 .register-hotel-title, .booking-title, .room-type-title, .update-availability-title, .cancel-booking-title {
   @apply text-3xl font-extrabold text-black mb-6;
@@ -90,13 +97,13 @@ body {
   @apply w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[var(--light-green)] bg-white text-[var(--text-dark)] placeholder-gray-500;
 }
 [data-theme="dark"] .form-input {
-  @apply border-gray-600 bg-gray-700 text-[var(--text-light)] placeholder-gray-400;
+  @apply border-gray-600 bg-white text-black placeholder-gray-400;
 }
 .submit-button {
   @apply w-full p-3 bg-black text-[var(--text-light)] rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50;
 }
 [data-theme="dark"] .submit-button {
-  @apply hover:text-[var(--text-dark)];
+  @apply hover:text-[var(--text-dark)] bg-white hover:bg-gray-500;
 }
 
 /* Rooms */
@@ -272,7 +279,7 @@ body {
   @apply bg-[var(--deep-purple)] text-white hover:bg-[var(--lavender)];
 }
 [data-theme="dark"] .edit-button {
-  @apply hover:text-[var(--text-dark)];
+  @apply bg-white text-black hover:text-[var(--text-dark)];
 }
 .cancel-button {
   @apply bg-red-500 text-white hover:bg-red-600;
