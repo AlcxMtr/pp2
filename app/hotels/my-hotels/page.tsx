@@ -60,7 +60,7 @@ export default function MyHotels() {
   if (loadingHotels) return <LoadingMessage message="Loading your hotels..." />;
 
   return (
-    <div className='flex flex-col justify-center rounded-lg bg-gray-500 dark:bg-gray-900'>
+    <div className='flex flex-col justify-center rounded-lg bg-[var(--gray-bg-light)] dark:bg-gray-900'>
           {/* Hotel Results */}
           {hotels.length > 0 ? (
             <div className="w-full flex flex-col gap-6 items-center pt-10 pb-20 dark:bg-gray-900">
