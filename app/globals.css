@@ -11,7 +11,7 @@
   --text-light: #ffffff;
   --text-dark: #1a1a1a;
   --gray-bg-light: #f5f5f5; 
-  --gray-bg-dark: #6b7381;  
+  --gray-bg-dark: rgb(17 24 39);  
   --card-bg-light: #ffffff;
   --card-bg-dark: #374151;
 }
@@ -19,13 +19,6 @@
 /* Light mode default */
 body {
   @apply min-h-screen bg-gray-400 text-[var(--text-dark)] font-sans transition-colors duration-300;
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-[var(--gray-bg-dark)];
-  }
 }
 
 [data-theme="dark"] body {
@@ -46,14 +39,18 @@ body {
   @apply flex space-x-4 items-center;
 }
 .navbar-link {
-  @apply font-semibold text-[var(--text-light)] hover:text-[var(--light-green)];
+  @apply font-semibold text-[var(--text-light)] hover:text-black transition-colors;
 }
 .navbar-auth {
-  @apply font-semibold text-red-600 hover:text-[var(--light-green)] transition-colors;
+  @apply font-semibold text-red-600 hover:text-black transition-colors;
 }
 
 [data-theme="dark"] .navbar-link {
-  @apply text-black;
+  @apply text-black hover:text-blue-800;
+}
+
+[data-theme="dark"] .navbar-auth {
+  @apply hover:text-blue-800;
 }
 
 [data-theme="dark"] .navbar-auth {
@@ -269,7 +266,7 @@ body {
   @apply bg-[var(--deep-purple)] text-white px-4 py-2 rounded-lg hover:bg-[var(--lavender)] transition-colors;
 }
 [data-theme="dark"] .back-button {
-  @apply hover:text-[var(--text-dark)];
+  @apply hover:text-[var(--text-dark)] bg-white text-black;
 }
 .edit-button, .cancel-button, .confirm-button {
   @apply px-4 py-1 rounded-lg;

@@ -12,7 +12,7 @@ export default function Home() {
         className="bg-white text-black hover:bg-gray-300 dark:bg-white dark:text-black dark:hover:bg-gray-500 rounded-full px-6 py-3 text-lg font-semibold transition-colors"
         onClick={() => router.push("/search")}
       >
-        Start planning your trip!
+        Start planning your next trip!
       </button>
     </div>
   );
