@@ -140,7 +140,7 @@ export default function Rooms() {
     }
     const headers = { Authorization: `Bearer ${accessToken}` };
     const queryParams = new URLSearchParams({
-      ownerId: userId.toString(),
+      ownerId: userId ? userId.toString() : '',
       startDate: filters.checkInDate,
       endDate: filters.checkOutDate,
     });
@@ -187,7 +187,7 @@ export default function Rooms() {
             logo: hotelData.logo,
           });
         } else {
-          throw new Error(await res.text());
+          throw new Error(await hotelRes.text());
         }
 
         await fetchRooms();

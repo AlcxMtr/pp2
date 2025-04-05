@@ -15,10 +15,10 @@ interface Hotel {
   images: string[] | { url: string }[];
 }
 
-interface RoomType {
-  id: number;
+type RoomType = {
+  id: string | number; // Ensure `id` is a string or number
   name: string;
-}
+};
 
 interface Booking {
   id: number;
@@ -244,11 +244,13 @@ export default function ManageHotel() {
           {hotel.images.length > 0 && (
             <div className="mt-4">
               <div className="relative w-full max-w-lg mx-auto">
-                <img
-                  src={hotel.images[currentImageIndex]}
-                  alt={`${hotel.name} image ${currentImageIndex + 1}`}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
+              <img
+                src={typeof hotel.images[currentImageIndex] === 'string' 
+                  ? hotel.images[currentImageIndex] 
+                  : hotel.images[currentImageIndex]?.url}
+                alt={`${hotel.name} image ${currentImageIndex + 1}`}
+                className="w-full h-64 object-cover rounded-lg"
+              />
                 {hotel.images.length > 1 && (
                   <>
                     <Button
@@ -330,10 +332,12 @@ export default function ManageHotel() {
                   onChange={(e) => handleFilterChange('roomTypeId', e.target.value)}
                   className="w-48"
                 >
-                  <SelectItem key="" value="">All Room Types</SelectItem>
-                  {roomTypes.map((rt) => (
-                    <SelectItem key={rt.id} value={rt.id.toString()}>{rt.name}</SelectItem>
-                  ))}
+                  <SelectItem key="" id="">All Room Types</SelectItem>
+                    <>
+                      {roomTypes.map((rt: RoomType) => (
+                        <SelectItem key={rt.id} id={rt.id.toString()}>{rt.name}</SelectItem>
+                      ))}
+                    </>
                 </Select>
               </div>
             )}

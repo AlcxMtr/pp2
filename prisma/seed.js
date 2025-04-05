@@ -256,7 +256,7 @@ async function seed() {
         userId: user1.id,
         creditCardNumber: '**** **** **** 1233',
         cardExpiry: '12/25',
-        invoiceUrl: '/invoices/itinerary_1.pdf',
+        invoiceUrl: '$1392',
         status: "CONFIRMED",
       },
     });
@@ -266,7 +266,7 @@ async function seed() {
         userId: user2.id,
         creditCardNumber: '**** **** **** 4567',
         cardExpiry: '06/26',
-        invoiceUrl: '/invoices/itinerary_2.pdf',
+        invoiceUrl: '$1392',
         status: 'CONFIRMED',
       },
     });
@@ -276,7 +276,7 @@ async function seed() {
           userId: user2.id,
           creditCardNumber: '**** **** **** 4567',
           cardExpiry: '06/26',
-          invoiceUrl: '/invoices/itinerary_3.pdf',
+          invoiceUrl: '$1392',
           status: 'PENDING',
         },
     });
@@ -287,7 +287,7 @@ async function seed() {
           userId: user3.id,
           creditCardNumber: '**** **** **** 5123',
           cardExpiry: '03/27',
-          invoiceUrl: '/invoices/itinerary_4.pdf',
+          invoiceUrl: '$1392',
           status: 'PENDING',
         },
     });
@@ -297,7 +297,7 @@ async function seed() {
           userId: user1.id,
           creditCardNumber: '**** **** **** 1233',
           cardExpiry: '12/25',
-          invoiceUrl: '/invoices/itinerary_5.pdf',
+          invoiceUrl: '$1392',
           status: "PENDING",
         },
     });
