@@ -1,8 +1,8 @@
-// Made with the help of ChatGPT
+// Made with the help of ChatGPT and Grok 3
 
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
-import { verifyToken } from "@/middleware/auth"
+import { verifyToken } from "@/middleware/auth";
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
@@ -22,7 +22,16 @@ export async function POST(request) {
     // Validation for required fields (ours + AFS API requirements)
     if (!passportNumber || !flightIds || !userId || !itineraryId) {
       return NextResponse.json(
-        { error: 'Missing required fields: email, firstName, lastName, passportNumber, flightIds, flightPrice, or userId' },
+        { error: 'Missing required fields: passportNumber, flightIds, userId, or itineraryId' },
+        { status: 400 }
+      );
+    }
+
+    // Validate passportNumber is a 9-digit number
+    const passportRegex = /^\d{9}$/;
+    if (!passportRegex.test(passportNumber)) {
+      return NextResponse.json(
+        { error: 'passportNumber must be a 9-digit number' },
         { status: 400 }
       );
     }
@@ -61,9 +70,9 @@ export async function POST(request) {
       );
     }
     
-    const email = user.email
-    const firstName = user.firstName
-    const lastName = user.lastName
+    const email = user.email;
+    const firstName = user.firstName;
+    const lastName = user.lastName;
 
     // Validate itinerary's existence
     const itinerary = await prisma.itinerary.findUnique({

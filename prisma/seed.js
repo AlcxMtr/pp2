@@ -199,7 +199,7 @@ async function seed() {
           create: [
             {
               name: "Single",
-              totalRooms: getRandomInt(1, 30),
+              totalRooms: getRandomInt(2, 30),
               pricePerNight: 80.0 + (i * 5), // Vary price slightly
               amenities: {
                 create: getRandomAmenities(),
@@ -221,7 +221,7 @@ async function seed() {
             },
             {
               name: "Suite",
-              totalRooms: getRandomInt(1, 10), // 1 to 5 rooms (rarer)
+              totalRooms: getRandomInt(2, 10), // 1 to 5 rooms (rarer)
               pricePerNight: 200.0 + (i * 20),
               amenities: {
                 create: getRandomAmenities(),
@@ -256,7 +256,7 @@ async function seed() {
         userId: user1.id,
         creditCardNumber: '**** **** **** 1233',
         cardExpiry: '12/25',
-        invoiceUrl: '$1392',
+        invoiceUrl: '1392',
         status: "CONFIRMED",
       },
     });
@@ -266,7 +266,7 @@ async function seed() {
         userId: user2.id,
         creditCardNumber: '**** **** **** 4567',
         cardExpiry: '06/26',
-        invoiceUrl: '$1392',
+        invoiceUrl: '1392',
         status: 'CONFIRMED',
       },
     });
@@ -276,7 +276,7 @@ async function seed() {
           userId: user2.id,
           creditCardNumber: '**** **** **** 4567',
           cardExpiry: '06/26',
-          invoiceUrl: '$1392',
+          invoiceUrl: '2578',
           status: 'PENDING',
         },
     });
@@ -287,7 +287,7 @@ async function seed() {
           userId: user3.id,
           creditCardNumber: '**** **** **** 5123',
           cardExpiry: '03/27',
-          invoiceUrl: '$1392',
+          invoiceUrl: '1384',
           status: 'PENDING',
         },
     });
@@ -297,7 +297,7 @@ async function seed() {
           userId: user1.id,
           creditCardNumber: '**** **** **** 1233',
           cardExpiry: '12/25',
-          invoiceUrl: '$1392',
+          invoiceUrl: '2304',
           status: "PENDING",
         },
     });
@@ -366,6 +366,9 @@ async function seed() {
 
     // Create Flight Bookings using the API function
     await createFlightBooking({
+      fBookingRef: "",
+      fTicketNumber:"",
+      fPrice: 0,
       passportNumber: '123233333',
       flightIds: [
         '6bbb4978-6d03-4a11-b752-a3be17f202cb',
@@ -378,6 +381,9 @@ async function seed() {
     });
 
     await createFlightBooking({
+      fBookingRef: "",
+      fTicketNumber:"",
+      fPrice: 0,
         passportNumber: '987654321',
         flightIds: ['abebdfe5-77e8-4d43-b277-437e81e311cf'],
         userId: user2.id,
@@ -386,6 +392,9 @@ async function seed() {
     });
 
     await createFlightBooking({
+        fBookingRef: "Toronto|London|2025-04-17T18:10:00.000Z",
+        fTicketNumber:"9e47f8a7-eb0b-403a-bc40-43008ff62e15|92b365e6-6e2f-4141-8686-6b1f6bc598a6",
+        fPrice: 2578,
         passportNumber: '987654321',
         flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
         userId: user2.id,
@@ -395,6 +404,9 @@ async function seed() {
 
 
     await createFlightBooking({
+        fBookingRef: "Toronto|Lisbon|2025-04-21T17:35:00.000Z",
+        fTicketNumber:"a8ff905f-f6da-487e-b98d-87633bf1453d|e0868c89-85f8-4ac4-af6a-8e3729c7409f",
+        fPrice: 1384,
         passportNumber: '123515154',
         flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
         userId: user3.id,

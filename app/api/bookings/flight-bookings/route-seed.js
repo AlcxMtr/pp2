@@ -1,5 +1,6 @@
 const { NextResponse } = require('next/server');
 const { PrismaClient } = require('@prisma/client');
+const { stat } = require('fs');
 require('dotenv').config();
 
 const prisma = new PrismaClient();
@@ -7,9 +8,8 @@ const prisma = new PrismaClient();
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
 
-
 // Reusable function to create a flight booking
-async function createFlightBooking({ passportNumber, flightIds, userId, itineraryId, status}) {
+async function createFlightBooking({fBookingRef, fTicketNumber, fPrice, passportNumber, flightIds, userId, itineraryId, status}) {
   try {
     // Validation for required fields
     if (!passportNumber || !flightIds || !userId || !itineraryId) {
@@ -67,17 +67,23 @@ async function createFlightBooking({ passportNumber, flightIds, userId, itinerar
         passportNumber,
       }),
     });
-
-    if (!afsResponse.ok) {
-      const errorText = await afsResponse.text();
-      throw new Error(`AFS API error: ${errorText}`);
+    let flightBookingRef = "";
+    let flightTicketNumber = "";
+    let flightPrice = 0;
+    if (status === "CONFIRMED") {
+      if (!afsResponse.ok) {
+        const errorText = await afsResponse.text();
+        throw new Error(`AFS API error: ${errorText}`);
+      }
+      const afsData = await afsResponse.json();
+      flightBookingRef = afsData.bookingReference;
+      flightTicketNumber = afsData.ticketNumber;
+      flightPrice = afsData.flights.reduce((total, flight) => total + flight.price, 0);
+    } else {
+      flightBookingRef = fBookingRef || "N/A";
+      flightTicketNumber = fTicketNumber || "N/A";
+      flightPrice = fPrice || 0;
     }
-
-    const afsData = await afsResponse.json();
-    const flightBookingRef = afsData.bookingReference;
-    const flightTicketNumber = afsData.ticketNumber;
-    const flightPrice = afsData.flights.reduce((total, flight) => total + flight.price, 0);
-
     // Construct flight booking data
     const bookingData = {
       flightBookingRef,

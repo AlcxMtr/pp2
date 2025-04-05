@@ -45,7 +45,13 @@ export default function ItineraryCheckout() {
   const [flightInfo, setFlightInfo] = useState<string[]>([]);
   const [flightIds, setFlightIds] = useState<string[]>([]); 
   const [flights, setFlights] = useState<Flight[]>([]);
-  const [response, setResponse] = useState(null);
+  interface CheckoutResponse {
+    flightBookingRef?: string;
+    flightTicketNumber?: string;
+    [key: string]: any; // Add this to allow other properties if needed
+  }
+  
+  const [response, setResponse] = useState<CheckoutResponse | null>(null);
   const [error, setError] = useState(null);
 
   const [payment, setPayment] = useState({
@@ -173,6 +179,7 @@ export default function ItineraryCheckout() {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
+          passport: String(payment.passportNumber),
           totalCost: String(totalCost()),
           itineraryId,
           creditCardNumber: payment.creditCardNumber,
@@ -194,10 +201,10 @@ export default function ItineraryCheckout() {
             Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
-            passportNumber: payment.passportNumber,
+            passportNumber: String(payment.passportNumber),
             flightIds: flightIds,
             userId: Number(userId),
-            itineraryId: booking.id,
+            itineraryId: Number(booking.id),
           }),
         });
   
@@ -258,9 +265,9 @@ export default function ItineraryCheckout() {
         <h1 className="text-3xl font-bold mb-6 text-center">Itinerary Checkout</h1>
 
         <div>
-          {flights.length > 0 ? (
-            flights.map((flight) => (
-              <FlightCard key={flight.id} flight={flight} id={flights.indexOf(flight)+1} />
+          {( flights.length > 0) ? (
+            flights.map((flight, index) => (
+              <FlightCard key={index} flight={flight} id={index + 1} />
             ))
           ) : (
             <p>{booking ? booking?.flightBooking ? "Flights Loading..." : "No flights available." : "Booking Loading..."}</p>
@@ -327,7 +334,8 @@ export default function ItineraryCheckout() {
         {response && (
           <div className="mt-4 p-4 border rounded-md">
             <h3 className="text-lg font-semibold">Checkout Successful</h3>
-            <pre className="text-sm">{JSON.stringify(response, null, 2)}</pre>
+            <pre className="text-sm">Flight Booking Ref: {response.flightBookingRef}</pre>
+            <pre className="text-sm">Flight Ticket Number: {response.flightTicketNumber}</pre>
           </div>
         )}
       </div>

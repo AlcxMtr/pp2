@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:15
@@ -21,7 +23,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/mydb
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/mydb?schema=public"
     command: sh -c "npx prisma migrate deploy && npm run seed && npm run start"
 
 volumes:

@@ -9,7 +9,14 @@ import { verifyToken } from "@/middleware/auth"
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { itineraryId, creditCardNumber, cardExpiry, totalCost } = body;
+    const { passport, itineraryId, creditCardNumber, cardExpiry, totalCost } = body;
+
+    if (!passport || typeof passport !== 'string') {
+      return NextResponse.json(
+        { error: 'Missing or invalid passport' },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
     if (!itineraryId || isNaN(parseInt(itineraryId, 10))) {
@@ -39,12 +46,21 @@ export async function POST(request) {
       );
     }
 
+    
+    // Validate passportNumber is a 9-digit number
+    const passportRegex = /^\d{9}$/;
+    if (!passportRegex.test(passport)) {
+      return NextResponse.json(
+        { error: 'passportNumber must be a 9-digit number' },
+        { status: 400 }
+      );
+    }
 
     // Validate creditCardNumber (four 4-digit groups, e.g., "2343 0231 1231 1233")
-    if (!/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/.test(creditCardNumber)) {
+    if (!/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/.test(creditCardNumber.trim())) {
       return NextResponse.json(
-        { error: 'Invalid credit card number format. Must be four 4-digit groups separated by spaces (e.g., 4519 0231 1231 1233)' },
-        { status: 400 }
+      { error: 'Invalid credit card number format. Must be four 4-digit groups separated by spaces (e.g., 4519 0231 1231 1233)' },
+      { status: 400 }
       );
     }
 
@@ -157,7 +173,7 @@ export async function POST(request) {
     const updates = [];
 
     // Update itinerary with new completed details
-    const lastFourDigits = creditCardNumber.slice(-4);
+    const lastFourDigits = creditCardNumber.trim().slice(-4);
     updates.push(
       prisma.itinerary.update({
         where: { id: parseInt(itineraryId, 10) },
