@@ -164,7 +164,7 @@ export default function itinerariesPage() {
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && booking.hotelBooking && booking.hotelBooking.status === 'CONFIRMED' && (
+        {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => setCancelHotelId(booking.hotelBooking?.id || null)}
             className="hover:bg-red-700 cursor-pointer"
@@ -173,7 +173,7 @@ export default function itinerariesPage() {
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && booking.flightBooking && booking.flightBooking.status === 'CONFIRMED' && (
+        {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => setCancelFlightId(booking.flightBooking?.id || null)}
             className="hover:bg-red-700 cursor-pointer"
