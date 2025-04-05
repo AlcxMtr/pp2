@@ -158,25 +158,25 @@ export default function itinerariesPage() {
         {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => viewInvoice(booking.id)}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)] cursor-pointer"
           >
             View Invoice
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && (
+        {booking.status === "CONFIRMED" && booking.hotelBooking && booking.hotelBooking.status === 'CONFIRMED' && (
           <Button
             onPress={() => setCancelHotelId(booking.hotelBooking?.id || null)}
-            className="hover:bg-red-700"
+            className="hover:bg-red-700 cursor-pointer"
           >
             Cancel Hotel Stay
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && (
+        {booking.status === "CONFIRMED" && booking.flightBooking && booking.flightBooking.status === 'CONFIRMED' && (
           <Button
             onPress={() => setCancelFlightId(booking.flightBooking?.id || null)}
-            className="hover:bg-red-700"
+            className="hover:bg-red-700 cursor-pointer"
           >
             Cancel Flight
           </Button>
@@ -185,7 +185,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/checkout')}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)] cursor-pointer"
           >
             Checkout
           </Button>
@@ -193,7 +193,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/search')}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)] cursor-pointer"
           >
             Edit
           </Button>
@@ -201,7 +201,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && booking.flightBooking && (
             <Button
             onPress={() => router.push(`/search?searchType=hotels&city=${flightBookingInfo?.destination}&checkInDate=${flightBookingInfo?.departureDate.substring(0, 10)}&checkOutDate=${flightBookingInfo?.returnDate.substring(0, 10)}`)}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)] cursor-pointer"
             >
             Suggest Hotels
             </Button>
@@ -210,7 +210,7 @@ export default function itinerariesPage() {
           <Button
             onPress={() => router.push(`/search?searchType=flights&origin=Toronto&destination=${booking.hotelBooking?.hotel.location}&departureDate=${booking.hotelBooking?.checkInDate.substring(0, 10)}&returnDate=${booking.hotelBooking?.checkOutDate.substring(0, 10)}`
             )}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)] cursor-pointer"
           >
             Suggest Flights
           </Button>
@@ -400,10 +400,10 @@ export default function itinerariesPage() {
                 Are you sure you want to cancel this booking?
               </p>
               <div className="flex justify-center mt-4">
-                <Button onClick={() => handleCancelHotel(cancelHotelId)} className="bg-red-500 text-white hover:bg-red-600">
+                <Button onClick={() => handleCancelHotel(cancelHotelId)} className="bg-red-500 text-white hover:bg-red-600 cursor-pointer">
                   Yes
                 </Button>
-                <Button onClick={() => setCancelHotelId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4">
+                <Button onClick={() => setCancelHotelId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4 cursor-pointer">
                   No
                 </Button>
               </div>
@@ -419,10 +419,10 @@ export default function itinerariesPage() {
                 Are you sure you want to cancel this booking?
               </p>
               <div className="flex justify-center mt-4">
-                <Button onClick={() => handleCancelFlight(cancelFlightId)} className="bg-red-500 text-white hover:bg-red-600">
+                <Button onClick={() => handleCancelFlight(cancelFlightId)} className="bg-red-500 text-white hover:bg-red-600 cursor-pointer">
                   Yes
                 </Button>
-                <Button onClick={() => setCancelFlightId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4">
+                <Button onClick={() => setCancelFlightId(null)} className="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 ml-4 cursor-pointer">
                   No
                 </Button>
               </div>
