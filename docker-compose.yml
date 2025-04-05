@@ -22,7 +22,7 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/mydb
-    command: sh -c "npx prisma migrate deploy && npm run start"
+    command: sh -c "npx prisma migrate deploy && npm run seed && npm run start"
 
 volumes:
   postgres-data:

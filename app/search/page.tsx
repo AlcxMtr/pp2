@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import debounce from 'lodash/debounce';
 import { Autocomplete, AutocompleteItem, DatePicker, DateRangePicker, Checkbox, Select, SelectItem, Input, Slider, Form, Button, Spinner } from "@heroui/react";
@@ -47,6 +47,14 @@ const starRatings = [
 ];
 
 export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading search...</div>}>
+      <SearchPageInner />
+    </Suspense>
+  );
+}
+
+function SearchPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isUserTriggeredSearch = useRef(false);
