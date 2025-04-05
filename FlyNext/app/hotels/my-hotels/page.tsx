@@ -26,12 +26,13 @@ interface HotelSummary {
 }
 
 export default function MyHotels() {
-  const { accessToken, userId } = useAuth();
+  const { accessToken, userId, loading: authLoading } = useAuth();
   const [hotels, setHotels] = useState<HotelSummary[]>([]);
   const [loadingHotels, setLoadingHotels] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!accessToken || !userId) {
       router.push('/login');
       return;
@@ -55,7 +56,7 @@ export default function MyHotels() {
       }
     };
     fetchHotels();
-  }, [accessToken, userId, router]);
+  }, [authLoading]);
 
   if (loadingHotels) return <LoadingMessage message="Loading your hotels..." />;
 

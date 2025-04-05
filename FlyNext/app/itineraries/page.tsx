@@ -158,13 +158,13 @@ export default function itinerariesPage() {
         {booking.status === "CONFIRMED" && (
           <Button
             onPress={() => viewInvoice(booking.id)}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--dark-hover)]"
           >
             View Invoice
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && (
+        {booking.status === "CONFIRMED" && booking.hotelBooking && (
           <Button
             onPress={() => setCancelHotelId(booking.hotelBooking?.id || null)}
             className="hover:bg-red-700"
@@ -173,7 +173,7 @@ export default function itinerariesPage() {
           </Button>
         )}
 
-        {booking.status === "CONFIRMED" && (
+        {booking.status === "CONFIRMED" && booking.flightBooking && (
           <Button
             onPress={() => setCancelFlightId(booking.flightBooking?.id || null)}
             className="hover:bg-red-700"
@@ -185,7 +185,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/checkout')}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--green-hover)] dark:hover:bg-[var(--dark-green-hover)]"
           >
             Checkout
           </Button>
@@ -193,7 +193,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && (
           <Button
             onPress={() => router.push('/search')}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--dark-hover)]"
           >
             Edit
           </Button>
@@ -201,7 +201,7 @@ export default function itinerariesPage() {
         {booking.status === "PENDING" && booking.flightBooking && (
             <Button
             onPress={() => router.push(`/search?searchType=hotels&city=${flightBookingInfo?.destination}&checkInDate=${flightBookingInfo?.departureDate.substring(0, 10)}&checkOutDate=${flightBookingInfo?.returnDate.substring(0, 10)}`)}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--dark-hover)]"
             >
             Suggest Hotels
             </Button>
@@ -210,7 +210,7 @@ export default function itinerariesPage() {
           <Button
             onPress={() => router.push(`/search?searchType=flights&origin=Toronto&destination=${booking.hotelBooking?.hotel.location}&departureDate=${booking.hotelBooking?.checkInDate.substring(0, 10)}&returnDate=${booking.hotelBooking?.checkOutDate.substring(0, 10)}`
             )}
-            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
+            className="hover:bg-[var(--beige)] dark:hover:bg-[var(--dark-hover)]"
           >
             Suggest Flights
           </Button>

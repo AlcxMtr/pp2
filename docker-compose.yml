@@ -1,28 +1,57 @@
 services:
-  postgres:
+  postgres-fn:
     image: postgres:15
-    container_name: postgres
+    container_name: postgres-fn
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mydb
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-fn:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
-  app:
-    build: .
-    container_name: nextjs-app
+  fn:
+    build: ./FlyNext
+    container_name: nextjs-fn
     restart: always
     depends_on:
-      - postgres
+      - postgres-fn
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/mydb?schema=public"
-    command: sh -c "npx prisma migrate deploy && npm run seed && npm run start"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres-fn:5432/mydb?schema=public"
+      AFS_BASE_URL: "http://nextjs-afs:3000"
+      AFS_API_KEY: "dca6b3ea1b1353a727654f0add4689dc1f1a02d74d753519308bbaafe8b7ab3a"
+    command: sh -c "npx prisma migrate deploy && npm run start"
+
+    # Second App
+  postgres-afs:
+    image: postgres:15
+    container_name: postgres-afs
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb2
+    volumes:
+      - postgres-data-afs:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" # Different host port to avoid conflict with first DB
+
+  afs:
+    build: ./afs
+    container_name: nextjs-afs
+    restart: always
+    depends_on:
+      - postgres-afs
+    ports:
+      - "3001:3000" # Different host port for second app
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public"
+    command: sh -c "npx prisma migrate deploy && npm run start"
 
 volumes:
-  postgres-data:
+  postgres-data-fn:
+  postgres-data-afs:

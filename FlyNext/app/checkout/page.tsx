@@ -184,6 +184,7 @@ export default function ItineraryCheckout() {
           itineraryId,
           creditCardNumber: payment.creditCardNumber,
           cardExpiry: payment.cardExpiry,
+          flightPresent: booking?.flightBooking ? true : false,
         }),
       });
   
@@ -192,6 +193,7 @@ export default function ItineraryCheckout() {
       if (!checkoutRes.ok) {
         throw new Error(checkoutData.error || 'Checkout failed');
       }
+      setResponse({Result: "Booking Successful"});
   
       if (booking?.flightBooking) {
         const flightBookingRes = await fetch('/api/bookings/flight-bookings', {
@@ -217,7 +219,7 @@ export default function ItineraryCheckout() {
         setResponse(flightBookingData);
       }
   
-      alert('Checkout and flight booking successful!');
+      alert('Checkout successful!');
     } catch (err: any) {
       console.error(err);
       setError(err.message);
@@ -281,7 +283,7 @@ export default function ItineraryCheckout() {
             <p><strong>Address:</strong> {booking.hotelBooking.hotel.address}</p>
             <p><strong>Check-in:</strong> {new Date(booking.hotelBooking.checkInDate).toLocaleDateString()}</p>
             <p><strong>Check-out:</strong> {new Date(booking.hotelBooking.checkOutDate).toLocaleDateString()}</p>
-            <p><strong>Price Per Day:</strong> {booking.hotelBooking.roomType.pricePerNight}</p>
+            <p><strong>Price Per Day:</strong> ${booking.hotelBooking.roomType.pricePerNight}</p>
             <p><strong>Total Days:</strong> {numDays()}</p>
             <p><strong>Total cost:</strong> ${booking.hotelBooking.roomType.pricePerNight * numDays()}</p>
           </Card>
@@ -327,11 +329,20 @@ export default function ItineraryCheckout() {
           {/* Display Response or Error */}
           {error && <p className="mt-4 text-red-500">{error}</p>}
           {response && (
+          <>
             <div className="mt-4 p-4 border rounded-md">
               <h3 className="text-lg font-semibold">Checkout Successful</h3>
-              <pre className="text-sm">Flight Booking Ref: {response.flightBookingRef}</pre>
-              <pre className="text-sm">Flight Ticket Number: {response.flightTicketNumber}</pre>
+              { booking?.flightBooking &&
+                <>
+                  <pre className="text-sm">Flight Booking Ref: {response.flightBookingRef}</pre>
+                  <pre className="text-sm">Flight Ticket Number: {response.flightTicketNumber}</pre>
+                </>
+              }
             </div>
+            <Button onPress={() => router.push("/itineraries")} className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg">
+              {"Go to Itinerary"}
+            </Button>
+          </>
           )}
           {!response &&
             <Button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg">

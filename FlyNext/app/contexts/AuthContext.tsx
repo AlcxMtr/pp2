@@ -4,6 +4,7 @@ import { clear, log } from 'console';
 import { set } from 'lodash';
 import { init } from 'next/dist/compiled/webpack/webpack';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -21,7 +22,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const debugAuth = false;
+  const debugAuth = true;
+  const router = useRouter();
 
   const REFRESH_INTERVAL = 12 * 60 * 1000; // 12 minutes in milliseconds (refresh expires in 15 minutes)
 
@@ -132,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('userId');
     localStorage.removeItem('lastRefreshTime');
     setLoading(true);
+    router.push('/login');
   };
 
   return (

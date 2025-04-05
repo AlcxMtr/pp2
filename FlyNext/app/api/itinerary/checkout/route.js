@@ -9,13 +9,24 @@ import { verifyToken } from "@/middleware/auth"
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { passport, itineraryId, creditCardNumber, cardExpiry, totalCost } = body;
+    const { passport, itineraryId, creditCardNumber, cardExpiry, totalCost, flightPresent } = body;
 
-    if (!passport || typeof passport !== 'string') {
-      return NextResponse.json(
-        { error: 'Missing or invalid passport' },
-        { status: 400 }
-      );
+    if (flightPresent) {
+      if (!passport || typeof passport !== 'string') {
+        return NextResponse.json(
+          { error: 'Missing or invalid passport' },
+          { status: 400 }
+        );
+      }
+
+      // Validate passportNumber is a 9-digit number
+      const passportRegex = /^\d{9}$/;
+      if (!passportRegex.test(passport)) {
+        return NextResponse.json(
+          { error: 'passportNumber must be a 9-digit number' },
+          { status: 400 }
+        );
+      }
     }
 
     // Validate required fields
@@ -42,16 +53,6 @@ export async function POST(request) {
     if (typeof cardExpiry !== 'string') {
       return NextResponse.json(
         { error: 'cardExpiry must be a string' },
-        { status: 400 }
-      );
-    }
-
-    
-    // Validate passportNumber is a 9-digit number
-    const passportRegex = /^\d{9}$/;
-    if (!passportRegex.test(passport)) {
-      return NextResponse.json(
-        { error: 'passportNumber must be a 9-digit number' },
         { status: 400 }
       );
     }

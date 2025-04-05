@@ -82,10 +82,10 @@ export async function POST(request) {
       doc.text(`Ticket Number: ${itinerary.flightBooking.flightTicketNumber}`, 20, y);
       y += 6;
       doc.text(`Price: $${itinerary.flightBooking.flightPrice}`, 20, y);
-      y += 6;
+      y += 12;
     }
 
-    y += 12;
+
 
     // Hotel Booking
     if (itinerary.hotelBooking) {

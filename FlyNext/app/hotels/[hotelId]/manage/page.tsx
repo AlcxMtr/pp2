@@ -34,7 +34,7 @@ interface Booking {
 export default function ManageHotel() {
   const { hotelId: hotelIdString } = useParams();
   const hotelId = Number(hotelIdString);
-  const { accessToken, userId } = useAuth();
+  const { accessToken, userId, loading: authLoading } = useAuth();
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
@@ -54,6 +54,7 @@ export default function ManageHotel() {
   const router = useRouter();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!accessToken || !userId) {
       router.push('/login');
       return;
@@ -83,7 +84,7 @@ export default function ManageHotel() {
     };
 
     fetchHotelAndRoomTypes();
-  }, [accessToken, userId, hotelId, router]);
+  }, [authLoading, hotelId]);
 
   useEffect(() => {
     if (!hotel || hotel.images.length <= 1 || !isSlideshowPlaying) return;

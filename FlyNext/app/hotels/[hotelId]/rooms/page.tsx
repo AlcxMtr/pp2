@@ -116,7 +116,7 @@ const RoomCard: React.FC<{ room: Room; onEdit?: (room: Room) => void }> = ({ roo
 
 export default function Rooms() {
   const { hotelId } = useParams();
-  const { accessToken, userId } = useAuth();
+  const { accessToken, userId, loading: authLoading } = useAuth();
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -167,6 +167,7 @@ export default function Rooms() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
     if (!accessToken || !userId) {
       router.push('/login');
       return;
@@ -199,7 +200,7 @@ export default function Rooms() {
       }
     };
     fetchHotelAndRooms();
-  }, [hotelId, accessToken, userId, filters.checkInDate, filters.checkOutDate, router]);
+  }, [hotelId, authLoading, filters.checkInDate, filters.checkOutDate, router]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

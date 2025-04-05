@@ -14,6 +14,9 @@
   --gray-bg-dark: rgb(17 24 39);  
   --card-bg-light: #ffffff;
   --card-bg-dark: #374151;
+  --dark-hover:#3a464a;
+  --dark-green-hover:#505c44;
+  --green-hover: #bdd9b8;
 }
 
 /* Light mode default */

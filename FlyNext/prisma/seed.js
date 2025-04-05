@@ -256,7 +256,7 @@ async function seed() {
         userId: user1.id,
         creditCardNumber: '**** **** **** 1233',
         cardExpiry: '12/25',
-        invoiceUrl: '1392',
+        invoiceUrl: '392',
         status: "CONFIRMED",
       },
     });
@@ -266,7 +266,7 @@ async function seed() {
         userId: user2.id,
         creditCardNumber: '**** **** **** 4567',
         cardExpiry: '06/26',
-        invoiceUrl: '1392',
+        invoiceUrl: '1322',
         status: 'CONFIRMED',
       },
     });
@@ -276,7 +276,7 @@ async function seed() {
           userId: user2.id,
           creditCardNumber: '**** **** **** 4567',
           cardExpiry: '06/26',
-          invoiceUrl: '2578',
+          invoiceUrl: '578',
           status: 'PENDING',
         },
     });
@@ -297,7 +297,7 @@ async function seed() {
           userId: user1.id,
           creditCardNumber: '**** **** **** 1233',
           cardExpiry: '12/25',
-          invoiceUrl: '2304',
+          invoiceUrl: '1304',
           status: "PENDING",
         },
     });
@@ -363,17 +363,17 @@ async function seed() {
           itineraryId: itinerary5.id,
         },
     });
+    
+    // DIFFICULT TO SEED FLIGHTS BECAUSE OF DYNAMIC FLIGHT CREATION ON THE AFS SIDE
 
     // Create Flight Bookings using the API function
-    await createFlightBooking({
+    /* await createFlightBooking({
       fBookingRef: "",
       fTicketNumber:"",
       fPrice: 0,
       passportNumber: '123233333',
       flightIds: [
-        '6bbb4978-6d03-4a11-b752-a3be17f202cb',
-        'abebdfe5-77e8-4d43-b277-437e81e311cf',
-        'c9355bd2-a5c0-48f9-a5ff-8d8d112c2426'
+        '6ae6dd74-9052-4e9e-ad14-b95d06ccd7ab'
       ],
       userId: user1.id,
       itineraryId: itinerary1.id,
@@ -385,35 +385,11 @@ async function seed() {
       fTicketNumber:"",
       fPrice: 0,
         passportNumber: '987654321',
-        flightIds: ['abebdfe5-77e8-4d43-b277-437e81e311cf'],
+        flightIds: ['8d52c860-c07f-40fc-aa1e-b5c0992a6b9c'],
         userId: user2.id,
         itineraryId: itinerary2.id,
         status: 'CONFIRMED',
-    });
-
-    await createFlightBooking({
-        fBookingRef: "Toronto|London|2025-04-17T18:10:00.000Z",
-        fTicketNumber:"9e47f8a7-eb0b-403a-bc40-43008ff62e15|92b365e6-6e2f-4141-8686-6b1f6bc598a6",
-        fPrice: 2578,
-        passportNumber: '987654321',
-        flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
-        userId: user2.id,
-        itineraryId: itinerary3.id,
-        status: 'PENDING',
-    });
-
-
-    await createFlightBooking({
-        fBookingRef: "Toronto|Lisbon|2025-04-21T17:35:00.000Z",
-        fTicketNumber:"a8ff905f-f6da-487e-b98d-87633bf1453d|e0868c89-85f8-4ac4-af6a-8e3729c7409f",
-        fPrice: 1384,
-        passportNumber: '123515154',
-        flightIds: ['6bbb4978-6d03-4a11-b752-a3be17f202cb'],
-        userId: user3.id,
-        itineraryId: itinerary4.id,
-        status: 'PENDING',
-    });
-
+    }); */
 
     // Create Notifications (after flight bookings exist)
     const flightBookings = await prisma.flightBooking.findMany();
@@ -424,7 +400,7 @@ async function seed() {
     await prisma.notification.create({
         data: {
           userId: user1.id,
-          message: `Itinerary ${itinerary1.id} checkout completed. Bookings confirmed.`,
+          message: `Itinerary checkout completed. Total cost $${itinerary1.invoiceUrl}.`,
           hotelBookingId: hotelBooking1.id,
           flightBookingId: flightBooking1Id,
         },
@@ -442,7 +418,7 @@ async function seed() {
     await prisma.notification.create({
         data: {
           userId: user2.id,
-          message: `Itinerary ${itinerary2.id} checkout completed. Bookings confirmed.`,
+          message: `Itinerary checkout completed. Total cost $${itinerary2.invoiceUrl}.`,
           hotelBookingId: hotelBooking2.id,
           flightBookingId: flightBooking2Id,
         },
