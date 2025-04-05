@@ -4,7 +4,7 @@
 import { useState, useEffect, use } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/react';
+import { Button, user } from '@heroui/react';
 import { Booking, UserProfile, FlightBookingInfo } from './BookingInterfaces';
 
 export default function itinerariesPage() {
@@ -74,6 +74,7 @@ export default function itinerariesPage() {
 
   // Fetch flight booking info for each booking
   useEffect(() => {
+    if (userProfile === null || bookings.length === 0) return;
     const fetchFlightInfo = async (bookingRef: string) => {
       try {
         const response = await fetch(
@@ -129,7 +130,7 @@ export default function itinerariesPage() {
     };
   
     updateFlightBookings();
-  }, [bookings]); // Dependencies, may need accessToken, userProfile
+  }, [bookings, userProfile]); // Dependencies, may need accessToken, userProfile
 
   const pendingBookings = bookings.filter(
     (booking) => booking.status === 'PENDING'

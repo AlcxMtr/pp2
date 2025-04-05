@@ -324,20 +324,23 @@ export default function ItineraryCheckout() {
             <p className="text-2xl font-bold">${totalCost()}</p>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg">
-            {loading ? 'Processing...' : 'Confirm & Pay'}
-          </Button>
+          {/* Display Response or Error */}
+          {error && <p className="mt-4 text-red-500">{error}</p>}
+          {response && (
+            <div className="mt-4 p-4 border rounded-md">
+              <h3 className="text-lg font-semibold">Checkout Successful</h3>
+              <pre className="text-sm">Flight Booking Ref: {response.flightBookingRef}</pre>
+              <pre className="text-sm">Flight Ticket Number: {response.flightTicketNumber}</pre>
+            </div>
+          )}
+          {!response &&
+            <Button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg">
+              {loading ? 'Processing...' : 'Confirm & Pay'}
+            </Button>
+          }
         </form>
 
-        {/* Display Response or Error */}
-        {error && <p className="mt-4 text-red-500">{error}</p>}
-        {response && (
-          <div className="mt-4 p-4 border rounded-md">
-            <h3 className="text-lg font-semibold">Checkout Successful</h3>
-            <pre className="text-sm">Flight Booking Ref: {response.flightBookingRef}</pre>
-            <pre className="text-sm">Flight Ticket Number: {response.flightTicketNumber}</pre>
-          </div>
-        )}
+
       </div>
     </div>
   );

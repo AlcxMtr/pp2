@@ -18,7 +18,7 @@ export async function POST(request) {
     // Check id
     if (!id || id !== userId) {
       return NextResponse.json(
-        { error: "Invalid user ID or credentials" },
+        { error: "Invalid user ID or credentials. userId: " + userId + ", authUserId: " + authUserId },
         { status: 400 }
       );
     }

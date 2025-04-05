@@ -30,7 +30,7 @@ export async function POST(request) {
     if (!userId || userId !== authUserId) {
       return NextResponse.json(
         { error: "Invalid user ID or credentials. userId: " + userId + ", authUserId: " + authUserId },
-        { status: 400 }
+        { status: 401 }
       );
     }
 
