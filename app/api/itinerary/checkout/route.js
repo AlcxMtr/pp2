@@ -221,7 +221,7 @@ export async function POST(request) {
     await prisma.notification.create({
       data: {
         userId: itinerary.userId,
-        message: `Itinerary ${itineraryId} checkout completed. Bookings confirmed.`,
+        message: `Itinerary checkout completed. Total cost: $${itinerary.invoiceUrl}.`,
         hotelBookingId: hasHotelBooking ? itinerary.hotelBooking.id : null,
         flightBookingId: hasFlightBooking ? itinerary.flightBooking.id : null,
       },

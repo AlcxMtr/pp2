@@ -85,6 +85,8 @@ export async function POST(request) {
       y += 6;
     }
 
+    y += 12;
+
     // Hotel Booking
     if (itinerary.hotelBooking) {
       doc.setFontSize(16);
