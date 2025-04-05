@@ -619,7 +619,7 @@ export default function SearchPage() {
             <h2 className="text-xl font-bold mb-4 border-3 border-gray-800 rounded-full p-5 bg-gray-200 text-gray-800 mb-5 dark:bg-black dark:text-gray-300 dark:border-gray-300">Outbound Flights</h2>
             <div className="max-h-[80vh] overflow-y-auto rounded-lg shadow-lg p-4 overscroll-contain mb-20 bg-white dark:bg-gray-900">
               {flightResults.outbound.map((itinerary, index) => (
-                <FlightCard key={index} itinerary={itinerary} />
+                <FlightCard key={index} itinerary={itinerary} directionOutbound={true} />
               ))}
             </div>
           </div>
@@ -630,7 +630,7 @@ export default function SearchPage() {
               <div className="max-h-[60vh] overflow-y-auto p-4 rounded-lg shadow-lg overscroll-contain mb-20 bg-white dark:bg-gray-900">
                 {(flightResults.inbound && flightResults.inbound.length > 0) ? (
                   flightResults.inbound.map((itinerary, index) => (
-                    <FlightCard key={index} itinerary={itinerary} />
+                    <FlightCard key={index} itinerary={itinerary} directionOutbound={false} />
                   ))
                 ) : (
                   <p className="text-red-800 text-xl font-medium text-center dark:text-red-400">No return flights found :(</p>

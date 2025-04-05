@@ -9,7 +9,7 @@ import { verifyToken } from "@/middleware/auth"
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { itineraryId, creditCardNumber, cardExpiry } = body;
+    const { itineraryId, creditCardNumber, cardExpiry, totalCost } = body;
 
     // Validate required fields
     if (!itineraryId || isNaN(parseInt(itineraryId, 10))) {
@@ -132,6 +132,7 @@ export async function POST(request) {
         );
       }
 
+      // are they available at that time range?
       const overlappingBookings = await prisma.hotelBooking.count({
         where: {
           roomTypeId: roomTypeId,
@@ -164,6 +165,7 @@ export async function POST(request) {
           creditCardNumber: `**** **** **** ${lastFourDigits}`,
           cardExpiry,
           status: 'CONFIRMED',
+          invoiceUrl: totalCost
         },
       })
     );

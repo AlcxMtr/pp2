@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import { verifyToken } from '@/middleware/auth';
 
-// POST Cancel a hotel booking
+// POST Cancel a hotel booking as the user who made the booking
 export async function POST(request) {
   try {
     const body = await request.json();

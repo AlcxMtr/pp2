@@ -113,6 +113,8 @@ model HotelBooking {
   userId        Int
   notifications Notification[] // Added inverse relation for Notification.hotelBooking
 }
+//http://localhost:3000/search?searchType=flights&origin=Toronto&destination=London&departureDate=2025-04-04&returnDate=2025-04-06
+//
 
 model FlightBooking {
   id                Int           @id @default(autoincrement())

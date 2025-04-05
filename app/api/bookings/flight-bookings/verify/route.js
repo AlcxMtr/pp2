@@ -68,29 +68,40 @@ export async function GET(request) {
     }
 
     const afsData = await afsResponse.json();
-    const numLegs = afsData.flights.length;
-    const origin = afsData.flights[numLegs -1].origin.city;
-    const departureDate = afsData.flights[numLegs - 1].departureTime;
-    const returnDate = afsData.flights[0].arrivalTime;
-    const destination = afsData.flights[0].destination.city;
 
     // Extract flight statuses
     const flightStatuses = afsData.flights.map(flight => ({
       flightId: flight.id,
       flightNumber: flight.flightNumber,
-      origin: flight.originId,
-      destination: flight.destinationId,
       status: flight.status,
+      departureTime: flight.departureTime,
+      originCity: flight.origin.city,
+      arrivalTime: flight.arrivalTime,
+      destinationCity: flight.destination.city,
     }));
 
+    // Sort by increasing departureTime
+    flightStatuses.sort((a, b) => {
+      return new Date(a.departureTime) - new Date(b.departureTime);
+    });
+
+    const numLegs = afsData.flights.length;
+    const departureDate = flightStatuses[0].departureTime;
+    const origin = flightStatuses[0].originCity;
+    const returnDate = flightStatuses[numLegs - 1].arrivalTime;
+    const destination = flightStatuses[numLegs - 1].destinationCity;
+
     // Check for CANCELLED or DELAYED flights
+
+    let bookingStatus = 'SCHEDULED';
     const cancelledOrDelayed = flightStatuses.filter(
-      flight => flight.status === 'CANCELLED' || flight.status === 'DELAYED'
+      flight => flight.status !== 'SCHEDULED'
     );
 
     // If any flights are CANCELLED or DELAYED, create a notification
     if (cancelledOrDelayed.length > 0 && flightBooking) {
       const affectedFlights = cancelledOrDelayed.map(f => `${f.flightNumber} : (${f.status})`).join(', ');
+      bookingStatus = cancelledOrDelayed.map(f => `(${f.status})`).join(', ');
       await prisma.notification.create({
         data: {
           userId: flightBooking.userId,
@@ -103,7 +114,7 @@ export async function GET(request) {
     // Return flight statuses
     return NextResponse.json({
       flightStatuses,
-      hasIssues: cancelledOrDelayed.length > 0,
+      status: bookingStatus,
       numLegs,
       origin,
       destination,

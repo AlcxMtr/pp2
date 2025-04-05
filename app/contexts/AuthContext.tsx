@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
+  const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds (for min for testing purposes TODO)
 
   useEffect(() => {
     console.log('AuthProvider mounted');
@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshAccessToken = async (refreshToken: string) => {
+    console.log('REFRESHING ACCESS TOKEN');
     try {
       const response = await fetch('/api/users/refresh', {
         method: 'POST',
@@ -82,7 +83,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Initial refresh with calculated delay
     const timeout = setTimeout(() => {
-      console.log('REFRESHING ACCESS TOKEN');
       refreshAccessToken(refreshToken);
 
       // Then set up regular interval
@@ -99,10 +99,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => clearTimeout(timeout);
   }, []);
-/* 
+
   useEffect(() => {
     console.log("userId changed: " + userId);
-  }, [userId]); */
+  }, [userId]);
+
+  useEffect(() => {
+    console.log("accessToken changed: " + accessToken);
+  }, [accessToken]);
+
+  useEffect(() => {
+    console.log("refreshToken changed: " + refreshToken);
+  }, [refreshToken]);
 
   const login = (newAccessToken: string, newRefreshToken: string, newUserId: string) => {
     setAccessToken(newAccessToken);

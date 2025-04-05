@@ -63,7 +63,7 @@ export interface FlightStatus {
 // Main interface for information about flight bookings
 export interface FlightBookingInfo {
   flightStatuses: FlightStatus[];
-  hasIssues: boolean; // e.g., false
+  status: string; // e.g., false
   numLegs: number; // e.g., 1
   origin: string; // City name, e.g., "Frankfurt"
   destination: string; // City name, e.g., "Zurich"

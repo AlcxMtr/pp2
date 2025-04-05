@@ -39,7 +39,7 @@ export interface FlightItinerary {
   flights: Flight[];
 }
 
-const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => {
+const FlightCard: React.FC<{ itinerary: FlightItinerary, directionOutbound: Boolean }> = ({ itinerary, directionOutbound }) => {
   
   const { accessToken, userId } = useAuth();
   const formatDate = (dateString: string) => {
@@ -93,7 +93,20 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
     setAddFlightLoading(true);
 
     let itineraryId = 0;
-    const passportNumber = "482473977"; // Temp
+    let origin = "";
+    let destination = "";
+
+    //make a new array of Flights and sort the flights by departure time
+    const sortedFlights = itinerary.flights.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
+
+
+    if (directionOutbound) {
+      origin = sortedFlights[0].origin.city;
+      destination = sortedFlights[sortedFlights.length - 1].destination.city;
+    } else {
+      origin = sortedFlights[sortedFlights.length - 1].destination.city;
+      destination = sortedFlights[0].origin.city;
+    }
 
     try {
       const response = await fetch('/api/itinerary/active', {
@@ -114,15 +127,18 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary }> = ({ itinerary }) => 
     }
 
     try {
-      const response = await fetch('/api/bookings/flight-bookings', {
+      const response = await fetch('/api/bookings/flight-bookings/pending', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          passportNumber: passportNumber,
-          flightIds: itinerary.flights.map(flight => flight.id),
+          origin: origin,
+          destination: destination,
+          departureTime: directionOutbound ? sortedFlights[0].departureTime : "N/A",
+          price: Number(totalPrice),
+          flightIds: sortedFlights.map(flight => flight.id),
           userId: Number(userId),
           itineraryId: itineraryId,
         })

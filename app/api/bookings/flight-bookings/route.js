@@ -1,3 +1,5 @@
+// Made with the help of ChatGPT
+
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import { verifyToken } from "@/middleware/auth"
@@ -112,7 +114,7 @@ export async function POST(request) {
     }
 
     // Remaining data for creating the booking in our DB
-    const status = 'PENDING'; // Default status for new bookings
+    const status = 'CONFIRMED'; // Default status for new bookings
 
     const afsData = await afsResponse.json();
     const flightBookingRef = afsData.bookingReference;
@@ -136,7 +138,7 @@ export async function POST(request) {
     const newBooking = await prisma.flightBooking.create({
       data: bookingData,
       include: {
-        user: true,
+        user: false,
         itinerary: !!itineraryId,
       },
     });

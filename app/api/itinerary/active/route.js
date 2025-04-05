@@ -52,7 +52,12 @@ export async function POST(request) {
         status: 'PENDING',
       },
       include: {
-        hotelBooking: true,
+        hotelBooking: {
+          include: {
+            hotel: true,
+            roomType: true,
+          },
+        },
         flightBooking: true,
         user: true,
       },
@@ -75,6 +80,7 @@ export async function POST(request) {
     const newItinerary = await prisma.itinerary.create({
       data: itineraryData,
       include: {
+        hotelBooking: true,
         user: true,
       },
     });

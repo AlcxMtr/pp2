@@ -1,3 +1,5 @@
+// Written with help from Grok AI
+
 'use client';
 import { useState, useEffect, use } from 'react';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,7 +24,6 @@ export default function itinerariesPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!accessToken || !userId) {
-      console.log('No access token or user ID found. Redirecting to login...');
       router.push('/login');
       return;
     }
@@ -97,11 +98,28 @@ export default function itinerariesPage() {
       const newEntries = new Map(); // Temporary map to store new data
   
       const fetchPromises = bookings.map(async (booking) => {
-        const bookingRef = booking.flightBooking?.flightBookingRef;
-        if (bookingRef && accessToken) {
-          const data = await fetchFlightInfo(bookingRef);
-          if (data) newEntries.set(bookingRef, data);
+        if (!booking.flightBooking) return;
+        const bookingRef = booking.flightBooking.flightBookingRef;
+        //const status = booking.flightBooking.status;
+        //if (status === 'CONFIRMED') {
+        if (bookingRef.split('|').length <= 1) {
+          if (bookingRef && accessToken) {
+            const data = await fetchFlightInfo(bookingRef);
+            if (data) newEntries.set(bookingRef, data);
+          }
+        } else {
+          const info = booking.flightBooking.flightBookingRef.split('|');
+          const numLegs = booking.flightBooking.flightTicketNumber.split('|').length;
+          newEntries.set(booking.flightBooking.flightBookingRef, {
+            flightStatuses: [],
+            status: 'PENDING',
+            numLegs: numLegs,
+            origin: info[0],
+            destination: info[1],
+            departureDate: info[2],
+          });
         }
+
       });
   
       await Promise.all(fetchPromises); // Wait for all fetches to complete
@@ -111,7 +129,7 @@ export default function itinerariesPage() {
     };
   
     updateFlightBookings();
-  }, [bookings, accessToken, userProfile]); // Dependencies
+  }, [bookings]); // Dependencies, may need accessToken, userProfile
 
   const pendingBookings = bookings.filter(
     (booking) => booking.status === 'PENDING'
@@ -119,10 +137,6 @@ export default function itinerariesPage() {
   const confirmedBookings = bookings.filter(
     (booking) => booking.status === 'CONFIRMED'
   );
-
-  const viewInvoice = () => {
-    //Todo: Implement view invoice functionality
-  }
 
 
   const renderBookingCard = (booking: Booking) => {
@@ -142,7 +156,7 @@ export default function itinerariesPage() {
       <div className="absolute top-0 right-0 mt-4 mr-4 flex flex-col space-y-2">
         {booking.status === "CONFIRMED" && (
           <Button
-            onPress={viewInvoice}
+            onPress={() => viewInvoice(booking.id)}
             className="hover:bg-[var(--beige)] dark:hover:bg-[var(--card-bg-dark)]"
           >
             View Invoice
@@ -231,19 +245,23 @@ export default function itinerariesPage() {
           <div className="">
             <h4 className="text-lg font-medium text-[var(--text-dark)] dark:text-[var(--text-light)] mb-1">Flight Booking</h4>
             <p className="text-md text-[var(--text-dark)] dark:text-[var(--text-light)]">
-              {flightBookingInfo?.origin} → {flightBookingInfo?.destination}
+              {flightBookingInfo?.origin || "Loading..."} → {flightBookingInfo?.destination || "Loading..."}
             </p>
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
-              Status: {booking.flightBooking.status}
+              Status: {flightBookingInfo ? flightBookingInfo.status : "Loading..."}
             </p>
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
-              Dep. Date: {flightBookingInfo?.departureDate.substring(0, 10)}
+              Dep. Date: {flightBookingInfo ? new Date(flightBookingInfo.departureDate).toLocaleDateString() : "Loading..."}
             </p>
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
-              Dep. Time: {flightBookingInfo?.departureDate.substring(11, 16)} (24h)
+              Dep. Time: {flightBookingInfo 
+                ? flightBookingInfo.departureDate.substring(11, 16) === ""
+                  ? "N/A"
+                  : flightBookingInfo.departureDate.substring(11, 16)
+                : "Loading..."}
             </p>
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
-              Number of Legs: {flightBookingInfo?.numLegs}
+              Total Flights: {flightBookingInfo?.numLegs || "Loading..."}
             </p>
             <p className="text-[var(--text-dark)] dark:text-[var(--text-light)]">
               Price: ${booking.flightBooking.flightPrice}
@@ -280,31 +298,57 @@ export default function itinerariesPage() {
     }
   };
 
-    // Cancel a flight
-    const handleCancelFlight = async (bookingId: number) => {
-      try {
-        const res = await fetch(`/api/bookings/flight-bookings/cancel`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ flightBookingId: bookingId }),
-        });
-        console.log(bookingId);
-        if (res.ok) {
-          setDeletedFlightBookings((prev) => [...prev, bookingId]);
-          alert('Booking cancelled successfully!');
-        } else {
-          throw new Error(await res.text());
-        }
-      } catch (error) {
-        console.error('Error cancelling booking:', error);
-        alert('Error cancelling booking');
-      } finally {
-        setCancelFlightId(null);
+  // Cancel a flight
+  const handleCancelFlight = async (bookingId: number) => {
+    try {
+      const res = await fetch(`/api/bookings/flight-bookings/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ flightBookingId: bookingId }),
+      });
+      if (res.ok) {
+        setDeletedFlightBookings((prev) => [...prev, bookingId]);
+        alert('Booking cancelled successfully!');
+      } else {
+        throw new Error(await res.text());
       }
-    };
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      alert('Error cancelling booking');
+    } finally {
+      setCancelFlightId(null);
+    }
+  };
+
+  const viewInvoice = async (id: number) => {
+    try {
+      const response = await fetch('/api/invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itineraryId: id }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate PDF');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'flight-details.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download PDF');
+    }
+  };
 
   if (loading) {
     return (
@@ -332,7 +376,7 @@ export default function itinerariesPage() {
           <h2 className="text-2xl font-semibold text-[var(--text-dark)] dark:text-[var(--text-light)] mb-4">
             Pending Itinerary
           </h2>
-          {pendingBookings.length > 0 ? pendingBookings.map(renderBookingCard) : (
+          {(pendingBookings.length > 0 && (pendingBookings[0].hotelBooking || pendingBookings[0].flightBooking)) ? pendingBookings.map(renderBookingCard) : (
             <p className="text-[var(--text-muted-dark)] dark:text-[var(--text-muted-light)]">No pending itinerary found.</p>
           )}
         </section>
