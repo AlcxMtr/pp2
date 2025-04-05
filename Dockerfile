@@ -2,17 +2,12 @@
 
 FROM node:18-alpine
 
-# Install build dependencies for bcrypt
-RUN apk add --no-cache python3 py3-pip make g++ linux-headers
-
 # Set working directory
 WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
 RUN npm install --production
-# Rebuild bcrypt to match the container's architecture
-RUN npm rebuild bcrypt --build-from-source
 
 # Copy the rest of the app
 COPY . .

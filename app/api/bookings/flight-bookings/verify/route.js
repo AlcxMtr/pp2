@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
-import { isString, verifyToken } from "@/middleware/auth";
+import { verifyToken } from "@/middleware/auth";
 
 const AFS_BASE_URL = process.env.AFS_BASE_URL;
 const AFS_API_KEY = process.env.AFS_API_KEY;
