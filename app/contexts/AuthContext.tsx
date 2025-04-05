@@ -1,6 +1,6 @@
 'use client';
 import { user } from '@heroui/react';
-import { clear } from 'console';
+import { clear, log } from 'console';
 import { set } from 'lodash';
 import { init } from 'next/dist/compiled/webpack/webpack';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -21,11 +21,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const debugAuth = false;
 
-  const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds (for min for testing purposes TODO)
+  const REFRESH_INTERVAL = 12 * 60 * 1000; // 12 minutes in milliseconds (refresh expires in 15 minutes)
 
   useEffect(() => {
-    console.log('AuthProvider mounted');
+    if (debugAuth) console.log('AuthProvider mounted');
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
     const storedUserId = localStorage.getItem('userId');
@@ -38,8 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshAccessToken = async (refreshToken: string) => {
-    console.log('REFRESHING ACCESS TOKEN');
+    if (debugAuth) console.log('REFRESHING ACCESS TOKEN');
     try {
+      setLoading(true);
       const response = await fetch('/api/users/refresh', {
         method: 'POST',
         headers: {
@@ -47,70 +49,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           Authorization: `Bearer ${refreshToken}`
         }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setAccessToken(data.accessToken);
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('lastRefreshTime', Date.now().toString());
-      } else {
-        logout();
+      if (!response.ok) {
         throw new Error('Token refresh failed');
       }
+      const data = await response.json();
+      setAccessToken(data.accessToken);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('lastRefreshTime', Date.now().toString());
     } catch (error) {
       console.error('Error refreshing access token:', error);
-      logout();
+      logout(); 
+    } finally {
+      setLoading(false);
     }
   };
 
   // Set up periodic token refresh
   useEffect(() => {
-    const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) return;
-    const lastRefreshTime = localStorage.getItem('lastRefreshTime');
-    let timeSinceLastRefresh: number;
-    if (!lastRefreshTime) {
-      timeSinceLastRefresh = REFRESH_INTERVAL;
-    } else {
-      const lastRefresh = parseInt(localStorage.getItem('lastRefreshTime') || '0', 10);
-      const now = Date.now();
-      timeSinceLastRefresh = now - lastRefresh;
-    }
-    const initialDelay = timeSinceLastRefresh >= REFRESH_INTERVAL 
-      ? 0 // Refresh immediately if overdue
-      : REFRESH_INTERVAL - timeSinceLastRefresh;
 
-    console.log("initialDelay: " + initialDelay);
+    const calculateInitialDelay = () => {
+      const lastRefreshTime = localStorage.getItem('lastRefreshTime');
+      const now = Date.now();
+      const lastRefresh = lastRefreshTime ? parseInt(lastRefreshTime, 10) : 0;
+      const timeSinceLastRefresh = now - lastRefresh;
+      return timeSinceLastRefresh >= REFRESH_INTERVAL 
+        ? 0 
+        : REFRESH_INTERVAL - timeSinceLastRefresh;
+    };
+
+    const initialDelay = calculateInitialDelay();
+    if (debugAuth) console.log("initialDelay: " + initialDelay);
 
     // Initial refresh with calculated delay
     const timeout = setTimeout(() => {
       refreshAccessToken(refreshToken);
 
-      // Then set up regular interval
+      // Then set up refresh loop
       const interval = setInterval(() => {
         refreshAccessToken(refreshToken);
       }, REFRESH_INTERVAL);
 
-
-      // Cleanup both timeout and interval
       return () => {
         clearInterval(interval);
       };
     }, initialDelay);
 
     return () => clearTimeout(timeout);
-  }, []);
-
-  useEffect(() => {
-    console.log("userId changed: " + userId);
-  }, [userId]);
-
-  useEffect(() => {
-    console.log("accessToken changed: " + accessToken);
-  }, [accessToken]);
-
-  useEffect(() => {
-    console.log("refreshToken changed: " + refreshToken);
   }, [refreshToken]);
+
+  if (debugAuth) {  
+    useEffect(() => {
+      console.log("userId changed: " + userId);
+    }, [userId]);
+
+    useEffect(() => {
+      console.log("accessToken changed: " + accessToken);
+    }, [accessToken]);
+
+    useEffect(() => {
+      console.log("refreshToken changed: " + refreshToken);
+    }, [refreshToken]);
+  }
 
   const login = (newAccessToken: string, newRefreshToken: string, newUserId: string) => {
     setAccessToken(newAccessToken);

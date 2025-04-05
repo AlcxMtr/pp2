@@ -134,7 +134,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, isOwnerView = false, check
     console.error('Error adding to itinerary:', error);
   } finally {
     setAddHotelLoading(false);
-    alert('Hotel booking request completed!');
+    alert('Hotel booking added to pending itinerary!');
   }
   }
 

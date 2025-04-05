@@ -99,7 +99,6 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary, directionOutbound: Bool
     //make a new array of Flights and sort the flights by departure time
     const sortedFlights = itinerary.flights.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
 
-
     if (directionOutbound) {
       origin = sortedFlights[0].origin.city;
       destination = sortedFlights[sortedFlights.length - 1].destination.city;
@@ -149,7 +148,7 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary, directionOutbound: Bool
       console.error('Error adding to itinerary:', error);
     } finally {
       setAddFlightLoading(false);
-      alert('Flight booking request completed!');
+      alert((directionOutbound ? "Outbound" : "Returning") + 'flight added to pending itinerary!');
     }
   };
 
