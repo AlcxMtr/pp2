@@ -1,7 +1,11 @@
 # Made with GROK 3 (mostly)
 #!/bin/bash
-
-# run afs/npm i, flynext/npm i ?
+cd FlyNext
+npm install
+cd ..
+cd afs
+npm install
+cd ..
 
 # Start the databases
 docker compose up -d postgres-fn postgres-afs
