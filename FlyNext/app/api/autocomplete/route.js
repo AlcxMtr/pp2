@@ -12,7 +12,7 @@ export async function GET(req) {
   try {
     // Search for cities
     const cities = await prisma.city.findMany({
-      where: { name: { contains: query } },
+      where: { name: { contains: query, mode: 'insensitive' } },
       select: { id: true, name: true },
       take: 5,
     });
@@ -21,8 +21,8 @@ export async function GET(req) {
     const airports = await prisma.airport.findMany({
       where: {
         OR: [
-          { code: { contains: query } },
-          { name: { contains: query } },
+          { code: { contains: query, mode: 'insensitive' } },
+          { name: { contains: query, mode: 'insensitive' } },
         ],
       },
       select: { id: true, name: true, code: true },
