@@ -9,7 +9,7 @@ import { verifyToken } from "@/middleware/auth"
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { passport, itineraryId, creditCardNumber, cardExpiry, totalCost, flightPresent } = body;
+    const { passport, itineraryId, creditCardNumber, cardExpiry, totalCost, flightPresent, destination} = body;
 
     if (flightPresent) {
       if (!passport || typeof passport !== 'string') {
@@ -212,7 +212,12 @@ export async function POST(request) {
     const updatedItinerary = await prisma.itinerary.findUnique({
       where: { id: parseInt(itineraryId, 10) },
       include: {
-        hotelBooking: true,
+        hotelBooking: {
+          include: {
+            hotel: true,
+            roomType: true,
+          },
+        },
         flightBooking: true,
         user: true,
       },
@@ -221,12 +226,22 @@ export async function POST(request) {
     // Notify user of successful checkout
     await prisma.notification.create({
       data: {
-        userId: itinerary.userId,
-        message: `Itinerary checkout completed. Total cost: $${itinerary.invoiceUrl}.`,
-        hotelBookingId: hasHotelBooking ? itinerary.hotelBooking.id : null,
-        flightBookingId: hasFlightBooking ? itinerary.flightBooking.id : null,
+        userId: updatedItinerary.userId,
+        message: `Itinerary for trip to ${destination} completed. Total cost: $${totalCost}.`,
+        hotelBookingId: hasHotelBooking ? updatedItinerary.hotelBooking.id : null,
+        flightBookingId: hasFlightBooking ? updatedItinerary.flightBooking.id : null,
       },
     });
+
+
+    if (updatedItinerary.hotelBooking) {
+      await prisma.notification.create({
+        data: {
+          userId: updatedItinerary.hotelBooking.hotel.ownerId,
+          message: `Booking made for ${updatedItinerary.hotelBooking.roomType.name} at ${updatedItinerary.hotelBooking.hotel.name}.`,
+        },
+      });
+    }
 
     return NextResponse.json(updatedItinerary, { status: 200 });
   } catch (error) {

@@ -4,6 +4,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { FiBell } from 'react-icons/fi';
 
+// Global object to hold the refresh function
+const globalNotificationRef = {
+  refresh: null as null | (() => void),
+};
+
+export const setRefreshNotifications = (fn: null | (() => void) ) => {
+  globalNotificationRef.refresh = fn;
+};
+
+export const refreshNotificationsGlobally = () => {
+  if (globalNotificationRef.refresh) {
+    console.log('Refreshing notifications globally');
+    globalNotificationRef.refresh();
+  }
+};
+
 interface NotificationItem {
   id: number;
   message: string;
@@ -14,48 +30,49 @@ interface NotificationItem {
 }
 
 export default function Notification() {
-  const { accessToken, userId } = useAuth();
+  const { accessToken, userId, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const router = useRouter();
 
+  const fetchNotifications = async () => {
+    try {
+      const countRes = await fetch(`/api/notifications/unread-count?userId=${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (countRes.ok) {
+        const countData = await countRes.json();
+        setUnreadCount(countData.unreadCount);
+      }
+
+      const notificationsRes = await fetch(`/api/notifications?userId=${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (notificationsRes.ok) {
+        const notificationsData = await notificationsRes.json();
+        setNotifications(notificationsData);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
   useEffect(() => {
+    if (authLoading) return;
     if (!accessToken || !userId) {
       router.push('/login');
       return;
     }
-
-    const fetchNotifications = async () => {
-      try {
-        // Fetch unread count
-        const countRes = await fetch(`/api/notifications/unread-count?userId=${userId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        if (countRes.ok) {
-          const countData = await countRes.json();
-          setUnreadCount(countData.unreadCount);
-        } else {
-          console.error('Failed to fetch unread count:', await countRes.text());
-        }
-
-        // Fetch all notifications
-        const notificationsRes = await fetch(`/api/notifications?userId=${userId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        if (notificationsRes.ok) {
-          const notificationsData = await notificationsRes.json();
-          setNotifications(notificationsData);
-        } else {
-          console.error('Failed to fetch notifications:', await notificationsRes.text());
-        }
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      }
-    };
-
     fetchNotifications();
-  }, [accessToken, userId, router]);
+
+    // Set the global refresh function
+    setRefreshNotifications(fetchNotifications);
+
+    return () => {
+      setRefreshNotifications(null); // Cleanup on unmount
+    };
+  }, [router, authLoading]);
 
   const markAsRead = async (notificationId: number) => {
     try {
@@ -64,13 +81,10 @@ export default function Notification() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res.ok) {
-        // Update the notification's isRead status locally
         setNotifications(notifications.map(n =>
           n.id === notificationId ? { ...n, isRead: true } : n
         ));
-        setUnreadCount(prev => Math.max(0, prev - 1)); // Decrease unread count
-      } else {
-        console.error('Failed to mark notification as read:', await res.text());
+        setUnreadCount(prev => Math.max(0, prev - 1));
       }
     } catch (error) {
       console.error('Error marking notification as read:', error);

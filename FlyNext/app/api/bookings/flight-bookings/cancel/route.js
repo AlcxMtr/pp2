@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from "@/utils/db";
 import { verifyToken } from "@/middleware/auth"
 
+const AFS_BASE_URL = process.env.AFS_BASE_URL;
+const AFS_API_KEY = process.env.AFS_API_KEY;
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -81,6 +84,26 @@ export async function POST(request) {
             },
           },
         })
+      );
+    }
+
+    // Call AFS API to cancel the flight booking
+    const afsResponse = await fetch( `${AFS_BASE_URL}/api/bookings/cancel`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': AFS_API_KEY,
+      },
+      body: JSON.stringify({
+        bookingReference: flightBooking.flightBookingRef,
+        lastName: flightBooking.user.lastName,
+      })
+    })
+    if (!afsResponse.ok) {
+      const errorText = await afsResponse.text();
+      return NextResponse.json(
+        { error: `AFS API error: ${errorText}` },
+        { status: afsResponse.status }
       );
     }
 

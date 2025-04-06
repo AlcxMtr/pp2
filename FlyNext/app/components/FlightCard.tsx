@@ -148,7 +148,7 @@ const FlightCard: React.FC<{ itinerary: FlightItinerary, directionOutbound: Bool
       console.error('Error adding to itinerary:', error);
     } finally {
       setAddFlightLoading(false);
-      alert((directionOutbound ? "Outbound" : "Returning") + 'flight added to pending itinerary!');
+      alert((directionOutbound ? "Outbound" : "Returning") + ' flight added to pending itinerary!');
     }
   };
 

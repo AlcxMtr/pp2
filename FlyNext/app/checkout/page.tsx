@@ -1,3 +1,4 @@
+// Written with help from Grok AI
 'use client';
 
 import { useState, useEffect, use} from 'react';
@@ -5,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Input, Button, Card } from '@heroui/react';
 import { Booking, UserProfile, FlightBookingInfo } from '../itineraries/BookingInterfaces';
+import { refreshNotificationsGlobally } from '../components/Notification';
 
 export interface Airport {
   code: string;
@@ -41,7 +43,6 @@ export default function ItineraryCheckout() {
 
   // Itinerary data
   const [booking, setBooking] = useState<Booking | null>(null);
-  //const [flightBooking, setFlightBooking] = useState<FlightBookingInfo | null>(null)
   const [flightInfo, setFlightInfo] = useState<string[]>([]);
   const [flightIds, setFlightIds] = useState<string[]>([]); 
   const [flights, setFlights] = useState<Flight[]>([]);
@@ -101,30 +102,26 @@ export default function ItineraryCheckout() {
       setFlightInfo(booking.flightBooking.flightBookingRef.split('|'));
       setFlightIds(booking.flightBooking.flightTicketNumber.split('|'));
     }
-
   }, [booking]);
 
-
-    // Fetch the info for each flight
-    useEffect(() => {
-      if (!flightIds.length) return;
-      const fetchFlights = async () => {
-        try {
-          const flightData = await Promise.all(flightIds.map(async (flightId) => {
-            const response = await fetch(`/api/flights/${flightId}`);
-            if (!response.ok) throw new Error('Failed to fetch flight info');
-            return response.json();
-          }));
-          flightData.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
-          setFlights(flightData);
-        } catch (error) {
-          console.error('Error fetching flight info:', error);
-        }
-      };
-      fetchFlights();
-    }, [flightIds]);
-
-
+  // Fetch the info for each flight
+  useEffect(() => {
+    if (!flightIds.length) return;
+    const fetchFlights = async () => {
+      try {
+        const flightData = await Promise.all(flightIds.map(async (flightId) => {
+          const response = await fetch(`/api/flights/${flightId}`);
+          if (!response.ok) throw new Error('Failed to fetch flight info');
+          return response.json();
+        }));
+        flightData.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
+        setFlights(flightData);
+      } catch (error) {
+        console.error('Error fetching flight info:', error);
+      }
+    };
+    fetchFlights();
+  }, [flightIds]);
 
   const numDays = () => {
     if (booking && booking.hotelBooking) {
@@ -171,6 +168,13 @@ export default function ItineraryCheckout() {
       if (!itineraryId) {
         throw new Error('No itinerary ID found');
       }
+      let destination = "N/A";
+
+      if (booking.hotelBooking) {
+        destination = booking.hotelBooking.hotel.address.split(',')[1].trim();
+      } else {
+        destination = flightInfo[1];
+      }
   
       const checkoutRes = await fetch('/api/itinerary/checkout', {
         method: 'POST',
@@ -185,6 +189,7 @@ export default function ItineraryCheckout() {
           creditCardNumber: payment.creditCardNumber,
           cardExpiry: payment.cardExpiry,
           flightPresent: booking?.flightBooking ? true : false,
+          destination: destination,
         }),
       });
   
@@ -218,8 +223,9 @@ export default function ItineraryCheckout() {
         
         setResponse(flightBookingData);
       }
-  
       alert('Checkout successful!');
+      console.log("Refreshing notifications in checkout");
+      refreshNotificationsGlobally()
     } catch (err: any) {
       console.error(err);
       setError(err.message);
@@ -260,6 +266,18 @@ export default function ItineraryCheckout() {
       </Card>
     );
   };
+
+  if (booking && !booking.hotelBooking && !booking.flightBooking) {
+    return (
+      <div className="flex flex-col items-center min-h-screen p-10 bg-gray-100 dark:bg-gray-900">
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center">Itinerary Checkout</h1>
+            <div className="text-center">
+              <p className="text-lg font-semibold">No Pending Itinerary Found</p>
+            </div>
+        </div>
+      </div>
+  );}
 
   return (
     <div className="flex flex-col items-center min-h-screen p-10 bg-gray-100 dark:bg-gray-900">
@@ -340,7 +358,7 @@ export default function ItineraryCheckout() {
               }
             </div>
             <Button onPress={() => router.push("/itineraries")} className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg">
-              {"Go to Itinerary"}
+              {"View Itineraries"}
             </Button>
           </>
           )}
@@ -350,8 +368,6 @@ export default function ItineraryCheckout() {
             </Button>
           }
         </form>
-
-
       </div>
     </div>
   );

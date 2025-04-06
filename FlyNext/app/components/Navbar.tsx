@@ -62,6 +62,9 @@ export default function Navbar({ onToggleTheme, theme }: NavbarProps) {
             <Link href="/itineraries" className="navbar-link">Itineraries</Link>
           )}
           {accessToken && (
+            <Link href="/checkout" className="navbar-link">Checkout</Link>
+          )}
+          {accessToken && (
             <Link href="/hotels/register" className="navbar-link">Register Hotel</Link>
           )}
           {accessToken && (

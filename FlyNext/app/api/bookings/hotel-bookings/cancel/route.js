@@ -102,10 +102,10 @@ export async function POST(request) {
     // Create a notification for the user that their booking has been cancelled
     await prisma.notification.create({
       data: {
-        userId: updatedBooking.userId,
-        message: `Your booking for ${updatedBooking.hotel.name} has been cancelled.`,
+        userId: booking.userId,
+        message: `Your booking for ${booking.hotel.name} has been cancelled.`,
         type: 'CANCELLED',
-        bookingId: updatedBooking.id,
+        bookingId: booking.id,
       },
     });
 
