@@ -32,13 +32,13 @@ echo "afs tables cleared!"
 
 # Seeding afs
 echo "Seeding afs database..."
-docker compose exec afs-backend bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/import_data.js'
-docker compose exec afs-backend bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/generate_flights.js'
-docker compose exec afs-backend bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/import_agencies.js'
+docker compose exec afs bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/import_data.js'
+docker compose exec afs bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/generate_flights.js'
+docker compose exec afs bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-afs:5432/mydb2?schema=public" node prisma/data/import_agencies.js'
 
 # Run seeding for FlyNext
 echo "FlyNext tables will be cleared within the seed script."
 echo "Seeding FlyNext database..."
-docker compose exec flynext-backend bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-fn:5432/mydb?schema=public" node prisma/seed.js'
+docker compose exec fn bash -c 'cd /app && DATABASE_URL="postgresql://postgres:postgres@postgres-fn:5432/mydb?schema=public" node prisma/seed.js'
 
 echo "Seeding complete!"
